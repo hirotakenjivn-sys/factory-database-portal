@@ -1,0 +1,55 @@
+:root {
+  /* カラーパレット */
+  --primary: #1abc9c;
+  --primary-hover: #16a085;
+  --dark: #2c3e50;
+  --light-bg: #f4f6f9;
+  --card-bg: #ffffff;
+  --gray: #7f8c8d;
+  --border: #dddddd;
+  --text: #333333;
+  --press-btn: #607d8b;
+  --press-btn-hover: #78909c;
+
+  /* その他カラー */
+  --secondary: #3498db;
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --error: #e74c3c;
+  --success: #27ae60;
+  --warning: #f39c12;
+
+  /* スペーシング */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* ボーダー・シャドウ */
+  --border-radius: 10px;
+  --border-radius-sm: 6px;
+  --shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+
+  /* フォント */
+  --font-family: "Segoe UI", "Noto Sans JP", sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+
+  /* 行間・文字間 */
+  --line-height: 1.5;
+  --letter-spacing: 0.25px;
+
+  /* レイアウト */
+  --header-height: 60px;
+  --nav-height: 48px;
+  --nav-width: 200px;
+  --content-max-width: 1400px;
+}

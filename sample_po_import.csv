@@ -1,0 +1,7 @@
+po_number,product_code,customer_name,po_quantity,date_receive_po,delivery_date
+PO-2025-001,PROD-001,Toyota,1000,15/01/2025,28/02/2025
+PO-2025-002,PROD-002,Honda,500,20/01/2025,15/03/2025
+PO-2025-003,INVALID-CODE,Toyota,300,25/01/2025,30/03/2025
+PO-2025-004,PROD-001,Wrong Customer,200,01/02/2025,15/04/2025
+PO-2025-005,PROD-003,Nissan,abc,05/02/2025,30/04/2025
+PO-2025-006,PROD-004,Mazda,600,invalid-date,15/05/2025

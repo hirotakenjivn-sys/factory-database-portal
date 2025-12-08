@@ -1,0 +1,4 @@
+po_number,product_code,customer_name,po_quantity,date_receive_po,delivery_date
+po001,xx001,TOYOTA,500,11/10/2025,11/15/2025
+po001,xx002,TOYOTA,9898789,11/10/2025,11/15/2025
+po001,xx003,TOYOTA,96677,11/10/2025,11/15/2025
