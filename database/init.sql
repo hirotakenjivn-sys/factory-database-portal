@@ -200,14 +200,16 @@ DROP TABLE IF EXISTS `spm`;
 CREATE TABLE `spm` (
   `spm_id` INT AUTO_INCREMENT PRIMARY KEY,
   `product_id` INT NOT NULL,
-  `process_name` VARCHAR(100) NOT NULL COMMENT '工程名（process_name_typesのprocess_nameを参照）',
-  `press_no` VARCHAR(100) NOT NULL COMMENT '機械番号（machine_listのmachine_noを参照）',
+  `process_name` VARCHAR(100) NOT NULL,
+  `process_no` INT NOT NULL,
+  `press_no` VARCHAR(100) NOT NULL,
   `cycle_time` DECIMAL(10, 2) NOT NULL,
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user` VARCHAR(100),
   FOREIGN KEY (`product_id`) REFERENCES `products`(`product_id`),
   INDEX `idx_spm_process_name` (`process_name`),
-  INDEX `idx_spm_press_no` (`press_no`)
+  INDEX `idx_spm_press_no` (`press_no`),
+  INDEX `idx_spm_product_process` (`product_id`, `process_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================
