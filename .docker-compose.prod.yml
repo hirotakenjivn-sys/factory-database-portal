@@ -1,0 +1,55 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    container_name: factory-web
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+      # 443はSSL取れたら開ける
+      # - "443:443"
+    restart: unless-stopped
+    networks:
+      - factory-network
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: factory-api
+    env_file:
+      - ./.env
+    restart: unless-stopped
+    networks:
+      - factory-network
+    # 本番はソースbindしない＆--reloadしない
+    command: >
+      gunicorn -k uvicorn.workers.UvicornWorker
+      -w 2 -b 0.0.0.0:8000 app.main:app
+
+  db:
+    image: mysql:8.0.32
+    container_name: factory-db
+    env_file:
+      - ./.env
+    restart: unless-stopped
+    networks:
+      - factory-network
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+networks:
+  factory-network:
+    driver: bridge
+
+volumes:
+  db_data:
