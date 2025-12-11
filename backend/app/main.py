@@ -7,7 +7,10 @@ app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     debug=settings.DEBUG,
+    docs_url="/api/docs",           
+    openapi_url="/api/openapi.json" 
 )
+
 
 # CORS設定
 app.add_middleware(
