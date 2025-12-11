@@ -5,6 +5,7 @@ from datetime import date, timedelta
 from ..database import get_db
 from ..models.po import PO
 from ..models.mold import BrokenMold
+from ..models.customer import Customer
 
 router = APIRouter()
 
@@ -14,11 +15,8 @@ async def get_dashboard_cards(db: Session = Depends(get_db)):
     """
     ダッシュボードカード用の統計データ
     """
-    # 過去30日のPO売上（仮計算）
-    thirty_days_ago = date.today() - timedelta(days=30)
-    total_sales = db.query(func.sum(PO.po_quantity)).filter(
-        PO.date_receive_po >= thirty_days_ago
-    ).scalar() or 0
+    # 顧客数
+    customer_count = db.query(func.count(Customer.customer_id)).scalar() or 0
 
     # 本日生産数（仮データ）
     today_production = 5300
@@ -32,7 +30,7 @@ async def get_dashboard_cards(db: Session = Depends(get_db)):
     delayed = 5
 
     return {
-        "total_sales": total_sales,
+        "customer_count": customer_count,
         "today_production": today_production,
         "broken_molds": broken_molds,
         "delayed": delayed

@@ -7,8 +7,8 @@
 
       <div class="grid grid-4">
         <div class="card stat-card">
-          <h3>PO売上（過去30日）</h3>
-          <p class="stat-value">{{ stats.total_sales.toLocaleString() }} 個</p>
+          <h3>顧客数</h3>
+          <p class="stat-value">{{ stats.customer_count.toLocaleString() }} 社</p>
         </div>
         <div class="card stat-card">
           <h3>本日生産数</h3>
@@ -70,7 +70,7 @@ ChartJS.register(
 )
 
 const stats = ref({
-  total_sales: 0,
+  customer_count: 0,
   today_production: 0,
   broken_molds: 0,
   delayed: 0,
