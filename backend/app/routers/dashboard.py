@@ -6,6 +6,8 @@ from ..database import get_db
 from ..models.po import PO
 from ..models.mold import BrokenMold
 from ..models.customer import Customer
+from ..models.product import Product
+from ..models.process import Process
 
 router = APIRouter()
 
@@ -15,25 +17,23 @@ async def get_dashboard_cards(db: Session = Depends(get_db)):
     """
     ダッシュボードカード用の統計データ
     """
-    # 顧客数
-    customer_count = db.query(func.count(Customer.customer_id)).scalar() or 0
+    # Customers
+    customers = db.query(func.count(Customer.customer_id)).scalar() or 0
 
-    # 本日生産数（仮データ）
-    today_production = 5300
+    # Products
+    products = db.query(func.count(Product.product_id)).scalar() or 0
 
-    # 金型故障中件数
-    broken_molds = db.query(func.count(BrokenMold.broken_mold_id)).filter(
-        BrokenMold.date_schedule_repaired >= date.today()
-    ).scalar() or 0
+    # Processes
+    processes = db.query(func.count(Process.process_id)).scalar() or 0
 
-    # 遅延件数（仮データ）
-    delayed = 5
+    # Count (Dummy)
+    count = 5
 
     return {
-        "customer_count": customer_count,
-        "today_production": today_production,
-        "broken_molds": broken_molds,
-        "delayed": delayed
+        "customers": customers,
+        "products": products,
+        "processes": processes,
+        "count": count
     }
 
 

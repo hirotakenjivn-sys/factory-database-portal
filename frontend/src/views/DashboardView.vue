@@ -7,20 +7,20 @@
 
       <div class="grid grid-4">
         <div class="card stat-card">
-          <h3>顧客数</h3>
-          <p class="stat-value">{{ stats.customer_count.toLocaleString() }} 社</p>
+          <h3>Customers</h3>
+          <p class="stat-value">{{ stats.customers.toLocaleString() }}</p>
         </div>
         <div class="card stat-card">
-          <h3>本日生産数</h3>
-          <p class="stat-value">{{ stats.today_production.toLocaleString() }} pcs</p>
+          <h3>Products</h3>
+          <p class="stat-value">{{ stats.products.toLocaleString() }}</p>
         </div>
         <div class="card stat-card">
-          <h3>金型故障中件数</h3>
-          <p class="stat-value">{{ stats.broken_molds }} 件</p>
+          <h3>Processes</h3>
+          <p class="stat-value">{{ stats.processes }}</p>
         </div>
         <div class="card stat-card">
-          <h3>遅延件数</h3>
-          <p class="stat-value">{{ stats.delayed }} 件</p>
+          <h3>Count</h3>
+          <p class="stat-value">{{ stats.count }}</p>
         </div>
       </div>
 
@@ -70,10 +70,10 @@ ChartJS.register(
 )
 
 const stats = ref({
-  customer_count: 0,
-  today_production: 0,
-  broken_molds: 0,
-  delayed: 0,
+  customers: 0,
+  products: 0,
+  processes: 0,
+  count: 0,
 })
 
 const salesChartData = ref(null)
