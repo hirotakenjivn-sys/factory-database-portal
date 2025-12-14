@@ -4,26 +4,26 @@
     <AppNavigation />
     <main class="app-main">
       <div style="margin-bottom: var(--spacing-lg)">
-        <router-link to="/master" class="btn btn-secondary">← マスターメニューに戻る</router-link>
+        <router-link to="/master" class="btn btn-secondary">← Back to Master Menu</router-link>
       </div>
 
-      <h1 class="page-title">仕入先マスター</h1>
+      <h1 class="page-title">Supplier Master</h1>
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>仕入先登録</h2>
+        <h2>Register Supplier</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">仕入先名</label>
+              <label class="form-label" style="margin-bottom: 0;">Supplier Name</label>
               <input v-model="form.supplier_name" class="form-input" type="text" required />
             </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">業種</label>
+              <label class="form-label" style="margin-bottom: 0;">Business Type</label>
               <input v-model="form.supplier_business" class="form-input" type="text" />
             </div>
             <div>
-              <button type="submit" class="btn btn-primary">登録</button>
+              <button type="submit" class="btn btn-primary">Register</button>
             </div>
           </div>
         </form>
@@ -31,21 +31,21 @@
 
       <!-- List -->
       <div class="card">
-        <h2>仕入先一覧</h2>
+        <h2>Supplier List</h2>
         <input
           v-model="searchQuery"
           @input="handleSearch"
           class="form-input"
           type="text"
-          placeholder="仕入先名で検索..."
+          placeholder="Search Supplier..."
           style="margin-bottom: var(--spacing-md); max-width: 175px;"
         />
         <table class="table">
           <thead>
             <tr>
-              <th>仕入先ID</th>
-              <th>仕入先名</th>
-              <th>業種</th>
+              <th>Supplier ID</th>
+              <th>Supplier Name</th>
+              <th>Business Type</th>
             </tr>
           </thead>
           <tbody>
@@ -57,7 +57,7 @@
           </tbody>
         </table>
         <div v-if="suppliers.length === 0" class="empty-state">
-          <p>仕入先データがありません</p>
+          <p>No supplier data found</p>
         </div>
       </div>
     </main>
@@ -86,14 +86,14 @@ const loadSuppliers = async (search = '') => {
     suppliers.value = response.data
   } catch (error) {
     console.error('Failed to load suppliers:', error)
-    alert('仕入先の読み込みに失敗しました')
+    alert('Failed to load suppliers')
   }
 }
 
 const handleSubmit = async () => {
   try {
     await api.post('/master/suppliers', form.value)
-    alert('仕入先の登録に成功しました')
+    alert('Supplier registered successfully')
     form.value = {
       supplier_name: '',
       supplier_business: '',
@@ -101,7 +101,7 @@ const handleSubmit = async () => {
     await loadSuppliers()
   } catch (error) {
     console.error('Failed to create supplier:', error)
-    alert('仕入先の登録に失敗しました')
+    alert('Failed to register supplier')
   }
 }
 

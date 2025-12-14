@@ -4,26 +4,26 @@
     <AppNavigation />
     <main class="app-main">
       <div style="margin-bottom: var(--spacing-lg)">
-        <router-link to="/master" class="btn btn-secondary">← マスターメニューに戻る</router-link>
+        <router-link to="/master" class="btn btn-secondary">← Back to Master Menu</router-link>
       </div>
 
-      <h1 class="page-title">顧客マスター</h1>
+      <h1 class="page-title">Customer Master</h1>
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>顧客登録</h2>
+        <h2>Register Customer</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">顧客名</label>
+              <label class="form-label" style="margin-bottom: 0;">Customer Name</label>
               <input v-model="form.customer_name" class="form-input" type="text" required />
             </div>
             <div style="display: flex; align-items: center; gap: var(--spacing-sm); height: 34px;">
               <input v-model="form.is_active" type="checkbox" />
-              <span>有効</span>
+              <span>Active</span>
             </div>
             <div>
-              <button type="submit" class="btn btn-primary">登録</button>
+              <button type="submit" class="btn btn-primary">Register</button>
             </div>
           </div>
         </form>
@@ -31,21 +31,21 @@
 
       <!-- List -->
       <div class="card">
-        <h2>顧客一覧</h2>
+        <h2>Customer List</h2>
         <input
           v-model="searchQuery"
           @input="handleSearch"
           class="form-input"
           type="text"
-          placeholder="顧客名で検索..."
+          placeholder="Search Customer..."
           style="margin-bottom: var(--spacing-md); max-width: 175px;"
         />
         <table class="table">
           <thead>
             <tr>
-              <th>顧客ID</th>
-              <th>顧客名</th>
-              <th>ステータス</th>
+              <th>Customer ID</th>
+              <th>Customer Name</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -54,7 +54,7 @@
               <td>{{ customer.customer_name }}</td>
               <td>
                 <span :class="customer.is_active ? 'status-active' : 'status-inactive'">
-                  {{ customer.is_active ? '有効' : '無効' }}
+                  {{ customer.is_active ? 'Active' : 'Inactive' }}
                 </span>
               </td>
             </tr>
@@ -93,12 +93,12 @@ const loadCustomers = async (search = '') => {
 const handleSubmit = async () => {
   try {
     await api.post('/master/customers', form.value)
-    alert('顧客の登録に成功しました')
+    alert('Customer registered successfully')
     form.value = { customer_name: '', is_active: true }
     loadCustomers()
   } catch (error) {
     console.error('Failed to create customer:', error)
-    alert('顧客の登録に失敗しました')
+    alert('Failed to register customer')
   }
 }
 

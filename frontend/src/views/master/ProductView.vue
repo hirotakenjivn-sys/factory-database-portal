@@ -4,38 +4,38 @@
     <AppNavigation />
     <main class="app-main">
       <div style="margin-bottom: var(--spacing-lg)">
-        <router-link to="/master" class="btn btn-secondary">← マスターメニューに戻る</router-link>
+        <router-link to="/master" class="btn btn-secondary">← Back to Master Menu</router-link>
       </div>
 
-      <h1 class="page-title">製品コードマスター</h1>
+      <h1 class="page-title">Product Code Master</h1>
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>製品登録</h2>
+        <h2>Register Product</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">製品コード</label>
+              <label class="form-label" style="margin-bottom: 0;">Product Code</label>
               <input v-model="form.product_code" class="form-input" type="text" required />
             </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">顧客名</label>
+              <label class="form-label" style="margin-bottom: 0;">Customer Name</label>
               <AutocompleteInput
                 v-model="form.customer_id"
                 endpoint="/master/autocomplete/customers"
                 display-field="name"
                 value-field="id"
-                placeholder="顧客名を入力..."
+                placeholder="Enter Customer Name..."
                 required
                 @select="handleCustomerSelect"
               />
             </div>
             <div style="display: flex; align-items: center; gap: var(--spacing-sm); height: 34px;">
               <input v-model="form.is_active" type="checkbox" />
-              <span>有効</span>
+              <span>Active</span>
             </div>
             <div>
-              <button type="submit" class="btn btn-primary">登録</button>
+              <button type="submit" class="btn btn-primary">Register</button>
             </div>
           </div>
         </form>
@@ -43,14 +43,14 @@
 
       <!-- List -->
       <div class="card">
-        <h2>製品一覧</h2>
+        <h2>Product List</h2>
         <div style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); flex-wrap: wrap;">
           <input
             v-model="searchProductCode"
             @input="handleSearch"
             class="form-input"
             type="text"
-            placeholder="製品コードで検索..."
+            placeholder="Search Product Code..."
             style="width: 200px;"
           />
           <input
@@ -58,18 +58,18 @@
             @input="handleSearch"
             class="form-input"
             type="text"
-            placeholder="顧客名で検索..."
+            placeholder="Search Customer..."
             style="width: 200px;"
           />
         </div>
         <table class="table">
           <thead>
             <tr>
-              <th>タイムスタンプ</th>
-              <th>製品コード</th>
-              <th>顧客名</th>
-              <th>ステータス</th>
-              <th>操作</th>
+              <th>Timestamp</th>
+              <th>Product Code</th>
+              <th>Customer Name</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -81,19 +81,19 @@
               <td>{{ product.customer_name }}</td>
               <td>
                 <span :class="product.is_active ? 'status-active' : 'status-inactive'">
-                  {{ product.is_active ? '有効' : '無効' }}
+                  {{ product.is_active ? 'Active' : 'Inactive' }}
                 </span>
               </td>
               <td>
                 <router-link :to="`/master/products/${product.product_id}`" class="btn btn-primary btn-sm">
-                  詳細
+                  Details
                 </router-link>
               </td>
             </tr>
           </tbody>
         </table>
         <div v-if="products.length === 0" class="empty-state">
-          <p>製品データがありません</p>
+          <p>No product data found</p>
         </div>
       </div>
     </main>
@@ -132,7 +132,7 @@ const loadProducts = async () => {
     products.value = response.data
   } catch (error) {
     console.error('Failed to load products:', error)
-    alert('製品の読み込みに失敗しました')
+    alert('Failed to load products')
   }
 }
 
@@ -142,13 +142,13 @@ const handleCustomerSelect = (customer) => {
 
 const handleSubmit = async () => {
   if (!form.value.customer_id) {
-    alert('顧客を選択してください')
+    alert('Please select a customer')
     return
   }
 
   try {
     await api.post('/master/products', form.value)
-    alert('製品の登録に成功しました')
+    alert('Product registered successfully')
     form.value = {
       product_code: '',
       customer_id: null,
@@ -158,7 +158,7 @@ const handleSubmit = async () => {
     await loadProducts()
   } catch (error) {
     console.error('Failed to create product:', error)
-    alert('製品の登録に失敗しました')
+    alert('Failed to register product')
   }
 }
 

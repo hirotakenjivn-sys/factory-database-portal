@@ -3,7 +3,7 @@
     <AppHeader />
     <AppNavigation />
     <main class="app-main">
-      <h1 class="page-title">マスターデータ管理</h1>
+      <h1 class="page-title">Master Data Management</h1>
 
       <div class="grid grid-auto">
         <router-link
@@ -25,15 +25,15 @@ import AppHeader from '../../components/common/AppHeader.vue'
 import AppNavigation from '../../components/common/AppNavigation.vue'
 
 const masterMenus = [
-  { path: '/master/customers', label: '顧客マスター', description: '顧客情報を管理' },
-  { path: '/master/products', label: '製品コードマスター', description: '製品コードを管理' },
-  { path: '/master/employees', label: '従業員マスター', description: '従業員情報を管理' },
-  { path: '/master/suppliers', label: '仕入先マスター', description: '仕入先情報を管理' },
-  { path: '/master/process-names', label: '工程名マスター', description: '工程名と種別を管理' },
-  { path: '/master/material-rates', label: '材料仕様マスター', description: '材料仕様を管理' },
-  { path: '/master/machines', label: '機械リストマスター', description: '機械設備を管理' },
-  { path: '/master/spm', label: '生産プレス機設定マスター', description: '生産プレス機設定を管理' },
-  { path: '/master/holidays', label: '休日マスター', description: '休日・祝日を管理' },
+  { path: '/master/customers', label: 'Customer Master', description: 'Manage customer information' },
+  { path: '/master/products', label: 'Product Code Master', description: 'Manage product codes' },
+  { path: '/master/employees', label: 'Employee Master', description: 'Manage employee information' },
+  { path: '/master/suppliers', label: 'Supplier Master', description: 'Manage supplier information' },
+  { path: '/master/process-names', label: 'Process Name Master', description: 'Manage process names and types' },
+  { path: '/master/material-rates', label: 'Material Spec Master', description: 'Manage material specifications' },
+  { path: '/master/machines', label: 'Machine List Master', description: 'Manage machine equipment' },
+  { path: '/master/spm', label: 'Production Press Settings Master', description: 'Manage production press settings' },
+  { path: '/master/holidays', label: 'Holiday Master', description: 'Manage holidays' },
 ]
 </script>
 

@@ -3,87 +3,87 @@
     <AppHeader />
     <AppNavigation />
     <main class="app-main">
-      <h1 class="page-title">販売 - PO管理</h1>
+      <h1 class="page-title">Sales - PO Management</h1>
 
-      <!-- 一括登録 -->
+      <!-- Bulk Import -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>一括登録（Excel貼り付け）</h2>
+        <h2>Bulk Import (Excel Paste)</h2>
         <ClipboardImport @import-success="handleImportSuccess" />
       </div>
 
-      <!-- PO登録フォーム -->
+      <!-- PO Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>{{ editMode ? 'PO編集' : 'PO登録' }}</h2>
+        <h2>{{ editMode ? 'Edit PO' : 'Register PO' }}</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">PO番号</label>
+              <label class="form-label" style="margin-bottom: 0;">PO Number</label>
               <input v-model="form.po_number" class="form-input" type="text" required />
             </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">製品コード</label>
+              <label class="form-label" style="margin-bottom: 0;">Product Code</label>
               <AutocompleteInput
                 v-model="form.product_id"
                 endpoint="/master/autocomplete/products"
                 display-field="code"
                 value-field="id"
-                placeholder="製品コードを入力..."
+                placeholder="Enter Product Code..."
                 required
               />
             </div>
             <div style="width: 81px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">数量</label>
+              <label class="form-label" style="margin-bottom: 0;">Quantity</label>
               <input v-model.number="form.po_quantity" class="form-input" type="number" required />
             </div>
             <div style="width: 143px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">納期</label>
+              <label class="form-label" style="margin-bottom: 0;">Delivery Date</label>
               <input v-model="form.delivery_date" class="form-input" type="date" required />
             </div>
             <div style="width: 143px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">PO受取日</label>
+              <label class="form-label" style="margin-bottom: 0;">PO Received Date</label>
               <input v-model="form.date_receive_po" class="form-input" type="date" required />
             </div>
             <div style="display: flex; gap: 8px;">
-              <button type="submit" class="btn btn-primary">{{ editMode ? '更新' : '登録' }}</button>
-              <button v-if="editMode" @click="cancelEdit" type="button" class="btn btn-secondary">キャンセル</button>
-              <button v-if="editMode" @click="handleDelete" type="button" class="btn btn-danger">削除</button>
-              <button @click="calculateDeliveryDate" type="button" class="btn btn-success">📅 納期計算</button>
+              <button type="submit" class="btn btn-primary">{{ editMode ? 'Update' : 'Register' }}</button>
+              <button v-if="editMode" @click="cancelEdit" type="button" class="btn btn-secondary">Cancel</button>
+              <button v-if="editMode" @click="handleDelete" type="button" class="btn btn-danger">Delete</button>
+              <button @click="calculateDeliveryDate" type="button" class="btn btn-success">📅 Calculate Delivery</button>
             </div>
           </div>
         </form>
 
-        <!-- 納期計算結果 -->
+        <!-- Delivery Calculation Result -->
         <div v-if="deliveryCalculation" style="margin-top: var(--spacing-md); padding: var(--spacing-md); background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50;">
-          <h3 style="margin-bottom: var(--spacing-sm); color: #2e7d32;">📊 納期計算結果</h3>
+          <h3 style="margin-bottom: var(--spacing-sm); color: #2e7d32;">📊 Delivery Calculation Result</h3>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
             <div>
-              <strong>開始日:</strong> {{ formatDateForDisplay(deliveryCalculation.start_date) }}
+              <strong>Start Date:</strong> {{ formatDateForDisplay(deliveryCalculation.start_date) }}
             </div>
             <div>
-              <strong>計算納期:</strong> <span style="color: #1976d2; font-weight: 600;">{{ formatDateForDisplay(deliveryCalculation.delivery_date) }}</span>
+              <strong>Calculated Date:</strong> <span style="color: #1976d2; font-weight: 600;">{{ formatDateForDisplay(deliveryCalculation.delivery_date) }}</span>
             </div>
             <div>
-              <strong>総所要日数:</strong> {{ deliveryCalculation.total_days }}営業日
+              <strong>Total Days:</strong> {{ deliveryCalculation.total_days }} days
             </div>
             <div>
-              <strong>PO数量:</strong> {{ deliveryCalculation.po_quantity.toLocaleString() }}個
+              <strong>PO Quantity:</strong> {{ deliveryCalculation.po_quantity.toLocaleString() }}
             </div>
           </div>
 
-          <!-- 工程詳細 -->
-          <h4 style="margin-bottom: var(--spacing-sm);">工程詳細</h4>
+          <!-- Process Details -->
+          <h4 style="margin-bottom: var(--spacing-sm);">Process Details</h4>
           <div style="overflow-x: auto;">
             <table class="table" style="background: white;">
               <thead>
                 <tr>
-                  <th>工程No.</th>
-                  <th>工程名</th>
-                  <th>タイプ</th>
-                  <th>所要日数</th>
-                  <th>開始日</th>
-                  <th>完了日</th>
+                  <th>Process No.</th>
+                  <th>Process Name</th>
+                  <th>Type</th>
+                  <th>Days Required</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
                   <th>DAY/CT</th>
-                  <th>生産限界</th>
+                  <th>Prod. Limit</th>
                 </tr>
               </thead>
               <tbody>
@@ -102,7 +102,7 @@
                       {{ process.process_type }}
                     </span>
                   </td>
-                  <td>{{ process.days }}日</td>
+                  <td>{{ process.days }} days</td>
                   <td>{{ formatDateForDisplay(process.start_date) }}</td>
                   <td>{{ formatDateForDisplay(process.end_date) }}</td>
                   <td>{{ process.rough_cycletime || '-' }}</td>
@@ -113,48 +113,48 @@
           </div>
 
           <div style="margin-top: var(--spacing-sm);">
-            <button @click="applyCalculatedDate" class="btn btn-primary btn-sm">計算された納期を適用</button>
-            <button @click="deliveryCalculation = null" class="btn btn-secondary btn-sm" style="margin-left: var(--spacing-sm);">閉じる</button>
+            <button @click="applyCalculatedDate" class="btn btn-primary btn-sm">Apply Calculated Date</button>
+            <button @click="deliveryCalculation = null" class="btn btn-secondary btn-sm" style="margin-left: var(--spacing-sm);">Close</button>
           </div>
         </div>
       </div>
 
-      <!-- PO一覧 -->
+      <!-- PO List -->
       <div class="card">
-        <h2>PO一覧</h2>
+        <h2>PO List</h2>
 
-        <!-- 検索フィールド -->
+        <!-- Search Fields -->
         <div style="display: flex; gap: 8px; margin-bottom: var(--spacing-md); flex-wrap: wrap;">
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0; font-size: 0.85rem;">PO番号</label>
+            <label class="form-label" style="margin-bottom: 0; font-size: 0.85rem;">PO Number</label>
             <input
               v-model="searchFilters.po_number"
               @input="handleSearch"
               class="form-input"
               type="text"
-              placeholder="PO番号で検索..."
+              placeholder="Search PO Number..."
               style="font-size: 0.9rem;"
             />
           </div>
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0; font-size: 0.85rem;">顧客名</label>
+            <label class="form-label" style="margin-bottom: 0; font-size: 0.85rem;">Customer Name</label>
             <input
               v-model="searchFilters.customer_name"
               @input="handleSearch"
               class="form-input"
               type="text"
-              placeholder="顧客名で検索..."
+              placeholder="Search Customer..."
               style="font-size: 0.9rem;"
             />
           </div>
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0; font-size: 0.85rem;">製品コード</label>
+            <label class="form-label" style="margin-bottom: 0; font-size: 0.85rem;">Product Code</label>
             <input
               v-model="searchFilters.product_code"
               @input="handleSearch"
               class="form-input"
               type="text"
-              placeholder="製品コードで検索..."
+              placeholder="Search Product Code..."
               style="font-size: 0.9rem;"
             />
           </div>
@@ -164,7 +164,7 @@
               class="btn btn-secondary"
               style="padding: 8px 16px; font-size: 0.9rem;"
             >
-              クリア
+              Clear
             </button>
           </div>
         </div>
@@ -172,15 +172,15 @@
         <table class="table">
           <thead>
             <tr>
-              <th>PO番号</th>
-              <th>顧客名</th>
-              <th>製品コード</th>
-              <th>数量</th>
-              <th>納期</th>
-              <th>PO受取日</th>
-              <th>登録日時</th>
-              <th>登録者</th>
-              <th>操作</th>
+              <th>PO Number</th>
+              <th>Customer Name</th>
+              <th>Product Code</th>
+              <th>Quantity</th>
+              <th>Delivery Date</th>
+              <th>PO Received Date</th>
+              <th>Registered Date</th>
+              <th>Registered By</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -197,13 +197,13 @@
               <td>{{ formatTimestamp(po.timestamp) }}</td>
               <td>{{ po.user || '-' }}</td>
               <td>
-                <button @click="editPO(po)" class="btn btn-sm btn-secondary">編集</button>
+                <button @click="editPO(po)" class="btn btn-sm btn-secondary">Edit</button>
               </td>
             </tr>
           </tbody>
         </table>
         <div v-if="poList.length === 0" class="empty-state">
-          <p>POデータがありません</p>
+          <p>No PO data found</p>
         </div>
       </div>
     </main>
@@ -285,20 +285,20 @@ const clearSearch = () => {
 
 const handleSubmit = async () => {
   if (!form.value.product_id) {
-    alert('製品コードを選択してください')
+    alert('Please select a Product Code')
     return
   }
 
   try {
     if (editMode.value) {
-      // 更新
+      // Update
       await api.put(`/sales/po/${editingPoId.value}`, form.value)
-      alert('PO更新成功')
+      alert('PO updated successfully')
       cancelEdit()
     } else {
-      // 新規登録
+      // Register
       await api.post('/sales/po', form.value)
-      alert('PO登録成功')
+      alert('PO registered successfully')
       form.value = {
         po_number: '',
         product_id: null,
@@ -310,7 +310,7 @@ const handleSubmit = async () => {
     loadPOs()
   } catch (error) {
     console.error('Failed to save PO:', error)
-    alert(editMode.value ? 'PO更新失敗' : 'PO登録失敗')
+    alert(editMode.value ? 'Failed to update PO' : 'Failed to register PO')
   }
 }
 
@@ -324,7 +324,7 @@ const editPO = (po) => {
     delivery_date: po.delivery_date,
     date_receive_po: po.date_receive_po,
   }
-  // 画面をスクロールしてフォームを表示
+  // Scroll to top to show form
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
@@ -341,18 +341,18 @@ const cancelEdit = () => {
 }
 
 const handleDelete = async () => {
-  if (!confirm('このPOを削除しますか？')) {
+  if (!confirm('Are you sure you want to delete this PO?')) {
     return
   }
 
   try {
     await api.delete(`/sales/po/${editingPoId.value}`)
-    alert('PO削除成功')
+    alert('PO deleted successfully')
     cancelEdit()
     loadPOs()
   } catch (error) {
     console.error('Failed to delete PO:', error)
-    alert('PO削除失敗')
+    alert('Failed to delete PO')
   }
 }
 
@@ -368,17 +368,17 @@ const formatTimestamp = (timestamp) => {
 }
 
 const calculateDeliveryDate = async () => {
-  // バリデーション
+  // Validation
   if (!form.value.product_id) {
-    alert('製品コードを選択してください')
+    alert('Please select a Product Code')
     return
   }
   if (!form.value.po_quantity || form.value.po_quantity <= 0) {
-    alert('数量を入力してください')
+    alert('Please enter Quantity')
     return
   }
   if (!form.value.date_receive_po) {
-    alert('PO受取日を入力してください')
+    alert('Please enter PO Received Date')
     return
   }
 
@@ -392,14 +392,14 @@ const calculateDeliveryDate = async () => {
     console.log('Delivery calculation result:', response.data)
   } catch (error) {
     console.error('Failed to calculate delivery date:', error)
-    alert('納期計算に失敗しました: ' + (error.response?.data?.detail || error.message))
+    alert('Failed to calculate delivery date: ' + (error.response?.data?.detail || error.message))
   }
 }
 
 const applyCalculatedDate = () => {
   if (deliveryCalculation.value && deliveryCalculation.value.delivery_date) {
     form.value.delivery_date = deliveryCalculation.value.delivery_date
-    alert('計算された納期を適用しました')
+    alert('Calculated delivery date applied')
   }
 }
 

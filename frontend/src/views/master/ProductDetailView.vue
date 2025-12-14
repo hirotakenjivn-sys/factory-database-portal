@@ -4,50 +4,50 @@
     <AppNavigation />
     <main class="app-main">
       <div style="margin-bottom: var(--spacing-lg)">
-        <router-link to="/master/products" class="btn btn-secondary">← 製品一覧に戻る</router-link>
+        <router-link to="/master/products" class="btn btn-secondary">← Back to Product List</router-link>
       </div>
 
-      <h1 class="page-title">製品詳細</h1>
+      <h1 class="page-title">Product Details</h1>
 
       <div v-if="loading" class="empty-state">
-        <p>読み込み中...</p>
+        <p>Loading...</p>
       </div>
 
       <div v-else-if="product">
-        <!-- 製品基本情報 -->
+        <!-- Basic Info -->
         <div class="card" style="margin-bottom: var(--spacing-lg)">
-          <h2>基本情報</h2>
+          <h2>Basic Info</h2>
           <form @submit.prevent="handleUpdateProduct">
             <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
               <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-                <label class="form-label" style="margin-bottom: 0;">製品コード</label>
+                <label class="form-label" style="margin-bottom: 0;">Product Code</label>
                 <input v-model="product.product_code" class="form-input" type="text" required />
               </div>
               <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-                <label class="form-label" style="margin-bottom: 0;">顧客ID</label>
+                <label class="form-label" style="margin-bottom: 0;">Customer ID</label>
                 <input v-model.number="product.customer_id" class="form-input" type="number" required />
               </div>
               <div style="display: flex; align-items: center; gap: var(--spacing-sm); height: 34px;">
                 <input v-model="product.is_active" type="checkbox" />
-                <span>有効</span>
+                <span>Active</span>
               </div>
               <div>
-                <button type="submit" class="btn btn-primary">更新</button>
+                <button type="submit" class="btn btn-primary">Update</button>
               </div>
             </div>
           </form>
         </div>
 
-        <!-- 材料仕様 -->
+        <!-- Material Specs -->
         <div class="card" style="margin-bottom: var(--spacing-lg)">
-          <h2>材料仕様</h2>
+          <h2>Material Specs</h2>
           <table class="table">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>厚さ</th>
-                <th>幅</th>
-                <th>ピッチ</th>
+                <th>Thickness</th>
+                <th>Width</th>
+                <th>Pitch</th>
                 <th>H</th>
               </tr>
             </thead>
@@ -62,66 +62,66 @@
             </tbody>
           </table>
           <div v-if="materialRates.length === 0" class="empty-state">
-            <p>材料仕様データがありません</p>
+            <p>No material spec data found</p>
           </div>
         </div>
 
-        <!-- 工程管理 -->
+        <!-- Process Management -->
         <div class="card" style="margin-bottom: var(--spacing-lg)">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
-            <h2 style="margin-bottom: 0;">工程管理</h2>
+            <h2 style="margin-bottom: 0;">Process Management</h2>
             <button @click="showAddProcessForm = !showAddProcessForm" class="btn btn-primary">
-              {{ showAddProcessForm ? 'キャンセル' : '+ 工程を追加' }}
+              {{ showAddProcessForm ? 'Cancel' : '+ Add Process' }}
             </button>
           </div>
 
-          <!-- 新規工程追加フォーム -->
+          <!-- Add Process Form -->
           <div v-if="showAddProcessForm" class="form-card" style="margin-bottom: var(--spacing-md); padding: var(--spacing-md); background: #f9fafb; border-radius: 8px;">
             <form @submit.prevent="handleAddProcess">
               <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm); align-items: flex-end;">
                 <div style="width: 100px;">
-                  <label class="form-label">工程番号</label>
+                  <label class="form-label">Process No</label>
                   <input v-model.number="newProcess.process_no" class="form-input" type="number" required />
                 </div>
                 <div style="width: 150px;">
-                  <label class="form-label">工程名</label>
+                  <label class="form-label">Process Name</label>
                   <input v-model="newProcess.process_name" class="form-input" type="text" required />
                 </div>
                 <div style="width: 120px;">
                   <label class="form-label">DAY</label>
-                  <input v-model.number="newProcess.rough_cycletime" class="form-input" type="number" step="0.01" placeholder="日数" />
+                  <input v-model.number="newProcess.rough_cycletime" class="form-input" type="number" step="0.01" placeholder="Days" />
                 </div>
                 <div style="width: 150px;">
-                  <label class="form-label">生産限界 (pcs)</label>
-                  <input v-model.number="newProcess.production_limit" class="form-input" type="number" placeholder="個数" />
+                  <label class="form-label">Prod. Limit (pcs)</label>
+                  <input v-model.number="newProcess.production_limit" class="form-input" type="number" placeholder="Pcs" />
                 </div>
                 <div style="width: 120px;">
-                  <label class="form-label">段取時間 (分)</label>
-                  <input v-model.number="newProcess.setup_time" class="form-input" type="number" step="0.01" placeholder="分" />
+                  <label class="form-label">Setup Time (min)</label>
+                  <input v-model.number="newProcess.setup_time" class="form-input" type="number" step="0.01" placeholder="Min" />
                 </div>
                 <div>
-                  <button type="submit" class="btn btn-success">追加</button>
+                  <button type="submit" class="btn btn-success">Add</button>
                 </div>
               </div>
             </form>
           </div>
 
-          <!-- 工程一覧テーブル -->
+          <!-- Process List Table -->
           <table class="table">
             <thead>
               <tr>
-                <th style="width: 80px;">工程番号</th>
-                <th style="width: 150px;">工程名</th>
+                <th style="width: 80px;">Process No</th>
+                <th style="width: 150px;">Process Name</th>
                 <th style="width: 100px;">DAY</th>
-                <th style="width: 120px;">生産限界 (pcs)</th>
-                <th style="width: 120px;">段取時間 (分)</th>
-                <th style="width: 100px;">操作</th>
+                <th style="width: 120px;">Prod. Limit (pcs)</th>
+                <th style="width: 120px;">Setup Time (min)</th>
+                <th style="width: 100px;">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="process in processes" :key="process.process_id">
                 <template v-if="editingProcessId === process.process_id">
-                  <!-- 編集モード -->
+                  <!-- Edit Mode -->
                   <td>
                     <input v-model.number="editingProcess.process_no" class="form-input" type="number" style="width: 70px;" required />
                   </td>
@@ -138,40 +138,40 @@
                     <input v-model.number="editingProcess.setup_time" class="form-input" type="number" step="0.01" style="width: 110px;" />
                   </td>
                   <td>
-                    <button @click="handleSaveProcess(process.process_id)" class="btn btn-success btn-sm" style="margin-right: 4px;">保存</button>
-                    <button @click="cancelEdit" class="btn btn-secondary btn-sm">キャンセル</button>
+                    <button @click="handleSaveProcess(process.process_id)" class="btn btn-success btn-sm" style="margin-right: 4px;">Save</button>
+                    <button @click="cancelEdit" class="btn btn-secondary btn-sm">Cancel</button>
                   </td>
                 </template>
                 <template v-else>
-                  <!-- 表示モード -->
+                  <!-- View Mode -->
                   <td>{{ process.process_no }}</td>
                   <td>{{ process.process_name }}</td>
                   <td>{{ process.rough_cycletime || '-' }}</td>
                   <td>{{ process.production_limit ? process.production_limit.toLocaleString() : '-' }}</td>
                   <td>{{ process.setup_time || '-' }}</td>
                   <td>
-                    <button @click="startEdit(process)" class="btn btn-primary btn-sm" style="margin-right: 4px;">編集</button>
-                    <button @click="handleDeleteProcess(process.process_id)" class="btn btn-danger btn-sm">削除</button>
+                    <button @click="startEdit(process)" class="btn btn-primary btn-sm" style="margin-right: 4px;">Edit</button>
+                    <button @click="handleDeleteProcess(process.process_id)" class="btn btn-danger btn-sm">Delete</button>
                   </td>
                 </template>
               </tr>
             </tbody>
           </table>
           <div v-if="processes.length === 0" class="empty-state">
-            <p>工程データがありません</p>
+            <p>No process data found</p>
           </div>
         </div>
 
-        <!-- SPM設定 -->
+        <!-- SPM Settings -->
         <div class="card" style="margin-bottom: var(--spacing-lg)">
-          <h2>SPM設定</h2>
+          <h2>SPM Settings</h2>
           <table class="table">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>工程番号</th>
-                <th>プレス番号</th>
-                <th>サイクルタイム</th>
+                <th>Process No</th>
+                <th>Press No</th>
+                <th>Cycle Time</th>
               </tr>
             </thead>
             <tbody>
@@ -184,13 +184,13 @@
             </tbody>
           </table>
           <div v-if="spmSettings.length === 0" class="empty-state">
-            <p>SPM設定データがありません</p>
+            <p>No SPM setting data found</p>
           </div>
         </div>
       </div>
 
       <div v-else class="empty-state">
-        <p>製品が見つかりません</p>
+        <p>Product not found</p>
       </div>
     </main>
   </div>
@@ -237,7 +237,7 @@ const loadProduct = async () => {
     }
   } catch (error) {
     console.error('Failed to load product:', error)
-    alert('製品の読み込みに失敗しました')
+    alert('Failed to load product')
   }
 }
 
@@ -278,7 +278,7 @@ const handleAddProcess = async () => {
       production_limit: newProcess.value.production_limit,
       setup_time: newProcess.value.setup_time
     })
-    alert('工程を追加しました')
+    alert('Process added successfully')
     showAddProcessForm.value = false
     newProcess.value = {
       process_no: null,
@@ -290,7 +290,7 @@ const handleAddProcess = async () => {
     await loadProcesses()
   } catch (error) {
     console.error('Failed to add process:', error)
-    alert('工程の追加に失敗しました: ' + (error.response?.data?.detail || error.message))
+    alert('Failed to add process: ' + (error.response?.data?.detail || error.message))
   }
 }
 
@@ -313,26 +313,26 @@ const handleSaveProcess = async (processId) => {
       production_limit: editingProcess.value.production_limit,
       setup_time: editingProcess.value.setup_time
     })
-    alert('工程を更新しました')
+    alert('Process updated successfully')
     cancelEdit()
     await loadProcesses()
   } catch (error) {
     console.error('Failed to update process:', error)
-    alert('工程の更新に失敗しました: ' + (error.response?.data?.detail || error.message))
+    alert('Failed to update process: ' + (error.response?.data?.detail || error.message))
   }
 }
 
 const handleDeleteProcess = async (processId) => {
-  if (!confirm('この工程を削除してもよろしいですか？')) {
+  if (!confirm('Are you sure you want to delete this process?')) {
     return
   }
   try {
     await api.delete(`/process/processes/${processId}`)
-    alert('工程を削除しました')
+    alert('Process deleted successfully')
     await loadProcesses()
   } catch (error) {
     console.error('Failed to delete process:', error)
-    alert('工程の削除に失敗しました: ' + (error.response?.data?.detail || error.message))
+    alert('Failed to delete process: ' + (error.response?.data?.detail || error.message))
   }
 }
 
@@ -343,10 +343,10 @@ const handleUpdateProduct = async () => {
       customer_id: product.value.customer_id,
       is_active: product.value.is_active,
     })
-    alert('製品情報を更新しました')
+    alert('Product updated successfully')
   } catch (error) {
     console.error('Failed to update product:', error)
-    alert('製品情報の更新に失敗しました')
+    alert('Failed to update product')
   }
 }
 

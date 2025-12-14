@@ -4,56 +4,56 @@
     <AppNavigation />
     <main class="app-main">
       <div style="margin-bottom: var(--spacing-lg)">
-        <router-link to="/master" class="btn btn-secondary">← マスターメニューに戻る</router-link>
+        <router-link to="/master" class="btn btn-secondary">← Back to Master Menu</router-link>
       </div>
 
-      <h1 class="page-title">生産プレス機設定マスター</h1>
+      <h1 class="page-title">SPM Master</h1>
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>生産プレス機設定登録</h2>
+        <h2>Register SPM Setting</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">製品コード</label>
+              <label class="form-label" style="margin-bottom: 0;">Product Code</label>
               <AutocompleteInput
                 v-model="form.product_id"
                 endpoint="/master/autocomplete/products"
                 display-field="code"
                 value-field="id"
-                placeholder="製品コードを入力..."
+                placeholder="Enter Product Code..."
                 required
               />
             </div>
             <div style="width: 150px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">工程名</label>
+              <label class="form-label" style="margin-bottom: 0;">Process Name</label>
               <AutocompleteInput
                 v-model="form.process_name"
                 endpoint="/master/autocomplete/process-names"
                 display-field="name"
                 value-field="name"
-                placeholder="工程名を入力..."
+                placeholder="Enter Process Name..."
                 required
               />
             </div>
             <div style="width: 120px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">プレス番号</label>
+              <label class="form-label" style="margin-bottom: 0;">Press No</label>
               <AutocompleteInput
                 v-model="form.press_no"
                 endpoint="/master/autocomplete/machines"
                 display-field="machine_no"
                 value-field="machine_no"
-                placeholder="プレス番号を入力..."
+                placeholder="Enter Press No..."
                 :filter-params="{ machine_type: 'PRESS' }"
                 required
               />
             </div>
             <div style="width: 81px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">サイクルタイム</label>
+              <label class="form-label" style="margin-bottom: 0;">Cycle Time</label>
               <input v-model.number="form.cycle_time" class="form-input" type="number" step="0.01" required />
             </div>
             <div>
-              <button type="submit" class="btn btn-primary">登録</button>
+              <button type="submit" class="btn btn-primary">Register</button>
             </div>
           </div>
         </form>
@@ -61,23 +61,23 @@
 
       <!-- List -->
       <div class="card">
-        <h2>生産プレス機設定一覧</h2>
+        <h2>SPM Setting List</h2>
         <input
           v-model="searchQuery"
           @input="handleSearch"
           class="form-input"
           type="text"
-          placeholder="製品コードで検索..."
+          placeholder="Search Product Code..."
           style="margin-bottom: var(--spacing-md); max-width: 175px;"
         />
         <table class="table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>製品コード</th>
-              <th>工程名</th>
-              <th>プレス番号</th>
-              <th>サイクルタイム</th>
+              <th>Product Code</th>
+              <th>Process Name</th>
+              <th>Press No</th>
+              <th>Cycle Time</th>
             </tr>
           </thead>
           <tbody>
@@ -94,7 +94,7 @@
           </tbody>
         </table>
         <div v-if="spmSettings.length === 0" class="empty-state">
-          <p>生産プレス機設定データがありません</p>
+          <p>No SPM setting data found</p>
         </div>
       </div>
     </main>
@@ -126,19 +126,19 @@ const loadSpmSettings = async (search = '') => {
     spmSettings.value = response.data
   } catch (error) {
     console.error('Failed to load SPM settings:', error)
-    alert('SPM設定の読み込みに失敗しました')
+    alert('Failed to load SPM settings')
   }
 }
 
 const handleSubmit = async () => {
   if (!form.value.product_id) {
-    alert('製品を選択してください')
+    alert('Please select a product')
     return
   }
 
   try {
     await api.post('/master/spm', form.value)
-    alert('SPM設定の登録に成功しました')
+    alert('SPM setting registered successfully')
     form.value = {
       product_id: null,
       process_name: '',
@@ -148,7 +148,7 @@ const handleSubmit = async () => {
     await loadSpmSettings()
   } catch (error) {
     console.error('Failed to create SPM settings:', error)
-    alert('SPM設定の登録に失敗しました')
+    alert('Failed to register SPM setting')
   }
 }
 

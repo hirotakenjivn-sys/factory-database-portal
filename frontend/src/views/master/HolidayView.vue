@@ -4,64 +4,64 @@
     <AppNavigation />
     <main class="app-main">
       <div style="margin-bottom: var(--spacing-lg)">
-        <router-link to="/master" class="btn btn-secondary">← マスターメニューに戻る</router-link>
+        <router-link to="/master" class="btn btn-secondary">← Back to Master Menu</router-link>
       </div>
 
-      <h1 class="page-title">休日マスター</h1>
+      <h1 class="page-title">Holiday Master</h1>
 
-      <!-- タブナビゲーション -->
+      <!-- Tab Navigation -->
       <div class="tabs" style="margin-bottom: var(--spacing-lg)">
         <button
           @click="activeTab = 'holidays'"
           :class="{ active: activeTab === 'holidays' }"
           class="tab-btn"
         >
-          休日登録
+          Register Holiday
         </button>
         <button
           @click="activeTab = 'holiday-types'"
           :class="{ active: activeTab === 'holiday-types' }"
           class="tab-btn"
         >
-          休日種別管理
+          Holiday Type Management
         </button>
       </div>
 
-      <!-- 休日登録タブ -->
+      <!-- Holiday Registration Tab -->
       <div v-if="activeTab === 'holidays'">
-        <!-- 休日登録フォーム -->
+        <!-- Holiday Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>休日登録</h2>
+        <h2>Register Holiday</h2>
         <form @submit.prevent="handleSubmit" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
           <div style="width: 113px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">休日日付</label>
+            <label class="form-label" style="margin-bottom: 0;">Holiday Date</label>
             <input v-model="form.date_holiday" class="form-input" type="text" placeholder="DD/MM/YYYY" required />
           </div>
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">休日種別</label>
+            <label class="form-label" style="margin-bottom: 0;">Holiday Type</label>
             <select v-model.number="form.holiday_type_id" class="form-input" required>
-              <option value="">種別を選択</option>
+              <option value="">Select Type</option>
               <option v-for="type in holidayTypes" :key="type.holiday_type_id" :value="type.holiday_type_id">
                 {{ type.date_type }}
               </option>
             </select>
           </div>
           <div>
-            <button type="submit" class="btn btn-primary">登録</button>
+            <button type="submit" class="btn btn-primary">Register</button>
           </div>
         </form>
       </div>
 
-      <!-- 休日一覧 -->
+      <!-- Holiday List -->
       <div class="card">
-        <h2>休日一覧</h2>
+        <h2>Holiday List</h2>
         <table class="table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>休日日付</th>
-              <th>休日種別</th>
-              <th>操作</th>
+              <th>Holiday Date</th>
+              <th>Holiday Type</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -71,42 +71,42 @@
               <td>{{ item.date_type }}</td>
               <td>
                 <button @click="handleDelete(item.calendar_id)" class="btn btn-danger btn-sm">
-                  削除
+                  Delete
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
         <div v-if="holidays.length === 0" class="empty-state">
-          <p>休日データがありません</p>
+          <p>No holiday data found</p>
         </div>
       </div>
       </div>
 
-      <!-- 休日種別管理タブ -->
+      <!-- Holiday Type Management Tab -->
       <div v-if="activeTab === 'holiday-types'">
-        <!-- 休日種別登録フォーム -->
+        <!-- Holiday Type Registration Form -->
         <div class="card" style="margin-bottom: var(--spacing-lg)">
-          <h2>休日種別登録</h2>
+          <h2>Register Holiday Type</h2>
           <form @submit.prevent="handleHolidayTypeSubmit" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">休日種別名</label>
+              <label class="form-label" style="margin-bottom: 0;">Holiday Type Name</label>
               <input v-model="holidayTypeForm.date_type" class="form-input" type="text" required />
             </div>
             <div>
-              <button type="submit" class="btn btn-primary">登録</button>
+              <button type="submit" class="btn btn-primary">Register</button>
             </div>
           </form>
         </div>
 
-        <!-- 休日種別一覧 -->
+        <!-- Holiday Type List -->
         <div class="card">
-          <h2>休日種別一覧</h2>
+          <h2>Holiday Type List</h2>
           <table class="table">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>休日種別名</th>
+                <th>Holiday Type Name</th>
               </tr>
             </thead>
             <tbody>
@@ -117,7 +117,7 @@
             </tbody>
           </table>
           <div v-if="holidayTypes.length === 0" class="empty-state">
-            <p>休日種別データがありません</p>
+            <p>No holiday type data found</p>
           </div>
         </div>
       </div>
@@ -161,20 +161,20 @@ const loadHolidays = async () => {
     holidays.value = response.data
   } catch (error) {
     console.error('Failed to load holidays:', error)
-    alert('休日の読み込みに失敗しました')
+    alert('Failed to load holidays')
   }
 }
 
 const handleSubmit = async () => {
   try {
-    // DD/MM/YYYY形式をYYYY-MM-DD形式に変換してAPIに送信
+    // Convert DD/MM/YYYY format to YYYY-MM-DD format for API submission
     const submitData = {
       ...form.value,
       date_holiday: formatDateForApi(form.value.date_holiday)
     }
 
     await api.post('/schedule/calendar', submitData)
-    alert('休日の登録に成功しました')
+    alert('Holiday registered successfully')
     form.value = {
       date_holiday: getTodayFormatted(),
       holiday_type_id: '',
@@ -182,36 +182,36 @@ const handleSubmit = async () => {
     await loadHolidays()
   } catch (error) {
     console.error('Failed to create holiday:', error)
-    alert('休日の登録に失敗しました')
+    alert('Failed to register holiday')
   }
 }
 
 const handleDelete = async (id) => {
-  if (!confirm('この休日を削除しますか？')) {
+  if (!confirm('Are you sure you want to delete this holiday?')) {
     return
   }
 
   try {
     await api.delete(`/schedule/calendar/${id}`)
-    alert('休日の削除に成功しました')
+    alert('Holiday deleted successfully')
     await loadHolidays()
   } catch (error) {
     console.error('Failed to delete holiday:', error)
-    alert('休日の削除に失敗しました')
+    alert('Failed to delete holiday')
   }
 }
 
 const handleHolidayTypeSubmit = async () => {
   try {
     await api.post('/schedule/holiday-types', holidayTypeForm.value)
-    alert('休日種別の登録に成功しました')
+    alert('Holiday type registered successfully')
     holidayTypeForm.value = {
       date_type: '',
     }
     await loadHolidayTypes()
   } catch (error) {
     console.error('Failed to create holiday type:', error)
-    alert('休日種別の登録に失敗しました')
+    alert('Failed to register holiday type')
   }
 }
 

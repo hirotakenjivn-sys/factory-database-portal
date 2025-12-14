@@ -4,42 +4,42 @@
     <AppNavigation />
     <main class="app-main">
       <div style="margin-bottom: var(--spacing-lg)">
-        <router-link to="/master" class="btn btn-secondary">← マスターメニューに戻る</router-link>
+        <router-link to="/master" class="btn btn-secondary">← Back to Master Menu</router-link>
       </div>
 
-      <h1 class="page-title">機械リストマスター</h1>
+      <h1 class="page-title">Machine List Master</h1>
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>機械登録</h2>
+        <h2>Register Machine</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">機械番号</label>
+              <label class="form-label" style="margin-bottom: 0;">Machine No</label>
               <input v-model="form.machine_no" class="form-input" type="text" required />
             </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">機械種類</label>
+              <label class="form-label" style="margin-bottom: 0;">Machine Type</label>
               <select v-model="form.machine_type" class="form-input" required>
-                <option value="">選択してください</option>
+                <option value="">Select Type</option>
                 <option value="PRESS">PRESS</option>
                 <option value="TAP">TAP</option>
                 <option value="BARREL">BARREL</option>
               </select>
             </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">工場名</label>
+              <label class="form-label" style="margin-bottom: 0;">Factory Name</label>
               <AutocompleteInput
                 v-model="form.factory_id"
                 endpoint="/master/autocomplete/factories"
                 display-field="name"
                 value-field="id"
-                placeholder="工場名を入力..."
+                placeholder="Enter Factory Name..."
                 required
               />
             </div>
             <div>
-              <button type="submit" class="btn btn-primary">登録</button>
+              <button type="submit" class="btn btn-primary">Register</button>
             </div>
           </div>
         </form>
@@ -47,22 +47,22 @@
 
       <!-- List -->
       <div class="card">
-        <h2>機械一覧</h2>
+        <h2>Machine List</h2>
         <input
           v-model="searchQuery"
           @input="handleSearch"
           class="form-input"
           type="text"
-          placeholder="機械番号で検索..."
+          placeholder="Search Machine No..."
           style="margin-bottom: var(--spacing-md); max-width: 175px;"
         />
         <table class="table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>機械番号</th>
-              <th>機械種類</th>
-              <th>工場名</th>
+              <th>Machine No</th>
+              <th>Machine Type</th>
+              <th>Factory Name</th>
             </tr>
           </thead>
           <tbody>
@@ -75,7 +75,7 @@
           </tbody>
         </table>
         <div v-if="machines.length === 0" class="empty-state">
-          <p>機械データがありません</p>
+          <p>No machine data found</p>
         </div>
       </div>
     </main>
@@ -105,14 +105,14 @@ const loadMachines = async (search = '') => {
     machines.value = response.data
   } catch (error) {
     console.error('Failed to load machines:', error)
-    alert('機械の読み込みに失敗しました')
+    alert('Failed to load machines')
   }
 }
 
 const handleSubmit = async () => {
   try {
     await api.post('/master/machines', form.value)
-    alert('機械の登録に成功しました')
+    alert('Machine registered successfully')
     form.value = {
       machine_no: '',
       machine_type: '',
@@ -121,7 +121,7 @@ const handleSubmit = async () => {
     await loadMachines()
   } catch (error) {
     console.error('Failed to create machine:', error)
-    alert('機械の登録に失敗しました')
+    alert('Failed to register machine')
   }
 }
 

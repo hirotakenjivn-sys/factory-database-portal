@@ -3,37 +3,37 @@
     <AppHeader />
     <AppNavigation />
     <main class="app-main">
-      <h1 class="page-title">プレス - 工程管理</h1>
+      <h1 class="page-title">Press - Process Management</h1>
 
-      <!-- 工程登録フォーム -->
+      <!-- Process Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>{{ editMode ? '工程編集' : '工程登録' }}</h2>
+        <h2>{{ editMode ? 'Edit Process' : 'Register Process' }}</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">製品コード</label>
+              <label class="form-label" style="margin-bottom: 0;">Product Code</label>
               <AutocompleteInput
                 v-model="form.product_id"
                 endpoint="/master/autocomplete/products"
                 display-field="product_code"
                 value-field="id"
-                placeholder="製品コードを入力..."
+                placeholder="Enter Product Code..."
                 @select="handleProductSelect"
                 required
               />
             </div>
             <div style="width: 81px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">工程番号</label>
+              <label class="form-label" style="margin-bottom: 0;">Process No</label>
               <input v-model.number="form.process_no" class="form-input" type="number" required />
             </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">工程名</label>
+              <label class="form-label" style="margin-bottom: 0;">Process Name</label>
               <AutocompleteInput
                 v-model="form.process_name"
                 endpoint="/press/autocomplete/process-names"
                 display-field="process_name"
                 value-field="process_name"
-                placeholder="工程名を選択..."
+                placeholder="Select Process Name..."
                 @select="handleProcessNameSelect"
                 required
               />
@@ -43,22 +43,22 @@
               <input v-model.number="form.rough_cycletime" class="form-input" type="number" step="0.01" />
             </div>
             <div v-if="processType === true" style="width: 100px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">段取時間（min）</label>
+              <label class="form-label" style="margin-bottom: 0;">Setup Time (min)</label>
               <input v-model.number="form.setup_time" class="form-input" type="number" step="0.01" />
             </div>
             <div v-if="processType === false" style="width: 100px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">生産可能限界（PCS）</label>
+              <label class="form-label" style="margin-bottom: 0;">Prod. Limit (PCS)</label>
               <input v-model.number="form.production_limit" class="form-input" type="number" />
             </div>
             <div style="display: flex; gap: 8px;">
-              <button type="submit" class="btn btn-primary">{{ editMode ? '更新' : '登録' }}</button>
-              <button v-if="editMode" @click="cancelEdit" type="button" class="btn btn-secondary">キャンセル</button>
-              <button v-if="editMode" @click="handleDelete" type="button" class="btn btn-danger">削除</button>
+              <button type="submit" class="btn btn-primary">{{ editMode ? 'Update' : 'Register' }}</button>
+              <button v-if="editMode" @click="cancelEdit" type="button" class="btn btn-secondary">Cancel</button>
+              <button v-if="editMode" @click="handleDelete" type="button" class="btn btn-danger">Delete</button>
             </div>
           </div>
         </form>
 
-        <!-- 選択された製品の工程表 -->
+        <!-- Selected Product Process Table -->
         <div v-if="selectedProductProcess" style="margin-top: var(--spacing-lg);">
           <h3 style="margin-bottom: var(--spacing-sm); color: var(--primary);">
             {{ selectedProductProcess.customer_name }} -
@@ -68,7 +68,7 @@
             <table class="table process-table">
               <thead>
                 <tr>
-                  <th v-for="i in 20" :key="i">工程{{ i }}</th>
+                  <th v-for="i in 20" :key="i">Process {{ i }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -88,37 +88,37 @@
         </div>
       </div>
 
-      <!-- タブナビゲーション -->
+      <!-- Tab Navigation -->
       <div class="tabs" style="margin-bottom: var(--spacing-lg)">
         <button
           @click="activeTab = 'process-table'"
           :class="{ active: activeTab === 'process-table' }"
           class="tab-btn"
         >
-          工程表
+          Process Table
         </button>
         <button
           @click="activeTab = 'process-list'"
           :class="{ active: activeTab === 'process-list' }"
           class="tab-btn"
         >
-          工程一覧（データベース）
+          Process List (Database)
         </button>
       </div>
 
-      <!-- 工程表タブ -->
+      <!-- Process Table Tab -->
       <div v-if="activeTab === 'process-table'" class="card">
-        <h2>工程表</h2>
+        <h2>Process Table</h2>
 
-        <!-- 検索フィールド -->
+        <!-- Search Fields -->
         <div style="display: flex; gap: 8px; margin-bottom: var(--spacing-md);">
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">顧客名</label>
-            <input v-model="searchTable.customer_name" class="form-input" type="text" placeholder="顧客名で検索..." />
+            <label class="form-label" style="margin-bottom: 0;">Customer Name</label>
+            <input v-model="searchTable.customer_name" class="form-input" type="text" placeholder="Search Customer..." />
           </div>
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">製品コード</label>
-            <input v-model="searchTable.product_code" class="form-input" type="text" placeholder="製品コードで検索..." />
+            <label class="form-label" style="margin-bottom: 0;">Product Code</label>
+            <input v-model="searchTable.product_code" class="form-input" type="text" placeholder="Search Product Code..." />
           </div>
         </div>
 
@@ -126,9 +126,9 @@
           <table class="table process-table">
             <thead>
               <tr>
-                <th class="sticky-col">顧客名</th>
-                <th class="sticky-col-2">製品コード</th>
-                <th v-for="i in 20" :key="i">工程{{ i }}</th>
+                <th class="sticky-col">Customer Name</th>
+                <th class="sticky-col-2">Product Code</th>
+                <th v-for="i in 20" :key="i">Process {{ i }}</th>
               </tr>
             </thead>
             <tbody>
@@ -153,40 +153,40 @@
           </table>
         </div>
         <div v-if="filteredProcessTable.length === 0" class="empty-state">
-          <p>工程データがありません</p>
+          <p>No process data found</p>
         </div>
       </div>
 
-      <!-- 工程一覧タブ -->
+      <!-- Process List Tab -->
       <div v-if="activeTab === 'process-list'" class="card">
-        <h2>工程一覧（データベース）</h2>
+        <h2>Process List (Database)</h2>
 
-        <!-- 検索フィールド -->
+        <!-- Search Fields -->
         <div style="display: flex; gap: 8px; margin-bottom: var(--spacing-md);">
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">顧客名</label>
-            <input v-model="searchList.customer_name" class="form-input" type="text" placeholder="顧客名で検索..." />
+            <label class="form-label" style="margin-bottom: 0;">Customer Name</label>
+            <input v-model="searchList.customer_name" class="form-input" type="text" placeholder="Search Customer..." />
           </div>
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">製品コード</label>
-            <input v-model="searchList.product_code" class="form-input" type="text" placeholder="製品コードで検索..." />
+            <label class="form-label" style="margin-bottom: 0;">Product Code</label>
+            <input v-model="searchList.product_code" class="form-input" type="text" placeholder="Search Product Code..." />
           </div>
         </div>
 
         <table class="table">
           <thead>
             <tr>
-              <th>登録日時</th>
-              <th>顧客名</th>
-              <th>製品コード</th>
+              <th>Registered Date</th>
+              <th>Customer Name</th>
+              <th>Product Code</th>
               <th class="sortable-header" @click="toggleSort('process_no')">
-                工程番号 <span class="sort-icon">{{ getSortIcon('process_no') }}</span>
+                Process No <span class="sort-icon">{{ getSortIcon('process_no') }}</span>
               </th>
-              <th>工程名</th>
-              <th>サイクルタイム</th>
-              <th>段取時間（min）</th>
-              <th>生産可能限界（PCS）</th>
-              <th>操作</th>
+              <th>Process Name</th>
+              <th>Cycle Time</th>
+              <th>Setup Time (min)</th>
+              <th>Prod. Limit (PCS)</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -202,13 +202,13 @@
               <td>{{ process.setup_time || '-' }}</td>
               <td>{{ process.production_limit || '-' }}</td>
               <td>
-                <button @click="editProcess(process)" class="btn btn-sm btn-secondary">編集</button>
+                <button @click="editProcess(process)" class="btn btn-sm btn-secondary">Edit</button>
               </td>
             </tr>
           </tbody>
         </table>
         <div v-if="filteredProcessList.length === 0" class="empty-state">
-          <p>工程データがありません</p>
+          <p>No process data found</p>
         </div>
       </div>
     </main>
@@ -227,7 +227,7 @@ const activeTab = ref('process-table')
 const editMode = ref(false)
 const editingProcessId = ref(null)
 const processType = ref(null) // null: デフォルト, true: SPM, false: DAY
-const cycleTimeLabel = ref('サイクルタイム')
+const cycleTimeLabel = ref('Cycle Time')
 
 const selectedProductProcess = ref(null)
 
@@ -330,31 +330,31 @@ const loadProcessNames = async () => {
 
 const handleSubmit = async () => {
   if (!form.value.product_id) {
-    alert('製品コードを選択してください')
+    alert('Please select a Product Code')
     return
   }
 
-  // 工程名がマスターに存在するかチェック
+  // Check if process name exists in master
   if (!processNameSuggestions.value.includes(form.value.process_name)) {
-    alert('入力された工程名はマスターに登録されていません。\nリストから選択してください。')
+    alert('The entered Process Name is not registered in the master.\nPlease select from the list.')
     return
   }
 
   try {
     if (editMode.value) {
-      // 更新
+      // Update
       await api.put(`/press/processes/${editingProcessId.value}`, form.value)
-      alert('工程更新成功')
+      alert('Process updated successfully')
       cancelEdit()
     } else {
-      // 新規登録
+      // Register
       const currentProductId = form.value.product_id
       await api.post('/press/processes', form.value)
-      alert('工程登録成功')
+      alert('Process registered successfully')
       processType.value = null
-      cycleTimeLabel.value = 'サイクルタイム'
+      cycleTimeLabel.value = 'Cycle Time'
       form.value = {
-        product_id: currentProductId, // 製品IDを保持
+        product_id: currentProductId, // Keep Product ID
         process_no: null,
         process_name: '',
         rough_cycletime: null,
@@ -364,13 +364,13 @@ const handleSubmit = async () => {
     }
     await loadProcesses()
     await loadProcessTable()
-    // 選択されている製品の工程表を更新
+    // Update selected product process table
     if (form.value.product_id) {
       await handleProductSelect()
     }
   } catch (error) {
     console.error('Failed to save process:', error)
-    alert(editMode.value ? '工程更新失敗' : '工程登録失敗')
+    alert(editMode.value ? 'Failed to update process' : 'Failed to register process')
   }
 }
 
@@ -385,20 +385,20 @@ const editProcess = (process) => {
     setup_time: process.setup_time,
     production_limit: process.production_limit,
   }
-  // 工程名に応じたタイプを取得
+  // Get type based on process name
   handleProcessNameChange()
-  // 画面をスクロールしてフォームを表示
+  // Scroll to top to show form
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const editProcessCell = async (product, processNo) => {
-  // 工程名がない場合はクリック不可
+  // Not clickable if no process name
   if (!product[`process_${processNo}`]) {
     return
   }
 
   try {
-    // 該当する工程データを取得
+    // Get corresponding process data
     const response = await api.get('/press/processes', {
       params: { product_id: product.product_id }
     })
@@ -407,7 +407,7 @@ const editProcessCell = async (product, processNo) => {
 
     if (targetProcess) {
       editProcess(targetProcess)
-      // 製品の工程表を表示
+      // Show product process table
       await handleProductSelect()
     }
   } catch (error) {
@@ -422,7 +422,7 @@ const handleProductSelect = async () => {
   }
 
   try {
-    // 工程表データから選択された製品の情報を取得
+    // Get selected product info from process table data
     const response = await api.get('/press/process-table')
     const products = response.data
     const product = products.find(p => p.product_id === form.value.product_id)
@@ -438,13 +438,13 @@ const handleProductSelect = async () => {
 }
 
 const editProcessCellFromSearch = async (product, processNo) => {
-  // 工程名がない場合はクリック不可
+  // Not clickable if no process name
   if (!product[`process_${processNo}`]) {
     return
   }
 
   try {
-    // 該当する工程データを取得
+    // Get corresponding process data
     const response = await api.get('/press/processes', {
       params: { product_id: product.product_id }
     })
@@ -453,7 +453,7 @@ const editProcessCellFromSearch = async (product, processNo) => {
 
     if (targetProcess) {
       editProcess(targetProcess)
-      // 製品の工程表を表示
+      // Show product process table
       await handleProductSelect()
     }
   } catch (error) {
@@ -471,7 +471,7 @@ const cancelEdit = () => {
   editMode.value = false
   editingProcessId.value = null
   processType.value = null
-  cycleTimeLabel.value = 'サイクルタイム'
+  cycleTimeLabel.value = 'Cycle Time'
   form.value = {
     product_id: null,
     process_no: null,
@@ -483,25 +483,25 @@ const cancelEdit = () => {
 }
 
 const handleDelete = async () => {
-  if (!confirm('この工程を削除しますか？')) {
+  if (!confirm('Are you sure you want to delete this process?')) {
     return
   }
 
   try {
-    const productId = form.value.product_id // 削除前に製品IDを保存
+    const productId = form.value.product_id // Save product ID before deletion
     await api.delete(`/press/processes/${editingProcessId.value}`)
-    alert('工程削除成功')
+    alert('Process deleted successfully')
     cancelEdit()
     await loadProcesses()
     await loadProcessTable()
-    // 選択されている製品の工程表を更新
+    // Update selected product process table
     if (productId) {
       form.value.product_id = productId
       await handleProductSelect()
     }
   } catch (error) {
     console.error('Failed to delete process:', error)
-    alert('工程削除失敗')
+    alert('Failed to delete process')
   }
 }
 

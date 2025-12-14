@@ -4,30 +4,30 @@
     <AppNavigation />
     <main class="app-main">
       <div style="margin-bottom: var(--spacing-lg)">
-        <router-link to="/master" class="btn btn-secondary">← マスターメニューに戻る</router-link>
+        <router-link to="/master" class="btn btn-secondary">← Back to Master Menu</router-link>
       </div>
 
-      <h1 class="page-title">従業員マスター</h1>
+      <h1 class="page-title">Employee Master</h1>
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>従業員登録</h2>
+        <h2>Register Employee</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">従業員番号</label>
+              <label class="form-label" style="margin-bottom: 0;">Employee No</label>
               <input v-model="form.employee_no" class="form-input" type="text" required />
             </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">名前</label>
+              <label class="form-label" style="margin-bottom: 0;">Name</label>
               <input v-model="form.name" class="form-input" type="text" required />
             </div>
             <div style="display: flex; align-items: center; gap: var(--spacing-sm); height: 34px;">
               <input v-model="form.is_active" type="checkbox" />
-              <span>有効</span>
+              <span>Active</span>
             </div>
             <div>
-              <button type="submit" class="btn btn-primary">登録</button>
+              <button type="submit" class="btn btn-primary">Register</button>
             </div>
           </div>
         </form>
@@ -35,14 +35,14 @@
 
       <!-- List -->
       <div class="card">
-        <h2>従業員一覧</h2>
+        <h2>Employee List</h2>
         <div style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); flex-wrap: wrap;">
           <input
             v-model="searchEmployeeNo"
             @input="handleSearch"
             class="form-input"
             type="text"
-            placeholder="従業員番号で検索..."
+            placeholder="Search Employee No..."
             style="width: 200px;"
           />
           <input
@@ -50,17 +50,17 @@
             @input="handleSearch"
             class="form-input"
             type="text"
-            placeholder="名前で検索..."
+            placeholder="Search Name..."
             style="width: 200px;"
           />
         </div>
         <table class="table">
           <thead>
             <tr>
-              <th>従業員ID</th>
-              <th>従業員番号</th>
-              <th>名前</th>
-              <th>ステータス</th>
+              <th>Employee ID</th>
+              <th>Employee No</th>
+              <th>Name</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -70,14 +70,14 @@
               <td>{{ employee.name }}</td>
               <td>
                 <span :class="employee.is_active ? 'status-active' : 'status-inactive'">
-                  {{ employee.is_active ? '有効' : '無効' }}
+                  {{ employee.is_active ? 'Active' : 'Inactive' }}
                 </span>
               </td>
             </tr>
           </tbody>
         </table>
         <div v-if="employees.length === 0" class="empty-state">
-          <p>従業員データがありません</p>
+          <p>No employee data found</p>
         </div>
       </div>
     </main>
@@ -113,14 +113,14 @@ const loadEmployees = async () => {
     employees.value = response.data
   } catch (error) {
     console.error('Failed to load employees:', error)
-    alert('従業員の読み込みに失敗しました')
+    alert('Failed to load employees')
   }
 }
 
 const handleSubmit = async () => {
   try {
     await api.post('/master/employees', form.value)
-    alert('従業員の登録に成功しました')
+    alert('Employee registered successfully')
     form.value = {
       employee_no: '',
       name: '',
@@ -129,7 +129,7 @@ const handleSubmit = async () => {
     await loadEmployees()
   } catch (error) {
     console.error('Failed to create employee:', error)
-    alert('従業員の登録に失敗しました')
+    alert('Failed to register employee')
   }
 }
 

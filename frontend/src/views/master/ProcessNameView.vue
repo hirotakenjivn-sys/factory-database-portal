@@ -4,22 +4,22 @@
     <AppNavigation />
     <main class="app-main">
       <div style="margin-bottom: var(--spacing-lg)">
-        <router-link to="/master" class="btn btn-secondary">← マスターメニューに戻る</router-link>
+        <router-link to="/master" class="btn btn-secondary">← Back to Master Menu</router-link>
       </div>
 
-      <h1 class="page-title">工程名マスター</h1>
+      <h1 class="page-title">Process Name Master</h1>
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>工程名登録</h2>
+        <h2>Register Process Name</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">工程名</label>
+              <label class="form-label" style="margin-bottom: 0;">Process Name</label>
               <input v-model="form.process_name" class="form-input" type="text" required />
             </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">種別</label>
+              <label class="form-label" style="margin-bottom: 0;">Type</label>
               <div style="display: flex; gap: 16px; align-items: center; height: 34px;">
                 <label style="display: flex; align-items: center; gap: 4px;">
                   <input v-model="form.day_or_spm" type="radio" :value="true" />
@@ -32,7 +32,7 @@
               </div>
             </div>
             <div>
-              <button type="submit" class="btn btn-primary">登録</button>
+              <button type="submit" class="btn btn-primary">Register</button>
             </div>
           </div>
         </form>
@@ -40,21 +40,21 @@
 
       <!-- List -->
       <div class="card">
-        <h2>工程名一覧</h2>
+        <h2>Process Name List</h2>
         <input
           v-model="searchQuery"
           @input="handleSearch"
           class="form-input"
           type="text"
-          placeholder="工程名で検索..."
+          placeholder="Search Process Name..."
           style="margin-bottom: var(--spacing-md); max-width: 175px;"
         />
         <table class="table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>工程名</th>
-              <th>種別</th>
+              <th>Process Name</th>
+              <th>Type</th>
             </tr>
           </thead>
           <tbody>
@@ -70,7 +70,7 @@
           </tbody>
         </table>
         <div v-if="processNames.length === 0" class="empty-state">
-          <p>工程名データがありません</p>
+          <p>No process name data found</p>
         </div>
       </div>
     </main>
@@ -98,14 +98,14 @@ const loadProcessNames = async (search = '') => {
     processNames.value = response.data
   } catch (error) {
     console.error('Failed to load process names:', error)
-    alert('工程名の読み込みに失敗しました')
+    alert('Failed to load process names')
   }
 }
 
 const handleSubmit = async () => {
   try {
     await api.post('/master/process-names', form.value)
-    alert('工程名の登録に成功しました')
+    alert('Process name registered successfully')
     form.value = {
       process_name: '',
       day_or_spm: true,
@@ -113,7 +113,7 @@ const handleSubmit = async () => {
     await loadProcessNames()
   } catch (error) {
     console.error('Failed to create process name:', error)
-    alert('工程名の登録に失敗しました')
+    alert('Failed to register process name')
   }
 }
 
