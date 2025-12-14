@@ -27,11 +27,11 @@
       <!-- グラフエリア -->
       <div class="grid grid-2" style="margin-top: var(--spacing-lg)">
         <div class="card">
-          <h2>週別売上推移</h2>
-          <Line v-if="salesChartData" :data="salesChartData" :options="chartOptions" />
+          <h2>Financial States</h2>
+          <Bar v-if="salesChartData" :data="salesChartData" :options="chartOptions" />
         </div>
         <div class="card">
-          <h2>日別生産数</h2>
+          <h2>Daily Production</h2>
           <Bar v-if="productionChartData" :data="productionChartData" :options="chartOptions" />
         </div>
       </div>
@@ -161,16 +161,27 @@ onMounted(async () => {
     const statsResponse = await api.get('/dashboard/cards')
     stats.value = statsResponse.data
 
-    // 週別売上データ
-    const salesResponse = await api.get('/dashboard/sales-weekly')
+    // Financial States (Dummy Data)
+    // const salesResponse = await api.get('/dashboard/sales-weekly')
     salesChartData.value = {
-      labels: salesResponse.data.map(item => `Week ${item.week}`),
+      labels: ['2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'],
       datasets: [
         {
-          label: '売上数量',
+          label: 'Revenue',
           backgroundColor: '#3498db',
           borderColor: '#3498db',
-          data: salesResponse.data.map(item => item.quantity),
+          data: [
+            123035353028,
+            123951288216,
+            139022514385,
+            128487074583,
+            127743763779,
+            144837448872,
+            178199346754,
+            145636172962,
+            165674798218,
+            133836603590
+          ],
         },
       ],
     }
