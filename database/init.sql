@@ -391,6 +391,19 @@ CREATE TABLE `production_schedule` (
   INDEX `idx_planned_end` (`planned_end_datetime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='生産計画スケジュール';
 
+-- ================================================
+-- 22. iot_button_events (ラズパイボタン押下ログ)
+-- ================================================
+DROP TABLE IF EXISTS `iot_button_events`;
+CREATE TABLE `iot_button_events` (
+  `event_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `button_name` VARCHAR(100) NOT NULL,
+  `raspi_no` VARCHAR(100) NULL,
+  `pressed_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `note` TEXT,
+  `user` VARCHAR(100) DEFAULT 'raspi'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ================================================
