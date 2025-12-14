@@ -35,6 +35,39 @@
           <Bar v-if="productionChartData" :data="productionChartData" :options="chartOptions" />
         </div>
       </div>
+
+      <!-- Machine Status Section -->
+      <div class="machine-status-section">
+        <div class="layout-container">
+          <img src="@/assets/factory_layout.png" alt="Factory Layout" class="factory-layout" />
+        </div>
+        <div class="status-table-container">
+          <table class="status-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Pressure</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Process</th>
+                <th>Qty/Total</th>
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="machine in machineStatus" :key="machine.no">
+                <td>{{ machine.no }}</td>
+                <td>{{ machine.pressure }}</td>
+                <td>{{ machine.customer }}</td>
+                <td>{{ machine.product }}</td>
+                <td>{{ machine.process }}</td>
+                <td>{{ machine.qty }}</td>
+                <td>{{ machine.name }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </main>
   </div>
 </template>
@@ -75,6 +108,38 @@ const stats = ref({
   processes: 0,
   count: 0,
 })
+
+const machineStatus = ref([
+  { no: "'01", pressure: 110, customer: "Tokyo Keiki", product: "SPACERToshibaK9459006P003-BA-PIEC", process: "3/5", qty: "1200/4800", name: "Nguyễn Thị Lan" },
+  { no: "'02", pressure: 80, customer: "OTL", product: "BA-13/FIXED CONTACTOR PLATE(RoHS)", process: "5/5", qty: "450/700", name: "None" },
+  { no: "'03", pressure: 80, customer: "None", product: "None", process: "None", qty: "None", name: "None" },
+  { no: "'04", pressure: 60, customer: "Shengbang", product: "Spacer (P113 TDTK)", process: "2/3", qty: "32000/40000", name: "Lê Minh Đức" },
+  { no: "'05", pressure: 60, customer: "Honda", product: "WASHER,PLAIN,8MM", process: "6/7", qty: "1000/1000", name: "None" },
+  { no: "'06", pressure: 45, customer: "None", product: "None", process: "None", qty: "None", name: "None" },
+  { no: "'07", pressure: 45, customer: "Daiwa", product: "PLATETakakoHOLDER SUCTION", process: "1/1", qty: "100/100", name: "None" },
+  { no: "'08", pressure: 45, customer: "Brother", product: "THREAD RELEASE LEVER", process: "7/7", qty: "2000/2000", name: "Đỗ Quang Vinh" },
+  { no: "'09", pressure: 45, customer: "F/pan 20", product: "None", process: "None", qty: "None", name: "None" },
+  { no: "'10", pressure: 35, customer: "Takazono", product: "DEGUCHI_PURE-TO", process: "5/6", qty: "5000/12500", name: "Hoàng Việt Anh" },
+  { no: "'11", pressure: 80, customer: "K.Source", product: "WASHERMitsubaSG03001, TERMINAL", process: "2/7", qty: "150/1500", name: "None" },
+  { no: "'12", pressure: 110, customer: "None", product: "None", process: "None", qty: "None", name: "None" },
+  { no: "'12-B", pressure: 150, customer: "Meggitt", product: "TOLEFocusBracket FPL30W-NEW", process: "4/7", qty: "50000/50000", name: "None" },
+  { no: "'14", pressure: 110, customer: "Kurabe", product: "METAL PLATE Code: 9538252D", process: "1/7", qty: "300/400", name: "Võ Thị Ngọc" },
+  { no: "'15", pressure: 110, customer: "None", product: "None", process: "None", qty: "None", name: "None" },
+  { no: "'16", pressure: 25, customer: "AMPHENOL", product: "PLAN3564-0047-XXX", process: "5/7", qty: "10000/20000", name: "Nguyễn Văn Dũng" },
+  { no: "'17", pressure: 35, customer: "JYS", product: "WASHER-PLAIN", process: "7/7", qty: "2500/3000", name: "None" },
+  { no: "'18", pressure: 60, customer: "Fujikura", product: "CFAS2-098C4*3", process: "2/2", qty: "100/200", name: "Phan Anh Khoa" },
+  { no: "'19", pressure: 200, customer: "Aiphone", product: "Q.TB-SE SP FIXER", process: "6/7", qty: "800/1000", name: "None" },
+  { no: "'21", pressure: 45, customer: "None", product: "None", process: "None", qty: "None", name: "None" },
+  { no: "'22", pressure: 200, customer: "Akiba", product: "SHI-BT (910308-B103-003)", process: "1/3", qty: "49000/50000", name: "None" },
+  { no: "'23", pressure: 80, customer: "Kyokuto", product: "TAM CO DINH/", process: "3/4", qty: "700/1400", name: "Trần Minh Quân" },
+  { no: "'24", pressure: 20, customer: "Panasonic", product: "INSTALL PLATE", process: "5/7", qty: "12000/12000", name: "None" },
+  { no: "'25", pressure: 35, customer: "None", product: "None", process: "None", qty: "None", name: "None" },
+  { no: "'26", pressure: 80, customer: "None", product: "None", process: "None", qty: "None", name: "None" },
+  { no: "'27", pressure: 110, customer: "Aqua", product: "60134942HaradaGUIDE PIPE", process: "6/7", qty: "200/5000", name: "Đặng Hồng Phúc" },
+  { no: "'28", pressure: 110, customer: "None", product: "None", process: "None", qty: "None", name: "None" },
+  { no: "'30", pressure: 30, customer: "None", product: "None", process: "None", qty: "None", name: "None" },
+  { no: "'31", pressure: 60, customer: "TYSLONG", product: "HANDLE PROCESSING", process: "3/7", qty: "500/800", name: "None" },
+])
 
 const salesChartData = ref(null)
 const productionChartData = ref(null)
@@ -155,5 +220,63 @@ onMounted(async () => {
 
 .card canvas {
   max-height: 300px;
+}
+
+.machine-status-section {
+  display: flex;
+  gap: 20px;
+  margin-top: 30px;
+  height: 600px; /* Adjust height as needed */
+}
+
+.layout-container {
+  flex: 1;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.factory-layout {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.status-table-container {
+  flex: 1;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: auto; /* Enable scrolling */
+}
+
+.status-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap; /* Prevent wrapping for horizontal scroll */
+}
+
+.status-table th,
+.status-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.status-table th {
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.status-table tr:hover {
+  background-color: #f5f5f5;
 }
 </style>
