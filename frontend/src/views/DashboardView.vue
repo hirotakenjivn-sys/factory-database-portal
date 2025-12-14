@@ -3,7 +3,7 @@
     <AppHeader />
     <AppNavigation />
     <main class="app-main">
-      <h1 class="page-title">ダッシュボード</h1>
+      <h1 class="page-title">Dashboard</h1>
 
       <div class="grid grid-4">
         <div class="card stat-card">
@@ -192,7 +192,7 @@ onMounted(async () => {
       labels: productionResponse.data.map(item => item.date),
       datasets: [
         {
-          label: '生産数',
+          label: 'Quantity',
           backgroundColor: '#2ecc71',
           borderColor: '#2ecc71',
           data: productionResponse.data.map(item => item.quantity),

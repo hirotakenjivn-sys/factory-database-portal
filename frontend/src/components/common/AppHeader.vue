@@ -8,7 +8,7 @@
       </button>
       <div v-if="isMenuOpen" class="user-dropdown-menu">
         <button @click="handleLogout" class="dropdown-item">
-          ログアウト
+          Logout
         </button>
       </div>
     </div>

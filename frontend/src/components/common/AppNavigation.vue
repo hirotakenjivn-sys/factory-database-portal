@@ -14,14 +14,14 @@
 
 <script setup>
 const navItems = [
-  { name: 'dashboard', label: 'ダッシュボード', path: '/dashboard' },
-  { name: 'trace', label: 'トレース', path: '/trace' },
-  { name: 'outsource', label: '委託', path: '/outsource' },
-  { name: 'schedule', label: 'スケジュール', path: '/schedule' },
-  { name: 'sales', label: '販売', path: '/sales' },
-  { name: 'press', label: 'プレス', path: '/press' },
-  { name: 'warehouse', label: '倉庫', path: '/warehouse' },
-  { name: 'mold', label: '金型', path: '/mold' },
-  { name: 'master', label: 'マスター', path: '/master' },
+  { name: 'dashboard', label: 'Dashboard', path: '/dashboard' },
+  { name: 'trace', label: 'Trace', path: '/trace' },
+  { name: 'outsource', label: 'Outsource', path: '/outsource' },
+  { name: 'schedule', label: 'Schedule', path: '/schedule' },
+  { name: 'sales', label: 'Sales', path: '/sales' },
+  { name: 'press', label: 'Press', path: '/press' },
+  { name: 'warehouse', label: 'Warehouse', path: '/warehouse' },
+  { name: 'mold', label: 'Mold', path: '/mold' },
+  { name: 'master', label: 'Master', path: '/master' },
 ]
 </script>
