@@ -8,6 +8,7 @@ from ..models.mold import BrokenMold
 from ..models.customer import Customer
 from ..models.product import Product
 from ..models.process import Process
+from ..models.iot_button_event import IotButtonEvent
 
 router = APIRouter()
 
@@ -26,8 +27,8 @@ async def get_dashboard_cards(db: Session = Depends(get_db)):
     # Processes
     processes = db.query(func.count(Process.process_id)).scalar() or 0
 
-    # Count (Dummy)
-    count = 5
+    # Count (IoT Events)
+    count = db.query(func.count(IotButtonEvent.event_id)).scalar() or 0
 
     return {
         "customers": customers,
