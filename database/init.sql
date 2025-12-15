@@ -57,13 +57,14 @@ CREATE TABLE `processes` (
   `process_id` INT AUTO_INCREMENT PRIMARY KEY,
   `product_id` INT NOT NULL,
   `process_no` INT NOT NULL,
-  `process_name` VARCHAR(100) NOT NULL,
+  `process_name_id` INT NOT NULL,
   `rough_cycletime` DECIMAL(10, 2),
   `setup_time` DECIMAL(10, 2) COMMENT '段取時間（分）',
   `production_limit` INT COMMENT '生産可能限界',
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user` VARCHAR(100),
   FOREIGN KEY (`product_id`) REFERENCES `products`(`product_id`),
+  FOREIGN KEY (`process_name_id`) REFERENCES `process_name_types`(`process_name_id`),
   INDEX `idx_processes_product` (`product_id`),
   UNIQUE KEY `uk_product_process` (`product_id`, `process_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -113,17 +114,45 @@ CREATE TABLE `maintain_machines` (
 -- ================================================
 -- 8. broken_mold (金型故障)
 -- ================================================
+DROP TABLE IF EXISTS `broken_mold_history`;
+DROP TABLE IF EXISTS `broken_mold_mold`;
+DROP TABLE IF EXISTS `broken_mold_stamp`;
 DROP TABLE IF EXISTS `broken_mold`;
-CREATE TABLE `broken_mold` (
-  `broken_mold_id` INT AUTO_INCREMENT PRIMARY KEY,
+
+CREATE TABLE `broken_mold_stamp` (
+  `broken_mold_stamp_id` INT AUTO_INCREMENT PRIMARY KEY,
   `process_id` INT NOT NULL,
-  `date_broken` DATE NOT NULL,
+  `reason` TEXT,
+  `date_broken_time` DATETIME,
   `date_hope_repaired` DATE,
-  `date_schedule_repaired` DATE,
   `note` TEXT,
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user` VARCHAR(100),
   FOREIGN KEY (`process_id`) REFERENCES `processes`(`process_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `broken_mold_mold` (
+  `broken_mold_mold_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `broken_mold_stamp_id` INT NOT NULL,
+  `date_schedule_repaired` DATE,
+  `note` TEXT,
+  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user` VARCHAR(100),
+  FOREIGN KEY (`broken_mold_stamp_id`) REFERENCES `broken_mold_stamp`(`broken_mold_stamp_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `broken_mold_history` (
+  `broken_mold_history_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `broken_mold_mold_id` INT NOT NULL,
+  `way_repair` TEXT,
+  `repairman` VARCHAR(100),
+  `cause` TEXT,
+  `actual_repaired_date` DATE,
+  `quantity` INT,
+  `note` TEXT,
+  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user` VARCHAR(100),
+  FOREIGN KEY (`broken_mold_mold_id`) REFERENCES `broken_mold_mold`(`broken_mold_mold_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================
@@ -199,17 +228,13 @@ CREATE TABLE `material_rates` (
 DROP TABLE IF EXISTS `spm`;
 CREATE TABLE `spm` (
   `spm_id` INT AUTO_INCREMENT PRIMARY KEY,
-  `product_id` INT NOT NULL,
-  `process_name` VARCHAR(100) NOT NULL,
-  `process_no` INT NOT NULL,
-  `press_no` VARCHAR(100) NOT NULL,
+  `process_id` INT NOT NULL,
+  `machine_list_id` INT NOT NULL,
   `cycle_time` DECIMAL(10, 2) NOT NULL,
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user` VARCHAR(100),
-  FOREIGN KEY (`product_id`) REFERENCES `products`(`product_id`),
-  INDEX `idx_spm_process_name` (`process_name`),
-  INDEX `idx_spm_press_no` (`press_no`),
-  INDEX `idx_spm_product_process` (`product_id`, `process_no`)
+  FOREIGN KEY (`process_id`) REFERENCES `processes`(`process_id`),
+  FOREIGN KEY (`machine_list_id`) REFERENCES `machine_list`(`machine_list_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================
@@ -271,20 +296,7 @@ CREATE TABLE `deleted_po` (
 -- ================================================
 -- 16. finished_products (完成品)
 -- ================================================
-DROP TABLE IF EXISTS `finished_products`;
-CREATE TABLE `finished_products` (
-  `finished_product_id` INT AUTO_INCREMENT PRIMARY KEY,
-  `product_id` INT NOT NULL,
-  `lot_id` INT NOT NULL,
-  `finished_quantity` INT NOT NULL,
-  `date_finished` DATE NOT NULL,
-  `is_shipped` BOOLEAN DEFAULT FALSE NOT NULL COMMENT '出荷済みフラグ',
-  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `user` VARCHAR(100),
-  FOREIGN KEY (`product_id`) REFERENCES `products`(`product_id`),
-  FOREIGN KEY (`lot_id`) REFERENCES `lot`(`lot_id`),
-  INDEX `idx_finished_shipped` (`is_shipped`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- ================================================
 -- 17. employees (従業員マスタ)
