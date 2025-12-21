@@ -19,7 +19,9 @@ from ..schemas import process as process_schema
 from ..schemas import factory as factory_schema
 from ..schemas import material as material_schema
 from ..schemas import spm as spm_schema
+from ..schemas import spm as spm_schema
 from .auth import get_current_user
+from ..utils.auth import get_password_hash, generate_strong_password
 
 router = APIRouter()
 
@@ -179,19 +181,34 @@ async def get_employees(
     return employees
 
 
-@router.post("/employees", response_model=employee_schema.EmployeeResponse)
+@router.post("/employees", response_model=employee_schema.EmployeeCreateResponse)
 async def create_employee(
     employee: employee_schema.EmployeeCreate,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ):
     employee_data = employee.model_dump()
+    create_password = employee_data.pop('create_password', True)
     employee_data['user'] = current_user['username']
+
+    plain_password = None
+    if create_password:
+        # パスワード自動生成
+        plain_password = generate_strong_password()
+        hashed_password = get_password_hash(plain_password)
+        employee_data['password_hash'] = hashed_password
+
     db_employee = Employee(**employee_data)
     db.add(db_employee)
     db.commit()
     db.refresh(db_employee)
-    return db_employee
+    
+    # レスポンス用にパスワードをセット（DBオブジェクトには持たせない）
+    response = employee_schema.EmployeeCreateResponse.model_validate(db_employee)
+    if plain_password:
+        response.generated_password = plain_password
+    
+    return response
 
 
 # ==================== Suppliers ====================

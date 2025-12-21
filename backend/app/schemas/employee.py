@@ -11,6 +11,7 @@ class EmployeeBase(BaseModel):
 
 class EmployeeCreate(EmployeeBase):
     user: Optional[str] = None
+    create_password: bool = True
 
 
 class EmployeeUpdate(BaseModel):
@@ -26,3 +27,7 @@ class EmployeeResponse(EmployeeBase):
     user: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class EmployeeCreateResponse(EmployeeResponse):
+    generated_password: Optional[str] = None

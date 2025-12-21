@@ -10,5 +10,6 @@ class Employee(Base):
     employee_no = Column(String(50), nullable=False, unique=True)
     name = Column(String(255), nullable=False)
     is_active = Column(Boolean, default=True)
+    password_hash = Column(String(255), nullable=True)
     timestamp = Column(DateTime, server_default=func.now(), onupdate=func.now())
     user = Column(String(100))

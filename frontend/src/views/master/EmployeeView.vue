@@ -23,8 +23,12 @@
               <input v-model="form.name" class="form-input" type="text" required />
             </div>
             <div style="display: flex; align-items: center; gap: var(--spacing-sm); height: 34px;">
-              <input v-model="form.is_active" type="checkbox" />
-              <span>Active</span>
+              <input v-model="form.is_active" type="checkbox" id="is_active" />
+              <label for="is_active" style="margin: 0; cursor: pointer;">Active</label>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--spacing-sm); height: 34px;">
+              <input v-model="form.create_password" type="checkbox" id="create_password" />
+              <label for="create_password" style="margin: 0; cursor: pointer;">Create Password</label>
             </div>
             <div>
               <button type="submit" class="btn btn-primary">Register</button>
@@ -94,6 +98,7 @@ const form = ref({
   employee_no: '',
   name: '',
   is_active: true,
+  create_password: true,
 })
 
 const employees = ref([])
@@ -119,12 +124,19 @@ const loadEmployees = async () => {
 
 const handleSubmit = async () => {
   try {
-    await api.post('/master/employees', form.value)
-    alert('Employee registered successfully')
+    const response = await api.post('/master/employees', form.value)
+    
+    if (response.data.generated_password) {
+      alert(`Employee registered successfully.\n\nLogin ID: ${response.data.employee_no}\nPassword: ${response.data.generated_password}\n\nPlease save this password immediately.`)
+    } else {
+      alert('Employee registered successfully')
+    }
+
     form.value = {
       employee_no: '',
       name: '',
       is_active: true,
+      create_password: true,
     }
     await loadEmployees()
   } catch (error) {
