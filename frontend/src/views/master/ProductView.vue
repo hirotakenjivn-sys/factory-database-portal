@@ -11,16 +11,12 @@
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>{{ editingId ? 'Edit Product' : 'Register Product' }}</h2>
+        <h2>Register Product</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
               <label class="form-label" style="margin-bottom: 0;">Product Code</label>
               <input v-model="form.product_code" class="form-input" type="text" required />
-            </div>
-            <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">Product Name</label>
-              <input v-model="form.product_name" class="form-input" type="text" />
             </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
               <label class="form-label" style="margin-bottom: 0;">Customer Name</label>
@@ -38,16 +34,8 @@
               <input v-model="form.is_active" type="checkbox" />
               <span>Active</span>
             </div>
-            <div style="display: flex; gap: 8px;">
-              <button type="submit" class="btn btn-primary">
-                {{ editingId ? 'Update' : 'Register' }}
-              </button>
-              <button v-if="editingId" type="button" class="btn btn-danger" @click="handleDelete(editingId)">
-                Delete
-              </button>
-              <button v-if="editingId" type="button" class="btn btn-secondary" @click="cancelEdit">
-                Cancel
-              </button>
+            <div>
+              <button type="submit" class="btn btn-primary">Register</button>
             </div>
           </div>
         </form>
@@ -79,7 +67,6 @@
             <tr>
               <th>Timestamp</th>
               <th>Product Code</th>
-              <th>Product Name</th>
               <th>Customer Name</th>
               <th>Status</th>
               <th>Actions</th>
@@ -91,7 +78,6 @@
               <td>
                 <CopyableText :text="product.product_code" />
               </td>
-              <td>{{ product.product_name }}</td>
               <td>{{ product.customer_name }}</td>
               <td>
                 <span :class="product.is_active ? 'status-active' : 'status-inactive'">
@@ -99,12 +85,9 @@
                 </span>
               </td>
               <td>
-                <div style="display: flex; gap: 8px;">
-                  <button class="btn btn-secondary btn-sm" @click="handleEdit(product)">Edit</button>
-                  <router-link :to="`/master/products/${product.product_id}`" class="btn btn-primary btn-sm">
-                    Details
-                  </router-link>
-                </div>
+                <router-link :to="`/master/products/${product.product_id}`" class="btn btn-primary btn-sm">
+                  Details
+                </router-link>
               </td>
             </tr>
           </tbody>
@@ -127,12 +110,10 @@ import api from '../../utils/api'
 
 const form = ref({
   product_code: '',
-  product_name: '',
   customer_id: null,
   is_active: true,
 })
 
-const editingId = ref(null)
 const products = ref([])
 const searchProductCode = ref('')
 const searchCustomerName = ref('')
@@ -166,61 +147,19 @@ const handleSubmit = async () => {
   }
 
   try {
-    if (editingId.value) {
-      await api.put(`/master/products/${editingId.value}`, form.value)
-      alert('Product updated successfully')
-    } else {
-      await api.post('/master/products', form.value)
-      alert('Product registered successfully')
+    await api.post('/master/products', form.value)
+    alert('Product registered successfully')
+    form.value = {
+      product_code: '',
+      customer_id: null,
+      is_active: true,
     }
-    resetForm()
+    selectedCustomer.value = null
     await loadProducts()
   } catch (error) {
-    console.error('Failed to save product:', error)
-    const detail = error.response?.data?.detail || 'Failed to save product'
-    alert(detail)
+    console.error('Failed to create product:', error)
+    alert('Failed to register product')
   }
-}
-
-const handleEdit = (product) => {
-  editingId.value = product.product_id
-  form.value = {
-    product_code: product.product_code,
-    product_name: product.product_name || '',
-    customer_id: product.customer_id,
-    is_active: product.is_active,
-  }
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-const handleDelete = async (id) => {
-  if (!confirm('Are you sure you want to delete this product?')) return
-
-  try {
-    await api.delete(`/master/products/${id}`)
-    alert('Product deleted successfully')
-    resetForm()
-    loadProducts()
-  } catch (error) {
-    console.error('Failed to delete product:', error)
-    const detail = error.response?.data?.detail || 'Failed to delete product'
-    alert(detail)
-  }
-}
-
-const cancelEdit = () => {
-  resetForm()
-}
-
-const resetForm = () => {
-  form.value = {
-    product_code: '',
-    product_name: '',
-    customer_id: null,
-    is_active: true,
-  }
-  editingId.value = null
-  selectedCustomer.value = null
 }
 
 const handleSearch = () => {

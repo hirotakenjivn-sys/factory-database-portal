@@ -9,7 +9,6 @@ class Product(Base):
 
     product_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     product_code = Column(String(100), nullable=False, index=True)
-    product_name = Column(String(255), nullable=True)
     customer_id = Column(Integer, ForeignKey("customers.customer_id"), nullable=False)
     is_active = Column(Boolean, default=True)
     timestamp = Column(DateTime, server_default=func.now(), onupdate=func.now())
