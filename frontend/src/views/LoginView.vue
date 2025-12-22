@@ -50,17 +50,22 @@ const handleLogin = async () => {
   error.value = ''
 
   try {
-    const formData = new FormData()
-    formData.append('username', employee_no.value)
-    formData.append('password', password.value)
+    // FastAPI OAuth2PasswordRequestForm expects application/x-www-form-urlencoded
+    const params = new URLSearchParams()
+    params.append('username', employee_no.value)
+    params.append('password', password.value)
 
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, formData)
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, params, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
     
     const token = response.data.access_token
     localStorage.setItem('token', token)
     
     // Redirect to dashboard or previous page
-    router.push('/')
+    router.push('/dashboard')
   } catch (err) {
     console.error('Login error:', err)
     if (err.response && err.response.status === 401) {

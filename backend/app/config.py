@@ -12,7 +12,14 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
 
     # CORS
-    CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000"]
+    CORS_ORIGINS: list[str] = [
+        "http://localhost:5173", 
+        "http://localhost:3000",
+        "https://hirota-vn.net",
+        "http://hirota-vn.net",
+        "https://www.hirota-vn.net",
+        "http://www.hirota-vn.net"
+    ]
 
     # App
     APP_NAME: str = "Factory Database Portal API"
