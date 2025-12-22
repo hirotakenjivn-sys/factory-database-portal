@@ -11,7 +11,7 @@
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>Register Customer</h2>
+        <h2>{{ editingId ? 'Edit Customer' : 'Register Customer' }}</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
@@ -22,8 +22,13 @@
               <input v-model="form.is_active" type="checkbox" />
               <span>Active</span>
             </div>
-            <div>
-              <button type="submit" class="btn btn-primary">Register</button>
+            <div style="display: flex; gap: 8px;">
+              <button type="submit" class="btn btn-primary">
+                {{ editingId ? 'Update' : 'Register' }}
+              </button>
+              <button v-if="editingId" type="button" class="btn btn-secondary" @click="cancelEdit">
+                Cancel
+              </button>
             </div>
           </div>
         </form>
@@ -46,6 +51,7 @@
               <th>Customer ID</th>
               <th>Customer Name</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -56,6 +62,12 @@
                 <span :class="customer.is_active ? 'status-active' : 'status-inactive'">
                   {{ customer.is_active ? 'Active' : 'Inactive' }}
                 </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-secondary btn-sm" @click="handleEdit(customer)">Edit</button>
+                  <button class="btn btn-danger btn-sm" @click="handleDelete(customer.customer_id)">Delete</button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -76,6 +88,7 @@ const form = ref({
   is_active: true,
 })
 
+const editingId = ref(null)
 const customers = ref([])
 const searchQuery = ref('')
 
@@ -92,14 +105,52 @@ const loadCustomers = async (search = '') => {
 
 const handleSubmit = async () => {
   try {
-    await api.post('/master/customers', form.value)
-    alert('Customer registered successfully')
-    form.value = { customer_name: '', is_active: true }
+    if (editingId.value) {
+      await api.put(`/master/customers/${editingId.value}`, form.value)
+      alert('Customer updated successfully')
+    } else {
+      await api.post('/master/customers', form.value)
+      alert('Customer registered successfully')
+    }
+    resetForm()
     loadCustomers()
   } catch (error) {
-    console.error('Failed to create customer:', error)
-    alert('Failed to register customer')
+    console.error('Failed to save customer:', error)
+    const detail = error.response?.data?.detail || 'Failed to save customer'
+    alert(detail)
   }
+}
+
+const handleEdit = (customer) => {
+  editingId.value = customer.customer_id
+  form.value = {
+    customer_name: customer.customer_name,
+    is_active: customer.is_active,
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const handleDelete = async (id) => {
+  if (!confirm('Are you sure you want to delete this customer?')) return
+
+  try {
+    await api.delete(`/master/customers/${id}`)
+    alert('Customer deleted successfully')
+    loadCustomers()
+  } catch (error) {
+    console.error('Failed to delete customer:', error)
+    const detail = error.response?.data?.detail || 'Failed to delete customer'
+    alert(detail)
+  }
+}
+
+const cancelEdit = () => {
+  resetForm()
+}
+
+const resetForm = () => {
+  form.value = { customer_name: '', is_active: true }
+  editingId.value = null
 }
 
 const handleSearch = () => {

@@ -78,6 +78,26 @@ async def update_customer(
     return db_customer
 
 
+@router.delete("/customers/{customer_id}")
+async def delete_customer(
+    customer_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    db_customer = db.query(Customer).filter(Customer.customer_id == customer_id).first()
+    if not db_customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    
+    # 関連する製品があるかチェック
+    products_count = db.query(Product).filter(Product.customer_id == customer_id).count()
+    if products_count > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete customer with associated products")
+
+    db.delete(db_customer)
+    db.commit()
+    return {"message": "Customer deleted successfully"}
+
+
 # ==================== Products ====================
 @router.get("/products")
 async def get_products(
