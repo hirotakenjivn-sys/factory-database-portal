@@ -21,7 +21,6 @@ from ..schemas import material as material_schema
 from ..schemas import spm as spm_schema
 from ..schemas import spm as spm_schema
 from .auth import get_current_user
-from ..utils.auth import get_password_hash, generate_strong_password
 
 router = APIRouter()
 

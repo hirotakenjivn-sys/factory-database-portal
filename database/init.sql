@@ -28,6 +28,7 @@ DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
   `product_id` INT AUTO_INCREMENT PRIMARY KEY,
   `product_code` VARCHAR(100) NOT NULL,
+  `product_name` VARCHAR(255) NULL,
   `customer_id` INT NOT NULL,
   `is_active` BOOLEAN DEFAULT TRUE,
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -433,3 +434,7 @@ INSERT INTO `holiday_types` (`holiday_type_id`, `date_type`) VALUES
 INSERT INTO `factories` (`factory_id`, `factory_name`, `user`) VALUES
 (1, 'Main Factory', 'system'),
 (2, 'Sub Factory', 'system');
+
+-- 管理者ユーザー (password: admin123)
+INSERT INTO `employees` (`employee_no`, `name`, `password_hash`, `user`) VALUES
+('admin', 'Administrator', '$2b$12$LQv3c1yqBWVHxkd0LpS8eeBRZafQ.9W6Z9J6W9J6W9J6W9J6W9J6W', 'system');
