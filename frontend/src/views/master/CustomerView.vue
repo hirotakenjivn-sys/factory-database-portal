@@ -26,6 +26,9 @@
               <button type="submit" class="btn btn-primary">
                 {{ editingId ? 'Update' : 'Register' }}
               </button>
+              <button v-if="editingId" type="button" class="btn btn-danger" @click="handleDelete(editingId)">
+                Delete
+              </button>
               <button v-if="editingId" type="button" class="btn btn-secondary" @click="cancelEdit">
                 Cancel
               </button>
@@ -64,10 +67,7 @@
                 </span>
               </td>
               <td>
-                <div style="display: flex; gap: 8px;">
-                  <button class="btn btn-secondary btn-sm" @click="handleEdit(customer)">Edit</button>
-                  <button class="btn btn-danger btn-sm" @click="handleDelete(customer.customer_id)">Delete</button>
-                </div>
+                <button class="btn btn-secondary btn-sm" @click="handleEdit(customer)">Edit</button>
               </td>
             </tr>
           </tbody>

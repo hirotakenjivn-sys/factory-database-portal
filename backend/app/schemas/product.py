@@ -5,6 +5,7 @@ from datetime import datetime
 
 class ProductBase(BaseModel):
     product_code: str
+    product_name: Optional[str] = None
     customer_id: int
     is_active: bool = True
 
@@ -15,6 +16,7 @@ class ProductCreate(ProductBase):
 
 class ProductUpdate(BaseModel):
     product_code: Optional[str] = None
+    product_name: Optional[str] = None
     customer_id: Optional[int] = None
     is_active: Optional[bool] = None
     user: Optional[str] = None

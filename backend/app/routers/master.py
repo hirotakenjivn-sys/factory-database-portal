@@ -127,6 +127,7 @@ async def get_products(
         result.append({
             "product_id": p.product_id,
             "product_code": p.product_code,
+            "product_name": p.product_name,
             "customer_id": p.customer_id,
             "customer_name": p.customer.customer_name if p.customer else None,
             "is_active": p.is_active,
@@ -155,6 +156,7 @@ async def get_product_by_code(
     return {
         "product_id": product.product_id,
         "product_code": product.product_code,
+        "product_name": product.product_name,
         "customer_id": product.customer_id,
         "customer_name": product.customer.customer_name if product.customer else None,
         "is_active": product.is_active
@@ -174,6 +176,53 @@ async def create_product(
     db.commit()
     db.refresh(db_product)
     return db_product
+
+
+@router.put("/products/{product_id}", response_model=product_schema.ProductResponse)
+async def update_product(
+    product_id: int,
+    product: product_schema.ProductUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """製品情報を更新"""
+    db_product = db.query(Product).filter(Product.product_id == product_id).first()
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    for key, value in product.model_dump(exclude_unset=True).items():
+        setattr(db_product, key, value)
+
+    db_product.user = current_user['username']
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+
+@router.delete("/products/{product_id}")
+async def delete_product(
+    product_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """製品を削除"""
+    db_product = db.query(Product).filter(Product.product_id == product_id).first()
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # 関連するSPM設定があるかチェック
+    spm_count = db.query(SPM).filter(SPM.product_id == product_id).count()
+    if spm_count > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete product with associated SPM settings")
+
+    # 関連する材料レートがあるかチェック
+    material_rate_count = db.query(MaterialRate).filter(MaterialRate.product_id == product_id).count()
+    if material_rate_count > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete product with associated material rates")
+
+    db.delete(db_product)
+    db.commit()
+    return {"message": "Product deleted successfully"}
 
 
 # ==================== Employees ====================
