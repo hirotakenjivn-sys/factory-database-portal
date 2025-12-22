@@ -437,4 +437,4 @@ INSERT INTO `factories` (`factory_id`, `factory_name`, `user`) VALUES
 
 -- 管理者ユーザー (password: admin123)
 INSERT INTO `employees` (`employee_no`, `name`, `password_hash`, `user`) VALUES
-('admin', 'Administrator', '$pbkdf2-sha256$29000$7.8vS.X.X.X.X.X.X.X.X.X$X.X.X.X.X.X.X.X.X.X.X.X.X.X.X.X.X.X.X.X.X.X', 'system');
+('admin', 'Administrator', '$2b$12$LQv3c1yqBWVHxkd0LpS8eeBRZafQ.9W6Z9J6W9J6W9J6W9J6W9J6W', 'system');
