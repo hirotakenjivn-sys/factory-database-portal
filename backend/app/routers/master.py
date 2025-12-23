@@ -7,6 +7,7 @@ from ..models.product import Product
 from ..models.employee import Employee
 from ..models.supplier import Supplier
 from ..models.lot import Lot
+from ..models.factory import Factory, MachineList
 from ..models.material import MaterialRate
 from ..models.spm import SPM
 from ..models.process import ProcessNameType, Process
