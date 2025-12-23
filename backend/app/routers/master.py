@@ -176,6 +176,57 @@ async def create_product(
     return db_product
 
 
+@router.put("/products/{product_id}", response_model=product_schema.ProductResponse)
+async def update_product(
+    product_id: int,
+    product: product_schema.ProductUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    db_product = db.query(Product).filter(Product.product_id == product_id).first()
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    for key, value in product.model_dump(exclude_unset=True).items():
+        setattr(db_product, key, value)
+
+    db_product.user = current_user['username']
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+
+@router.delete("/products/{product_id}")
+async def delete_product(
+    product_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    db_product = db.query(Product).filter(Product.product_id == product_id).first()
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Check for associated data
+    # Lots
+    lots_count = db.query(Lot).filter(Lot.product_id == product_id).count()
+    if lots_count > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete product with associated lots")
+
+    # SPM settings
+    spm_count = db.query(SPM).filter(SPM.product_id == product_id).count()
+    if spm_count > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete product with associated SPM settings")
+
+    # Material rates
+    material_rates_count = db.query(MaterialRate).filter(MaterialRate.product_id == product_id).count()
+    if material_rates_count > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete product with associated material rates")
+
+    db.delete(db_product)
+    db.commit()
+    return {"message": "Product deleted successfully"}
+
+
 # ==================== Employees ====================
 @router.get("/employees", response_model=List[employee_schema.EmployeeResponse])
 async def get_employees(

@@ -66,7 +66,13 @@
               <td>
                 <div style="display: flex; gap: 8px;">
                   <button class="btn btn-secondary btn-sm" @click="handleEdit(customer)">Edit</button>
-                  <button class="btn btn-danger btn-sm" @click="handleDelete(customer.customer_id)">Delete</button>
+                  <button
+                    v-if="editingId === customer.customer_id"
+                    class="btn btn-danger btn-sm"
+                    @click="handleDelete(customer.customer_id)"
+                  >
+                    Delete
+                  </button>
                 </div>
               </td>
             </tr>
