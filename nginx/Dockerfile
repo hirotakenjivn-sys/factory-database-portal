@@ -4,6 +4,7 @@ WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm ci
 
+ARG CACHEBUST=1
 COPY frontend/ ./
 # Viteは production 用 env を読む（frontend/.env.production）
 RUN npm run build

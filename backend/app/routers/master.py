@@ -7,10 +7,11 @@ from ..models.product import Product
 from ..models.employee import Employee
 from ..models.supplier import Supplier
 from ..models.lot import Lot
-from ..models.process import ProcessNameType
-from ..models.factory import Factory, MachineList
 from ..models.material import MaterialRate
 from ..models.spm import SPM
+from ..models.process import ProcessNameType, Process
+from ..models.po import PO
+from ..models.finished_product import FinishedProduct
 from ..schemas import customer as customer_schema
 from ..schemas import product as product_schema
 from ..schemas import employee as employee_schema
@@ -221,6 +222,21 @@ async def delete_product(
     material_rates_count = db.query(MaterialRate).filter(MaterialRate.product_id == product_id).count()
     if material_rates_count > 0:
         raise HTTPException(status_code=400, detail="Cannot delete product with associated material rates")
+
+    # Processes
+    processes_count = db.query(Process).filter(Process.product_id == product_id).count()
+    if processes_count > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete product with associated processes")
+
+    # POs
+    pos_count = db.query(PO).filter(PO.product_id == product_id).count()
+    if pos_count > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete product with associated POs")
+
+    # Finished products
+    finished_products_count = db.query(FinishedProduct).filter(FinishedProduct.product_id == product_id).count()
+    if finished_products_count > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete product with associated finished products")
 
     db.delete(db_product)
     db.commit()
