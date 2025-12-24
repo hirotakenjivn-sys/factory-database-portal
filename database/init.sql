@@ -119,40 +119,17 @@ DROP TABLE IF EXISTS `broken_mold_mold`;
 DROP TABLE IF EXISTS `broken_mold_stamp`;
 DROP TABLE IF EXISTS `broken_mold`;
 
-CREATE TABLE `broken_mold_stamp` (
-  `broken_mold_stamp_id` INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE `broken_mold` (
+  `broken_mold_id` INT AUTO_INCREMENT PRIMARY KEY,
   `process_id` INT NOT NULL,
-  `reason` TEXT,
-  `date_broken_time` DATETIME,
+  `date_broken` DATE NOT NULL,
   `date_hope_repaired` DATE,
-  `note` TEXT,
-  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `user` VARCHAR(100),
-  FOREIGN KEY (`process_id`) REFERENCES `processes`(`process_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `broken_mold_mold` (
-  `broken_mold_mold_id` INT AUTO_INCREMENT PRIMARY KEY,
-  `broken_mold_stamp_id` INT NOT NULL,
   `date_schedule_repaired` DATE,
   `note` TEXT,
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user` VARCHAR(100),
-  FOREIGN KEY (`broken_mold_stamp_id`) REFERENCES `broken_mold_stamp`(`broken_mold_stamp_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `broken_mold_history` (
-  `broken_mold_history_id` INT AUTO_INCREMENT PRIMARY KEY,
-  `broken_mold_mold_id` INT NOT NULL,
-  `way_repair` TEXT,
-  `repairman` VARCHAR(100),
-  `cause` TEXT,
-  `actual_repaired_date` DATE,
-  `quantity` INT,
-  `note` TEXT,
-  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `user` VARCHAR(100),
-  FOREIGN KEY (`broken_mold_mold_id`) REFERENCES `broken_mold_mold`(`broken_mold_mold_id`)
+  FOREIGN KEY (`process_id`) REFERENCES `processes`(`process_id`),
+  INDEX `idx_broken_mold_process` (`process_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================
@@ -228,13 +205,15 @@ CREATE TABLE `material_rates` (
 DROP TABLE IF EXISTS `spm`;
 CREATE TABLE `spm` (
   `spm_id` INT AUTO_INCREMENT PRIMARY KEY,
-  `process_id` INT NOT NULL,
-  `machine_list_id` INT NOT NULL,
+  `product_id` INT NOT NULL,
+  `process_name` VARCHAR(100) NOT NULL,
+  `press_no` VARCHAR(100) NOT NULL,
   `cycle_time` DECIMAL(10, 2) NOT NULL,
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user` VARCHAR(100),
-  FOREIGN KEY (`process_id`) REFERENCES `processes`(`process_id`),
-  FOREIGN KEY (`machine_list_id`) REFERENCES `machine_list`(`machine_list_id`)
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`product_id`),
+  INDEX `idx_spm_product` (`product_id`),
+  INDEX `idx_spm_process_name` (`process_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================
@@ -337,6 +316,7 @@ CREATE TABLE `stamp_traces` (
   `ok_quantity` INT NOT NULL,
   `ng_quantity` INT NOT NULL,
   `result` VARCHAR(50) COMMENT 'pass, fail, rework',
+  `done` BOOLEAN DEFAULT FALSE,
   `date` DATE NOT NULL,
   `note` TEXT,
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
