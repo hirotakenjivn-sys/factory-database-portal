@@ -13,6 +13,9 @@ from ..models.spm import SPM
 from ..models.process import ProcessNameType, Process
 from ..models.po import PO
 from ..models.finished_product import FinishedProduct
+from ..models.production_schedule import ProductionSchedule
+from ..models.trace import StampTrace, OutsourceTrace
+from ..models.mold import BrokenMold
 from ..schemas import customer as customer_schema
 from ..schemas import product as product_schema
 from ..schemas import employee as employee_schema
@@ -20,7 +23,6 @@ from ..schemas import supplier as supplier_schema
 from ..schemas import process as process_schema
 from ..schemas import factory as factory_schema
 from ..schemas import material as material_schema
-from ..schemas import spm as spm_schema
 from ..schemas import spm as spm_schema
 from .auth import get_current_user
 from ..utils.auth import get_password_hash, generate_strong_password
@@ -204,44 +206,73 @@ async def delete_product(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ):
-    db_product = db.query(Product).filter(Product.product_id == product_id).first()
-    if not db_product:
-        raise HTTPException(status_code=404, detail="Product not found")
+    try:
+        db_product = db.query(Product).filter(Product.product_id == product_id).first()
+        if not db_product:
+            raise HTTPException(status_code=404, detail="Product not found")
 
-    # Check for associated data
-    # Lots
-    lots_count = db.query(Lot).filter(Lot.product_id == product_id).count()
-    if lots_count > 0:
-        raise HTTPException(status_code=400, detail="Cannot delete product with associated lots")
+        # Check for associated data
+        # Lots
+        lots_count = db.query(Lot).filter(Lot.product_id == product_id).count()
+        if lots_count > 0:
+            raise HTTPException(status_code=400, detail="Cannot delete product with associated lots")
 
-    # SPM settings
-    spm_count = db.query(SPM).filter(SPM.product_id == product_id).count()
-    if spm_count > 0:
-        raise HTTPException(status_code=400, detail="Cannot delete product with associated SPM settings")
+        # SPM settings
+        spm_count = db.query(SPM).filter(SPM.product_id == product_id).count()
+        if spm_count > 0:
+            raise HTTPException(status_code=400, detail="Cannot delete product with associated SPM settings")
 
-    # Material rates
-    material_rates_count = db.query(MaterialRate).filter(MaterialRate.product_id == product_id).count()
-    if material_rates_count > 0:
-        raise HTTPException(status_code=400, detail="Cannot delete product with associated material rates")
+        # Material rates
+        material_rates_count = db.query(MaterialRate).filter(MaterialRate.product_id == product_id).count()
+        if material_rates_count > 0:
+            raise HTTPException(status_code=400, detail="Cannot delete product with associated material rates")
 
-    # Processes
-    processes_count = db.query(Process).filter(Process.product_id == product_id).count()
-    if processes_count > 0:
-        raise HTTPException(status_code=400, detail="Cannot delete product with associated processes")
+        # Processes
+        processes = db.query(Process).filter(Process.product_id == product_id).all()
+        process_ids = [p.process_id for p in processes]
+        if len(process_ids) > 0:
+            # Check for data associated with processes
+            # Production Schedule
+            schedules_count = db.query(ProductionSchedule).filter(ProductionSchedule.process_id.in_(process_ids)).count()
+            if schedules_count > 0:
+                raise HTTPException(status_code=400, detail="Cannot delete product with associated production schedules")
+            
+            # Stamp Traces
+            stamp_traces_count = db.query(StampTrace).filter(StampTrace.process_id.in_(process_ids)).count()
+            if stamp_traces_count > 0:
+                raise HTTPException(status_code=400, detail="Cannot delete product with associated stamp traces")
+            
+            # Outsource Traces
+            outsource_traces_count = db.query(OutsourceTrace).filter(OutsourceTrace.process_id.in_(process_ids)).count()
+            if outsource_traces_count > 0:
+                raise HTTPException(status_code=400, detail="Cannot delete product with associated outsource traces")
+            
+            # Broken Molds
+            broken_molds_count = db.query(BrokenMold).filter(BrokenMold.process_id.in_(process_ids)).count()
+            if broken_molds_count > 0:
+                raise HTTPException(status_code=400, detail="Cannot delete product with associated broken mold records")
 
-    # POs
-    pos_count = db.query(PO).filter(PO.product_id == product_id).count()
-    if pos_count > 0:
-        raise HTTPException(status_code=400, detail="Cannot delete product with associated POs")
+            raise HTTPException(status_code=400, detail="Cannot delete product with associated processes")
 
-    # Finished products
-    finished_products_count = db.query(FinishedProduct).filter(FinishedProduct.product_id == product_id).count()
-    if finished_products_count > 0:
-        raise HTTPException(status_code=400, detail="Cannot delete product with associated finished products")
+        # POs
+        pos_count = db.query(PO).filter(PO.product_id == product_id).count()
+        if pos_count > 0:
+            raise HTTPException(status_code=400, detail="Cannot delete product with associated POs")
 
-    db.delete(db_product)
-    db.commit()
-    return {"message": "Product deleted successfully"}
+        # Finished products
+        finished_products_count = db.query(FinishedProduct).filter(FinishedProduct.product_id == product_id).count()
+        if finished_products_count > 0:
+            raise HTTPException(status_code=400, detail="Cannot delete product with associated finished products")
+
+        db.delete(db_product)
+        db.commit()
+        return {"message": "Product deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        print(f"Error deleting product: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error during deletion: {str(e)}")
 
 
 # ==================== Employees ====================
