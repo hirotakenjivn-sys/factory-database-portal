@@ -417,7 +417,7 @@ INSERT INTO `products` (`product_code`, `customer_id`, `is_active`, `user`) VALU
 -- ================================================
 -- Employees (従業員) - 200 records
 -- ================================================
-INSERT INTO `employees` (`employee_no`, `name`, `is_active`, `user`) VALUES
+INSERT IGNORE INTO `employees` (`employee_no`, `name`, `is_active`, `user`) VALUES
 ('admin', 'admin', TRUE, 'system'),
 ('EMP0001', '伊藤 雅之', TRUE, 'admin'),
 ('EMP0002', '中島 陽菜', TRUE, 'admin'),
