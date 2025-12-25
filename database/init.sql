@@ -275,6 +275,22 @@ CREATE TABLE `deleted_po` (
 -- ================================================
 -- 16. finished_products (完成品)
 -- ================================================
+DROP TABLE IF EXISTS `finished_products`;
+CREATE TABLE `finished_products` (
+  `finished_product_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `product_id` INT NOT NULL,
+  `lot_id` INT NOT NULL,
+  `finished_quantity` INT NOT NULL,
+  `date_finished` DATE NOT NULL,
+  `is_shipped` BOOLEAN DEFAULT FALSE NOT NULL,
+  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user` VARCHAR(100),
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`product_id`),
+  FOREIGN KEY (`lot_id`) REFERENCES `lot`(`lot_id`),
+  INDEX `idx_finished_products_product` (`product_id`),
+  INDEX `idx_finished_products_lot` (`lot_id`),
+  INDEX `idx_finished_products_shipped` (`is_shipped`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 -- ================================================
@@ -416,4 +432,4 @@ INSERT INTO `factories` (`factory_id`, `factory_name`, `user`) VALUES
 
 -- 管理者ユーザー (employee_no: admin, password: admin123)
 INSERT INTO `employees` (`employee_no`, `name`, `password_hash`, `is_active`, `user`) VALUES
-('admin', 'Administrator', '$pbkdf2-sha256$29000$4u3PajYXzvs3a99YYaspLw$7iYGFWWBJeVU6ySEJoDYBp_KRjq5WA5Ozmhve1dB3dU', TRUE, 'system');
+('admin', 'Administrator', '$pbkdf2-sha256$29000$l9sId.wouC6nCeZx/BQBF$pkK546HVraIqRnUifMH2DPk4qRrH4qQbjZzRKWnETx2', TRUE, 'system');
