@@ -11,7 +11,7 @@
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>Register Employee</h2>
+        <h2>{{ editingId ? 'Edit Employee' : 'Register Employee' }}</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
@@ -26,12 +26,17 @@
               <input v-model="form.is_active" type="checkbox" id="is_active" />
               <label for="is_active" style="margin: 0; cursor: pointer;">Active</label>
             </div>
-            <div style="display: flex; align-items: center; gap: var(--spacing-sm); height: 34px;">
+            <div v-if="!editingId" style="display: flex; align-items: center; gap: var(--spacing-sm); height: 34px;">
               <input v-model="form.create_password" type="checkbox" id="create_password" />
               <label for="create_password" style="margin: 0; cursor: pointer;">Create Password</label>
             </div>
-            <div>
-              <button type="submit" class="btn btn-primary">Register</button>
+            <div style="display: flex; gap: 8px;">
+              <button type="submit" class="btn btn-primary">
+                {{ editingId ? 'Update' : 'Register' }}
+              </button>
+              <button v-if="editingId" type="button" class="btn btn-secondary" @click="cancelEdit">
+                Cancel
+              </button>
             </div>
           </div>
         </form>
@@ -65,6 +70,7 @@
               <th>Employee No</th>
               <th>Name</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -76,6 +82,18 @@
                 <span :class="employee.is_active ? 'status-active' : 'status-inactive'">
                   {{ employee.is_active ? 'Active' : 'Inactive' }}
                 </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-secondary btn-sm" @click="handleEdit(employee)">Edit</button>
+                  <button
+                    v-if="editingId === employee.employee_id"
+                    class="btn btn-danger btn-sm"
+                    @click="handleDelete(employee.employee_id)"
+                  >
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -98,9 +116,10 @@ const form = ref({
   employee_no: '',
   name: '',
   is_active: true,
-  create_password: true,
+  create_password: false,
 })
 
+const editingId = ref(null)
 const employees = ref([])
 const searchEmployeeNo = ref('')
 const searchName = ref('')
@@ -124,25 +143,64 @@ const loadEmployees = async () => {
 
 const handleSubmit = async () => {
   try {
-    const response = await api.post('/master/employees', form.value)
-    
-    if (response.data.generated_password) {
-      alert(`Employee registered successfully.\n\nLogin ID: ${response.data.employee_no}\nPassword: ${response.data.generated_password}\n\nPlease save this password immediately.`)
+    if (editingId.value) {
+      await api.put(`/master/employees/${editingId.value}`, form.value)
+      alert('Employee updated successfully')
     } else {
-      alert('Employee registered successfully')
+      const response = await api.post('/master/employees', form.value)
+      if (response.data.generated_password) {
+        alert(`Employee registered successfully.\n\nLogin ID: ${response.data.employee_no}\nPassword: ${response.data.generated_password}\n\nPlease save this password immediately.`)
+      } else {
+        alert('Employee registered successfully')
+      }
     }
 
-    form.value = {
-      employee_no: '',
-      name: '',
-      is_active: true,
-      create_password: true,
-    }
+    resetForm()
     await loadEmployees()
   } catch (error) {
-    console.error('Failed to create employee:', error)
-    alert('Failed to register employee')
+    console.error('Failed to save employee:', error)
+    const detail = error.response?.data?.detail || 'Failed to save employee'
+    alert(detail)
   }
+}
+
+const handleEdit = (employee) => {
+  editingId.value = employee.employee_id
+  form.value = {
+    employee_no: employee.employee_no,
+    name: employee.name,
+    is_active: employee.is_active,
+    create_password: false,
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const handleDelete = async (id) => {
+  if (!confirm('Are you sure you want to delete this employee?')) return
+
+  try {
+    await api.delete(`/master/employees/${id}`)
+    alert('Employee deleted successfully')
+    loadEmployees()
+  } catch (error) {
+    console.error('Failed to delete employee:', error)
+    const detail = error.response?.data?.detail || 'Failed to delete employee'
+    alert(detail)
+  }
+}
+
+const cancelEdit = () => {
+  resetForm()
+}
+
+const resetForm = () => {
+  form.value = {
+    employee_no: '',
+    name: '',
+    is_active: true,
+    create_password: false,
+  }
+  editingId.value = null
 }
 
 const handleSearch = () => {

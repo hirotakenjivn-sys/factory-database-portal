@@ -330,6 +330,48 @@ async def create_employee(
     return response
 
 
+@router.put("/employees/{employee_id}", response_model=employee_schema.EmployeeResponse)
+async def update_employee(
+    employee_id: int,
+    employee: employee_schema.EmployeeUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """従業員情報を更新"""
+    db_employee = db.query(Employee).filter(Employee.employee_id == employee_id).first()
+    if not db_employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+
+    for key, value in employee.model_dump(exclude_unset=True).items():
+        setattr(db_employee, key, value)
+
+    db_employee.user = current_user['username']
+    db.commit()
+    db.refresh(db_employee)
+    return db_employee
+
+
+@router.delete("/employees/{employee_id}")
+async def delete_employee(
+    employee_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """従業員を削除"""
+    db_employee = db.query(Employee).filter(Employee.employee_id == employee_id).first()
+    if not db_employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+
+    # 関連する実績データがあるかチェック
+    traces_count = db.query(StampTrace).filter(StampTrace.employee_id == employee_id).count()
+    if traces_count > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete employee with associated production traces")
+
+    db.delete(db_employee)
+    db.commit()
+    return {"message": "Employee deleted successfully"}
+
+
 # ==================== Suppliers ====================
 @router.get("/suppliers", response_model=List[supplier_schema.SupplierResponse])
 async def get_suppliers(
