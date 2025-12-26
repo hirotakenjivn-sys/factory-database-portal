@@ -43,7 +43,6 @@
           class="form-input"
           type="text"
           placeholder="Search Customer..."
-          placeholder="Search Customer..."
           style="margin-bottom: var(--spacing-md); max-width: 175px;"
         />
         <button class="btn btn-secondary" @click="downloadCSV" style="margin-left: var(--spacing-md);">
