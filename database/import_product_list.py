@@ -21,6 +21,19 @@ def generate_product_inserts(csv_path, output_sql_path):
 
     reader = csv.DictReader(lines)
     
+    # Mapping for corrupted/mismatched names to DB names
+    CORRECTIONS = {
+        'C\ue31eg ty TNHH NIDEC ADVANCED MOTOR (VI?T NAM)': 'Công ty TNHH NIDEC ADVANCED MOTOR (VIỆT NAM)',
+        'CﾔNG TY TNHH WAKYO MAGALL': 'CÔNG TY TNHH WAKYO MAGALL',
+        'HOﾀNG NGUYﾊN': 'HOÀNG NGUYÊN',
+        'NISSEI M? THO': 'NISSEI MỸ THO',
+        'NISSEI TH? ﾐ?C': 'NISSEI THỦ ĐỨC',
+        'SA`I GO`N PRECISION': 'SÀI GÒN PRECISION',
+        'SHARP(Vi?t nam)': 'SHARP(Việt nam)',
+        'YUWA VI?T NAM': 'YUWA VIỆT NAM',
+        "LIXIL (D'ADDARIO)": " LIXIL (D'ADDARIO)", # Restore leading space
+    }
+    
     for row in reader:
         customer_name = row.get('customer') or row.get('Customer')
         product_code = row.get('Product') or row.get('product')
@@ -30,6 +43,10 @@ def generate_product_inserts(csv_path, output_sql_path):
             
         customer_name = customer_name.strip()
         product_code = product_code.strip()
+        
+        # Apply corrections
+        if customer_name in CORRECTIONS:
+            customer_name = CORRECTIONS[customer_name]
         
         # Escape single quotes
         safe_code = product_code.replace("'", "''")
@@ -51,7 +68,7 @@ def generate_product_inserts(csv_path, output_sql_path):
 
 if __name__ == "__main__":
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    product_csv_path = os.path.join(base_dir, 'product-list.csv')
+    product_csv_path = os.path.join(base_dir, 'product-list2.csv')
     output_sql_path = os.path.join(base_dir, 'import_products.sql')
     
     print(f"Reading products from: {product_csv_path}")
