@@ -43,8 +43,12 @@
           class="form-input"
           type="text"
           placeholder="Search Customer..."
+          placeholder="Search Customer..."
           style="margin-bottom: var(--spacing-md); max-width: 175px;"
         />
+        <button class="btn btn-secondary" @click="downloadCSV" style="margin-left: var(--spacing-md);">
+          Download CSV
+        </button>
         <table class="table">
           <thead>
             <tr>
@@ -161,6 +165,37 @@ const resetForm = () => {
 
 const handleSearch = () => {
   loadCustomers(searchQuery.value)
+}
+
+const downloadCSV = () => {
+  if (customers.value.length === 0) {
+    alert('No data to download')
+    return
+  }
+
+  const headers = ['Customer ID', 'Customer Name', 'Status']
+  const rows = customers.value.map(c => [
+    c.customer_id,
+    `"${c.customer_name.replace(/"/g, '""')}"`, // Escape quotes
+    c.is_active ? 'Active' : 'Inactive'
+  ])
+
+  const csvContent = [
+    headers.join(','),
+    ...rows.map(row => row.join(','))
+  ].join('\n')
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', 'customers.csv')
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 }
 
 onMounted(() => {
