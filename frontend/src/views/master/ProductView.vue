@@ -67,6 +67,9 @@
             placeholder="Search Customer..."
             style="width: 200px;"
           />
+          <button class="btn btn-secondary" @click="downloadCSV">
+            Download CSV
+          </button>
         </div>
         <table class="table">
           <thead>
@@ -230,6 +233,38 @@ const resetForm = () => {
 
 const handleSearch = () => {
   loadProducts()
+}
+
+const downloadCSV = () => {
+  if (products.value.length === 0) {
+    alert('No data to download')
+    return
+  }
+
+  const headers = ['Timestamp', 'Product Code', 'Customer Name', 'Status']
+  const rows = products.value.map(p => [
+    formatTimestamp(p.timestamp),
+    `"${p.product_code}"`,
+    `"${p.customer_name.replace(/"/g, '""')}"`,
+    p.is_active ? 'Active' : 'Inactive'
+  ])
+
+  const csvContent = [
+    headers.join(','),
+    ...rows.map(row => row.join(','))
+  ].join('\n')
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', 'products.csv')
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 }
 
 const formatTimestamp = (timestamp) => {
