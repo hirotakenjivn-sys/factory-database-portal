@@ -76,9 +76,12 @@ TARO 4/4	SPM"""
 output_file = r"c:\Users\PCPV\factory-database-portal\database\import_process_names.sql"
 
 sql_statements = []
+sql_statements.append("SET NAMES utf8mb4;")
 sql_statements.append("USE factory_db;")
 sql_statements.append("-- Import Process Names")
 sql_statements.append("-- DAY = 0, SPM = 1")
+sql_statements.append("DELETE FROM process_name_types;")
+sql_statements.append("ALTER TABLE process_name_types AUTO_INCREMENT = 1;")
 
 for line in data.strip().split('\n'):
     if not line.strip():

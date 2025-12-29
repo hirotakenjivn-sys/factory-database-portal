@@ -1,6 +1,9 @@
+SET NAMES utf8mb4;
 USE factory_db;
 -- Import Process Names
 -- DAY = 0, SPM = 1
+DELETE FROM process_name_types;
+ALTER TABLE process_name_types AUTO_INCREMENT = 1;
 INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('CNC', 0, 'admin');
 INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('ĐÓNG GÓI', 0, 'admin');
 INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('HẠ NHIỆT', 0, 'admin');
