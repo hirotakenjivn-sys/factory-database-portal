@@ -330,7 +330,7 @@ async def create_employee(
     return response
 
 
-@router.put("/employees/{employee_id}", response_model=employee_schema.EmployeeResponse)
+@router.put("/employees/{employee_id}", response_model=employee_schema.EmployeeCreateResponse)
 async def update_employee(
     employee_id: int,
     employee: employee_schema.EmployeeUpdate,
@@ -342,13 +342,29 @@ async def update_employee(
     if not db_employee:
         raise HTTPException(status_code=404, detail="Employee not found")
 
-    for key, value in employee.model_dump(exclude_unset=True).items():
+    employee_data = employee.model_dump(exclude_unset=True)
+    create_password = employee_data.pop('create_password', False)
+
+    plain_password = None
+    if create_password:
+        # パスワード自動生成
+        plain_password = generate_strong_password()
+        hashed_password = get_password_hash(plain_password)
+        employee_data['password_hash'] = hashed_password
+
+    for key, value in employee_data.items():
         setattr(db_employee, key, value)
 
     db_employee.user = current_user['username']
     db.commit()
     db.refresh(db_employee)
-    return db_employee
+
+    # レスポンス作成
+    response = employee_schema.EmployeeCreateResponse.model_validate(db_employee)
+    if plain_password:
+        response.generated_password = plain_password
+
+    return response
 
 
 @router.delete("/employees/{employee_id}")

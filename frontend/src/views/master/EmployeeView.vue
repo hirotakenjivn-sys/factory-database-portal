@@ -26,7 +26,7 @@
               <input v-model="form.is_active" type="checkbox" id="is_active" />
               <label for="is_active" style="margin: 0; cursor: pointer;">Active</label>
             </div>
-            <div v-if="!editingId" style="display: flex; align-items: center; gap: var(--spacing-sm); height: 34px;">
+            <div style="display: flex; align-items: center; gap: var(--spacing-sm); height: 34px;">
               <input v-model="form.create_password" type="checkbox" id="create_password" />
               <label for="create_password" style="margin: 0; cursor: pointer;">Create Password</label>
             </div>
@@ -144,8 +144,12 @@ const loadEmployees = async () => {
 const handleSubmit = async () => {
   try {
     if (editingId.value) {
-      await api.put(`/master/employees/${editingId.value}`, form.value)
-      alert('Employee updated successfully')
+      const response = await api.put(`/master/employees/${editingId.value}`, form.value)
+      if (response.data.generated_password) {
+        alert(`Employee updated successfully.\n\nNew Password: ${response.data.generated_password}\n\nPlease save this password immediately.`)
+      } else {
+        alert('Employee updated successfully')
+      }
     } else {
       const response = await api.post('/master/employees', form.value)
       if (response.data.generated_password) {

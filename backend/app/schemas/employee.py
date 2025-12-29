@@ -19,6 +19,7 @@ class EmployeeUpdate(BaseModel):
     name: Optional[str] = None
     is_active: Optional[bool] = None
     user: Optional[str] = None
+    create_password: Optional[bool] = False
 
 
 class EmployeeResponse(EmployeeBase):
