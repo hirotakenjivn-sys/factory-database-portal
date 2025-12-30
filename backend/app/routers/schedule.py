@@ -702,9 +702,9 @@ async def debug_production_schedule(
     target_products = scheduler.get_target_products_with_pos()
 
     # PRESS機を確認
-    from ..models.factory import MachineList
-    press_machines = db.query(MachineList).filter(
-        MachineList.machine_type == 'PRESS'
+    from ..models.factory import MachineList, MachineType
+    press_machines = db.query(MachineList).join(MachineType).filter(
+        MachineType.machine_type_name == 'PRESS'
     ).all()
 
     # 全工程名を取得（ユニーク）
@@ -755,7 +755,7 @@ async def debug_production_schedule(
             {
                 "machine_list_id": m.machine_list_id,
                 "machine_no": m.machine_no,
-                "machine_type": m.machine_type
+                "machine_type": m.machine_type.machine_type_name if m.machine_type else None
             }
             for m in press_machines
         ],
@@ -1171,8 +1171,9 @@ async def get_press_weekly_schedule_from_plan(
     dates = [(today + timedelta(days=i)).isoformat() for i in range(7)]
 
     # PRESS機を取得
-    press_machines = db.query(MachineList).filter(
-        MachineList.machine_type == 'PRESS'
+    from ..models.factory import MachineList, MachineType
+    press_machines = db.query(MachineList).join(MachineType).filter(
+        MachineType.machine_type_name == 'PRESS'
     ).order_by(MachineList.machine_no).all()
 
     # デバッグログ：全スケジュール件数を確認
@@ -1227,7 +1228,7 @@ async def get_press_weekly_schedule_from_plan(
                 continue
             
             # PRESS機械以外はスキップ（TAP, BARREL, PACKINGなど）
-            if machine.machine_type != 'PRESS':
+            if not machine.machine_type or machine.machine_type.machine_type_name != 'PRESS':
                 continue
 
             # POと製品情報を取得
