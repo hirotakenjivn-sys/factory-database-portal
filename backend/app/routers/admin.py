@@ -78,21 +78,12 @@ async def insert_press_machines(db: Session = Depends(get_db)):
     """
     PRESS機のマスタデータを登録
     """
-    from ..models.factory import MachineList, MachineType
+    from ..models.factory import MachineList
 
     try:
-        # PRESSのMachineTypeを取得
-        press_type = db.query(MachineType).filter(MachineType.machine_type_name == 'PRESS').first()
-        if not press_type:
-            # なければ作成 (通常はinit.sqlで作成済み)
-            press_type = MachineType(machine_type_name='PRESS', user='admin')
-            db.add(press_type)
-            db.commit()
-            db.refresh(press_type)
-
         # 既存のPRESS機を確認
         existing_press = db.query(MachineList).filter(
-            MachineList.machine_type_id == press_type.machine_type_id
+            MachineList.machine_type == 'PRESS'
         ).all()
 
         # PRESS機の番号リスト
@@ -111,7 +102,7 @@ async def insert_press_machines(db: Session = Depends(get_db)):
                 new_machine = MachineList(
                     factory_id=1,
                     machine_no=machine_no,
-                    machine_type_id=press_type.machine_type_id,
+                    machine_type='PRESS',
                     user='admin'
                 )
                 db.add(new_machine)
@@ -121,7 +112,7 @@ async def insert_press_machines(db: Session = Depends(get_db)):
 
         # 登録後のPRESS機数を確認
         total_press = db.query(MachineList).filter(
-            MachineList.machine_type_id == press_type.machine_type_id
+            MachineList.machine_type == 'PRESS'
         ).count()
 
         return {
@@ -146,11 +137,11 @@ async def check_press_machines(db: Session = Depends(get_db)):
     """
     PRESS機の登録状況を確認
     """
-    from ..models.factory import MachineList, MachineType
+    from ..models.factory import MachineList
 
     try:
-        press_machines = db.query(MachineList).join(MachineType).filter(
-            MachineType.machine_type_name == 'PRESS'
+        press_machines = db.query(MachineList).filter(
+            MachineList.machine_type == 'PRESS'
         ).all()
 
         return {
@@ -161,7 +152,7 @@ async def check_press_machines(db: Session = Depends(get_db)):
                     "machine_list_id": m.machine_list_id,
                     "machine_no": m.machine_no,
                     "factory_id": m.factory_id,
-                    "machine_type_name": m.machine_type.machine_type_name
+                    "machine_type": m.machine_type
                 }
                 for m in press_machines
             ]

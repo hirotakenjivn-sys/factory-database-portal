@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO)
 logger.setLevel(logging.DEBUG)
 
 from ..models import (
-    PO, Process, ProcessNameType, MachineList, MachineType,
+    PO, Process, ProcessNameType, MachineList,
     Calendar, Product, ProductionSchedule, FinishedProduct
 )
 
@@ -1108,8 +1108,8 @@ class ProductionScheduler:
 
     def initialize_machine_availability(self):
         """PRESS機の空き時間を初期化"""
-        press_machines = self.db.query(MachineList).join(MachineType).filter(
-            MachineType.machine_type_name == 'PRESS'
+        press_machines = self.db.query(MachineList).filter(
+            MachineList.machine_type == 'PRESS'
         ).all()
 
         # 現在時刻を開始時刻とする
@@ -1822,8 +1822,8 @@ class ProductionScheduler:
     def find_best_press_machine(self, process: Process, current_date: date) -> Optional[int]:
         """最適なPRESS機を選択（空き時間が最も多い機械）"""
         # 全PRESS機を取得
-        all_press_machines = self.db.query(MachineList).join(MachineType).filter(
-            MachineType.machine_type_name == 'PRESS'
+        all_press_machines = self.db.query(MachineList).filter(
+            MachineList.machine_type == 'PRESS'
         ).all()
 
         best_machine_id = None
@@ -2120,8 +2120,8 @@ class ProductionScheduler:
 
                         if required_machine_type:
                             # 該当する機械タイプの中から最適な機械を探す
-                            suitable_machines = self.db.query(MachineList).join(MachineType).filter(
-                                MachineType.machine_type_name == required_machine_type
+                            suitable_machines = self.db.query(MachineList).filter(
+                                MachineList.machine_type == required_machine_type
                             ).all()
 
                             for machine in suitable_machines:
@@ -2833,8 +2833,8 @@ class ProductionScheduler:
                 
                 if machine_type:
                     # 該当する機械の最初のものを割り当て
-                    machines = self.db.query(MachineList).join(MachineType).filter(
-                        MachineType.machine_type_name == machine_type
+                    machines = self.db.query(MachineList).filter(
+                        MachineList.machine_type == machine_type
                     ).all()
                     if machines:
                         machine_list_id = machines[0].machine_list_id
@@ -2912,8 +2912,8 @@ class ProductionScheduler:
         for process_type, constraint in self.resource_constraints.items():
             if constraint['enabled'] and constraint['type'] == 'machine':
                 # 該当する機械タイプを取得（例: PRESS機）
-                machines = self.db.query(MachineList).join(MachineType).filter(
-                    MachineType.machine_type_name == process_type
+                machines = self.db.query(MachineList).filter(
+                    MachineList.machine_type == process_type
                 ).all()
 
                 for machine in machines:
@@ -3091,8 +3091,8 @@ class ProductionScheduler:
     ) -> Optional[int]:
         """指定された工程タイプの最適な機械を選択"""
         # 該当する機械タイプを取得
-        machines = self.db.query(MachineList).join(MachineType).filter(
-            MachineType.machine_type_name == process_type
+        machines = self.db.query(MachineList).filter(
+            MachineList.machine_type == process_type
         ).all()
 
         best_machine_id = None

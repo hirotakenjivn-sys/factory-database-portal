@@ -542,10 +542,10 @@ async def autocomplete_machines(
     db: Session = Depends(get_db)
 ):
     """機械番号のオートコンプリート用エンドポイント"""
-    query = db.query(MachineList.machine_no).outerjoin(MachineType, MachineList.machine_type_id == MachineType.machine_type_id)
+    query = db.query(MachineList.machine_no)
 
     if machine_type:
-        query = query.filter(MachineType.machine_type_name == machine_type)
+        query = query.filter(MachineList.machine_type == machine_type)
 
     if search:
         query = query.filter(MachineList.machine_no.contains(search))
@@ -671,76 +671,6 @@ async def create_material_rate(
     return db_material_rate
 
 
-# ==================== Machine Types ====================
-@router.get("/machine-types", response_model=List[factory_schema.MachineTypeResponse])
-async def get_machine_types(
-    skip: int = 0,
-    limit: int = 100,
-    search: str = None,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
-    """機械種類一覧を取得"""
-    query = db.query(MachineType)
-    if search:
-        query = query.filter(MachineType.machine_type_name.contains(search))
-    machine_types = query.offset(skip).limit(limit).all()
-    return machine_types
-
-
-@router.post("/machine-types", response_model=factory_schema.MachineTypeResponse)
-async def create_machine_type(
-    machine_type: factory_schema.MachineTypeCreate,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
-    """機械種類を登録"""
-    machine_type_data = machine_type.model_dump()
-    machine_type_data['user'] = current_user['username']
-    db_machine_type = MachineType(**machine_type_data)
-    db.add(db_machine_type)
-    db.commit()
-    db.refresh(db_machine_type)
-    return db_machine_type
-
-
-@router.put("/machine-types/{machine_type_id}", response_model=factory_schema.MachineTypeResponse)
-async def update_machine_type(
-    machine_type_id: int,
-    machine_type: factory_schema.MachineTypeUpdate,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
-    """機械種類を更新"""
-    db_machine_type = db.query(MachineType).filter(MachineType.machine_type_id == machine_type_id).first()
-    if not db_machine_type:
-        raise HTTPException(status_code=404, detail="Machine type not found")
-
-    for key, value in machine_type.model_dump(exclude_unset=True).items():
-        setattr(db_machine_type, key, value)
-
-    db_machine_type.user = current_user['username']
-    db.commit()
-    db.refresh(db_machine_type)
-    return db_machine_type
-
-
-@router.delete("/machine-types/{machine_type_id}")
-async def delete_machine_type(
-    machine_type_id: int,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
-    """機械種類を削除"""
-    db_machine_type = db.query(MachineType).filter(MachineType.machine_type_id == machine_type_id).first()
-    if not db_machine_type:
-        raise HTTPException(status_code=404, detail="Machine type not found")
-
-    db.delete(db_machine_type)
-    db.commit()
-    return {"message": "Machine type deleted successfully"}
-
-
 # ==================== Machines ====================
 @router.get("/machines", response_model=List[factory_schema.MachineListWithDetails])
 async def get_machines(
@@ -751,7 +681,7 @@ async def get_machines(
     current_user: dict = Depends(get_current_user)
 ):
     """機械一覧を取得"""
-    query = db.query(MachineList).join(Factory, MachineList.factory_id == Factory.factory_id).outerjoin(MachineType, MachineList.machine_type_id == MachineType.machine_type_id)
+    query = db.query(MachineList).join(Factory, MachineList.factory_id == Factory.factory_id)
     if search:
         query = query.filter(MachineList.machine_no.contains(search))
     machines = query.offset(skip).limit(limit).all()
@@ -760,16 +690,14 @@ async def get_machines(
     result = []
     for m in machines:
         factory = db.query(Factory).filter(Factory.factory_id == m.factory_id).first()
-        machine_type = db.query(MachineType).filter(MachineType.machine_type_id == m.machine_type_id).first()
         result.append({
             "machine_list_id": m.machine_list_id,
             "factory_id": m.factory_id,
             "machine_no": m.machine_no,
-            "machine_type_id": m.machine_type_id,
+            "machine_type": m.machine_type,
             "timestamp": m.timestamp,
             "user": m.user,
             "factory_name": factory.factory_name if factory else None,
-            "machine_type_name": machine_type.machine_type_name if machine_type else None,
         })
     return result
 
@@ -782,7 +710,7 @@ async def create_machine(
 ):
     """機械を登録"""
     machine_no = machine_data.get("machine_no")
-    machine_type_id = machine_data.get("machine_type_id")
+    machine_type = machine_data.get("machine_type")
     factory_id = machine_data.get("factory_id")
 
     if not machine_no:
@@ -795,7 +723,7 @@ async def create_machine(
     db_machine = MachineList(
         factory_id=factory_id,
         machine_no=machine_no,
-        machine_type_id=machine_type_id,
+        machine_type=machine_type,
         user=current_user['username']
     )
     db.add(db_machine)

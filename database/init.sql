@@ -81,39 +81,22 @@ CREATE TABLE `factories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================
--- ================================================
--- 6. machine_types (機械種類マスタ)
--- ================================================
-DROP TABLE IF EXISTS `machine_types`;
-CREATE TABLE `machine_types` (
-  `machine_type_id` INT AUTO_INCREMENT PRIMARY KEY,
-  `machine_type_name` VARCHAR(50) NOT NULL UNIQUE,
-  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `user` VARCHAR(100)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-INSERT INTO `machine_types` (`machine_type_name`, `user`) VALUES ('PRESS', 'admin');
-INSERT INTO `machine_types` (`machine_type_name`, `user`) VALUES ('TAP', 'admin');
-INSERT INTO `machine_types` (`machine_type_name`, `user`) VALUES ('BARREL', 'admin');
-
--- ================================================
--- 7. machine_list (機械リスト)
+-- 6. machine_list (機械リスト)
 -- ================================================
 DROP TABLE IF EXISTS `machine_list`;
 CREATE TABLE `machine_list` (
   `machine_list_id` INT AUTO_INCREMENT PRIMARY KEY,
   `factory_id` INT NOT NULL,
   `machine_no` VARCHAR(100) NOT NULL,
-  `machine_type_id` INT,
+  `machine_type` ENUM('PRESS', 'TAP', 'BARREL') NULL COMMENT '機械種類',
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user` VARCHAR(100),
   FOREIGN KEY (`factory_id`) REFERENCES `factories`(`factory_id`),
-  FOREIGN KEY (`machine_type_id`) REFERENCES `machine_types`(`machine_type_id`),
-  INDEX `idx_machine_type_id` (`machine_type_id`)
+  INDEX `idx_machine_type` (`machine_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================
--- 8. maintain_machines (機械メンテナンス)
+-- 7. maintain_machines (機械メンテナンス)
 -- ================================================
 DROP TABLE IF EXISTS `maintain_machines`;
 CREATE TABLE `maintain_machines` (

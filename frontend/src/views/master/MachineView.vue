@@ -20,13 +20,13 @@
             </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
               <label class="form-label" style="margin-bottom: 0;">Machine Type</label>
-              <select v-model="form.machine_type_id" class="form-input" required>
-                <option :value="null">Select Type</option>
-                <option v-for="type in machineTypes" :key="type.machine_type_id" :value="type.machine_type_id">
-                  {{ type.machine_type_name }}
-                </option>
+              <select v-model="form.machine_type" class="form-input" required>
+                <option value="">Select Type</option>
+                <option value="PRESS">PRESS</option>
+                <option value="TAP">TAP</option>
+                <option value="BARREL">BARREL</option>
               </select>
-            </div>;ＬＰ－
+            </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
               <label class="form-label" style="margin-bottom: 0;">Factory Name</label>
               <AutocompleteInput
@@ -69,7 +69,7 @@
             <tr v-for="item in machines" :key="item.machine_list_id">
               <td>{{ item.machine_list_id }}</td>
               <td>{{ item.machine_no }}</td>
-              <td>{{ item.machine_type_name || '-' }}</td>
+              <td>{{ item.machine_type || '-' }}</td>
               <td>{{ item.factory_name || '-' }}</td>
             </tr>
           </tbody>
@@ -91,22 +91,12 @@ import api from '../../utils/api'
 
 const form = ref({
   machine_no: '',
-  machine_type_id: null,
+  machine_type: '',
   factory_id: null,
 })
 
 const machines = ref([])
-const machineTypes = ref([])
 const searchQuery = ref('')
-
-const loadMachineTypes = async () => {
-  try {
-    const response = await api.get('/master/machine-types')
-    machineTypes.value = response.data
-  } catch (error) {
-    console.error('Failed to load machine types:', error)
-  }
-}
 
 const loadMachines = async (search = '') => {
   try {
@@ -125,7 +115,7 @@ const handleSubmit = async () => {
     alert('Machine registered successfully')
     form.value = {
       machine_no: '',
-      machine_type_id: null,
+      machine_type: '',
       factory_id: null,
     }
     await loadMachines()
@@ -140,7 +130,6 @@ const handleSearch = () => {
 }
 
 onMounted(() => {
-  loadMachineTypes()
   loadMachines()
 })
 </script>

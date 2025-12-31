@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, String, Numeric, DateTime, ForeignKey, Enum
-from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from ..database import Base
 
@@ -13,27 +12,15 @@ class Factory(Base):
     user = Column(String(100))
 
 
-class MachineType(Base):
-    __tablename__ = "machine_types"
-
-    machine_type_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    machine_type_name = Column(String(50), nullable=False, unique=True)
-    timestamp = Column(DateTime, server_default=func.now(), onupdate=func.now())
-    user = Column(String(100))
-
-
 class MachineList(Base):
     __tablename__ = "machine_list"
 
     machine_list_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     factory_id = Column(Integer, ForeignKey("factories.factory_id"), nullable=False)
     machine_no = Column(String(100), nullable=False)
-    machine_type_id = Column(Integer, ForeignKey("machine_types.machine_type_id"), nullable=True)
+    machine_type = Column(Enum('PRESS', 'TAP', 'BARREL', name='machine_type_enum'), nullable=True)
     timestamp = Column(DateTime, server_default=func.now(), onupdate=func.now())
     user = Column(String(100))
-
-    # Relationships
-    machine_type = relationship("MachineType")
 
 
 class WorkingHours(Base):
