@@ -5,7 +5,7 @@ from .supplier import Supplier
 from .po import PO, DeletedPO
 from .process import Process, ProcessNameType
 from .lot import Lot
-from .factory import Factory, MachineList, WorkingHours
+from .factory import Factory, MachineList, MachineType, WorkingHours
 from .mold import BrokenMold
 from .calendar import Calendar, HolidayType
 from .finished_product import FinishedProduct
@@ -26,6 +26,7 @@ __all__ = [
     "Lot",
     "Factory",
     "MachineList",
+    "MachineType",
     "WorkingHours",
     "BrokenMold",
     "Calendar",
