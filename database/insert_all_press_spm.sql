@@ -124,10 +124,11 @@ SELECT
     s.process_name,
     s.press_no,
     s.cycle_time,
-    ml.machine_type
+    mt.machine_type_name
 FROM spm s
 JOIN products pr ON s.product_id = pr.product_id
 LEFT JOIN machine_list ml ON s.press_no = ml.machine_no
+LEFT JOIN machine_types mt ON ml.machine_type_id = mt.machine_type_id
 ORDER BY s.product_id, s.process_name, s.press_no
 LIMIT 30;
 
@@ -136,6 +137,7 @@ SELECT 'Invalid press_no (should be empty):' as status;
 SELECT DISTINCT s.press_no
 FROM spm s
 LEFT JOIN machine_list ml ON s.press_no = ml.machine_no
+LEFT JOIN machine_types mt ON ml.machine_type_id = mt.machine_type_id
 WHERE ml.machine_list_id IS NULL;
 
 -- 各工程に割り当てられたPRESS機の数を確認

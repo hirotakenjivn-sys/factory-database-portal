@@ -2,50 +2,81 @@
 -- Machine List (機械リスト) - 30機
 -- ================================================
 -- Main Factory: 20機, Sub Factory: 10機
--- machine_type: PRESS, TAP, BARREL
+-- 新スキーマ: machine_type_id (外部キー)
 
-INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type`, `user`) VALUES
+SET NAMES utf8mb4;
+
 -- Main Factory (factory_id = 1) - PRESS machines
-(1, 'PRESS-001', 'PRESS', 'admin'),
-(1, 'PRESS-002', 'PRESS', 'admin'),
-(1, 'PRESS-003', 'PRESS', 'admin'),
-(1, 'PRESS-004', 'PRESS', 'admin'),
-(1, 'PRESS-005', 'PRESS', 'admin'),
-(1, 'PRESS-006', 'PRESS', 'admin'),
-(1, 'PRESS-007', 'PRESS', 'admin'),
-(1, 'PRESS-008', 'PRESS', 'admin'),
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'PRESS-001', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'PRESS';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'PRESS-002', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'PRESS';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'PRESS-003', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'PRESS';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'PRESS-004', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'PRESS';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'PRESS-005', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'PRESS';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'PRESS-006', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'PRESS';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'PRESS-007', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'PRESS';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'PRESS-008', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'PRESS';
 
 -- Main Factory - TAP machines
-(1, 'TAP-001', 'TAP', 'admin'),
-(1, 'TAP-002', 'TAP', 'admin'),
-(1, 'TAP-003', 'TAP', 'admin'),
-(1, 'TAP-004', 'TAP', 'admin'),
-(1, 'TAP-005', 'TAP', 'admin'),
-(1, 'TAP-006', 'TAP', 'admin'),
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'TAP-001', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'TAP';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'TAP-002', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'TAP';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'TAP-003', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'TAP';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'TAP-004', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'TAP';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'TAP-005', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'TAP';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'TAP-006', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'TAP';
 
 -- Main Factory - BARREL machines
-(1, 'BARREL-001', 'BARREL', 'admin'),
-(1, 'BARREL-002', 'BARREL', 'admin'),
-(1, 'BARREL-003', 'BARREL', 'admin'),
-(1, 'BARREL-004', 'BARREL', 'admin'),
-(1, 'BARREL-005', 'BARREL', 'admin'),
-(1, 'BARREL-006', 'BARREL', 'admin'),
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'BARREL-001', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'BARREL';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'BARREL-002', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'BARREL';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'BARREL-003', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'BARREL';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'BARREL-004', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'BARREL';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'BARREL-005', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'BARREL';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 1, 'BARREL-006', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'BARREL';
 
 -- Sub Factory (factory_id = 2) - PRESS machines
-(2, 'PRESS-S001', 'PRESS', 'admin'),
-(2, 'PRESS-S002', 'PRESS', 'admin'),
-(2, 'PRESS-S003', 'PRESS', 'admin'),
-(2, 'PRESS-S004', 'PRESS', 'admin'),
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 2, 'PRESS-S001', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'PRESS';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 2, 'PRESS-S002', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'PRESS';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 2, 'PRESS-S003', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'PRESS';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 2, 'PRESS-S004', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'PRESS';
 
 -- Sub Factory - TAP machines
-(2, 'TAP-S001', 'TAP', 'admin'),
-(2, 'TAP-S002', 'TAP', 'admin'),
-(2, 'TAP-S003', 'TAP', 'admin'),
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 2, 'TAP-S001', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'TAP';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 2, 'TAP-S002', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'TAP';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 2, 'TAP-S003', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'TAP';
 
 -- Sub Factory - BARREL machines
-(2, 'BARREL-S001', 'BARREL', 'admin'),
-(2, 'BARREL-S002', 'BARREL', 'admin'),
-(2, 'BARREL-S003', 'BARREL', 'admin');
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 2, 'BARREL-S001', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'BARREL';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 2, 'BARREL-S002', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'BARREL';
+INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`)
+SELECT 2, 'BARREL-S003', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = 'BARREL';
 
 -- 合計30機
 -- Main Factory: PRESS 8機, TAP 6機, BARREL 6機 = 20機

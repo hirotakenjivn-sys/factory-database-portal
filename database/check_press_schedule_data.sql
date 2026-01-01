@@ -1,19 +1,21 @@
 -- ================================================
 -- 今週のプレス計画に関わるテーブルデータ確認
+-- 新スキーマ: machine_type_id (外部キー)
 -- ================================================
 
 -- 1. machine_list (機械リスト) - PRESS機械のみ
 SELECT '=== 1. PRESS機械リスト ===' AS '';
 SELECT
-    machine_list_id,
-    factory_id,
-    machine_no,
-    machine_type,
-    user,
-    timestamp
-FROM machine_list
-WHERE machine_type = 'PRESS'
-ORDER BY machine_no;
+    ml.machine_list_id,
+    ml.factory_id,
+    ml.machine_no,
+    mt.machine_type_name,
+    ml.user,
+    ml.timestamp
+FROM machine_list ml
+JOIN machine_types mt ON ml.machine_type_id = mt.machine_type_id
+WHERE mt.machine_type_name = 'PRESS'
+ORDER BY ml.machine_no;
 
 -- 2. products (製品マスタ) - 有効な製品のみ、最初の20件
 SELECT '' AS '';
@@ -66,18 +68,19 @@ LIMIT 30;
 SELECT '' AS '';
 SELECT '=== 5. PRESS工程（先頭50件） ===' AS '';
 SELECT
-    process_id,
-    product_id,
-    process_no,
-    process_name,
-    rough_cycletime,
-    setup_time,
-    production_limit,
-    user,
-    timestamp
-FROM processes
-WHERE process_name LIKE '%PRESS%'
-ORDER BY product_id, process_no
+    p.process_id,
+    p.product_id,
+    p.process_no,
+    pnt.process_name,
+    p.rough_cycletime,
+    p.setup_time,
+    p.production_limit,
+    p.user,
+    p.timestamp
+FROM processes p
+JOIN process_name_types pnt ON p.process_name_id = pnt.process_name_id
+WHERE pnt.process_name LIKE '%PRESS%'
+ORDER BY p.product_id, p.process_no
 LIMIT 50;
 
 -- 6. process_name_types (工程名マスタ) - PRESS関連のみ
@@ -116,7 +119,10 @@ LIMIT 30;
 -- データ件数サマリー
 SELECT '' AS '';
 SELECT '=== データ件数サマリー ===' AS '';
-SELECT 'PRESS機械数' AS category, COUNT(*) AS count FROM machine_list WHERE machine_type = 'PRESS'
+SELECT 'PRESS機械数' AS category, COUNT(*) AS count
+FROM machine_list ml
+JOIN machine_types mt ON ml.machine_type_id = mt.machine_type_id
+WHERE mt.machine_type_name = 'PRESS'
 UNION ALL
 SELECT '有効製品数', COUNT(*) FROM products WHERE is_active = TRUE
 UNION ALL
@@ -124,7 +130,10 @@ SELECT '有効顧客数', COUNT(*) FROM customers WHERE is_active = TRUE
 UNION ALL
 SELECT '未配送PO数', COUNT(*) FROM po WHERE is_delivered = FALSE
 UNION ALL
-SELECT 'PRESS工程数', COUNT(*) FROM processes WHERE process_name LIKE '%PRESS%'
+SELECT 'PRESS工程数', COUNT(*) 
+FROM processes p
+JOIN process_name_types pnt ON p.process_name_id = pnt.process_name_id
+WHERE pnt.process_name LIKE '%PRESS%'
 UNION ALL
 SELECT 'PRESS工程名タイプ数', COUNT(*) FROM process_name_types WHERE process_name LIKE '%PRESS%'
 UNION ALL
