@@ -26,7 +26,7 @@
                   {{ type.machine_type_name }}
                 </option>
               </select>
-            </div>;ＬＰ－
+            </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
               <label class="form-label" style="margin-bottom: 0;">Factory Name</label>
               <AutocompleteInput
