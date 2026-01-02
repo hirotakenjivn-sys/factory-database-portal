@@ -747,6 +747,9 @@ INSERT IGNORE INTO customers (customer_name, is_active, user) VALUES ('JYS VN', 
 INSERT IGNORE INTO customers (customer_name, is_active, user) VALUES ('SR SUNTOUR', 1, 'admin');
 INSERT IGNORE INTO customers (customer_name, is_active, user) VALUES ('HANGNAM', 1, 'admin');
 
+-- ========== Admin User ==========
+INSERT IGNORE INTO employees (employee_no, name, password_hash, is_active, user) VALUES ('admin', 'Administrator', '$pbkdf2-sha256$29000$f8.59z6nFMJYi1FqTQnBGA$GkHzkJMcSiw0pM0adMApNHGb8KrKdfNKUW.OTk3nYGo', 1, 'system');
+
 -- ========== Employees ==========
 INSERT IGNORE INTO employees (employee_no, name, is_active, user) VALUES ('admin', 'Administrator', 1, 'admin');
 INSERT IGNORE INTO employees (employee_no, name, is_active, user) VALUES ('5060001', 'LÝ THANH NHÀN', 1, 'admin');

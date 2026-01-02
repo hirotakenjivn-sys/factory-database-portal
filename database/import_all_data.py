@@ -237,6 +237,21 @@ def generate_material_rates(csv_path):
     return inserts
 
 
+def generate_admin_user():
+    """管理者ユーザーSQL生成"""
+    inserts = ["-- ========== Admin User =========="]
+
+    # admin123 のパスワードハッシュ (pbkdf2_sha256)
+    password_hash = "$pbkdf2-sha256$29000$f8.59z6nFMJYi1FqTQnBGA$GkHzkJMcSiw0pM0adMApNHGb8KrKdfNKUW.OTk3nYGo"
+
+    sql = f"INSERT IGNORE INTO employees (employee_no, name, password_hash, is_active, user) VALUES ('admin', 'Administrator', '{password_hash}', 1, 'system');"
+    inserts.append(sql)
+
+    print("Processing Admin User (embedded data)")
+    print("  → 1 admin user (password: admin123)")
+    return inserts
+
+
 def generate_customers(csv_path):
     """顧客データSQL生成"""
     inserts = ["-- ========== Customers =========="]
@@ -428,6 +443,8 @@ def main():
     all_inserts.extend(generate_material_rates(material_rates_csv))
     all_inserts.append("")
     all_inserts.extend(generate_customers(customer_csv))
+    all_inserts.append("")
+    all_inserts.extend(generate_admin_user())
     all_inserts.append("")
     all_inserts.extend(generate_employees(employee_csv))
     all_inserts.append("")
