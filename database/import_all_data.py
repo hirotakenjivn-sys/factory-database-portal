@@ -100,6 +100,122 @@ def generate_machine_types(csv_path):
     return inserts
 
 
+def generate_holiday_types(csv_path):
+    """休日種別データSQL生成"""
+    inserts = ["-- ========== Holiday Types =========="]
+    inserts.append("-- 既存データを削除")
+    inserts.append("DELETE FROM holiday_types;")
+    inserts.append("ALTER TABLE holiday_types AUTO_INCREMENT = 1;")
+
+    if not os.path.exists(csv_path):
+        print(f"Warning: {csv_path} が見つかりません。スキップします。")
+        return inserts
+
+    print(f"Processing Holiday Types: {csv_path}")
+    lines = read_csv_robust(csv_path)
+    reader = csv.DictReader(lines)
+
+    count = 0
+    for row in reader:
+        holiday_type = row.get('Holiday Type')
+
+        if holiday_type:
+            holiday_type = holiday_type.strip()
+            safe_type = escape_sql(holiday_type)
+            sql = f"INSERT INTO holiday_types (date_type) VALUES ('{safe_type}');"
+            inserts.append(sql)
+            count += 1
+
+    print(f"  → {count} holiday types")
+    return inserts
+
+
+def generate_material_rates(csv_path):
+    """材料レートデータSQL生成"""
+    inserts = ["-- ========== Material Rates =========="]
+    inserts.append("-- 既存データを削除")
+    inserts.append("DELETE FROM material_rates;")
+    inserts.append("ALTER TABLE material_rates AUTO_INCREMENT = 1;")
+
+    if not os.path.exists(csv_path):
+        print(f"Warning: {csv_path} が見つかりません。スキップします。")
+        return inserts
+
+    print(f"Processing Material Rates: {csv_path}")
+    lines = read_csv_robust(csv_path)
+    reader = csv.DictReader(lines)
+
+    seen = set()
+    count = 0
+    for row in reader:
+        product_code = row.get('Product')
+        thickness = row.get('Thickness', '0')
+        width = row.get('Width', '0')
+        pitch = row.get('Pitch', '0')
+        h = row.get('h', '0')
+
+        if not product_code:
+            continue
+
+        product_code = product_code.strip()
+
+        # 重複チェック
+        if product_code in seen:
+            continue
+        seen.add(product_code)
+
+        safe_code = escape_sql(product_code)
+
+        # product_idをproductsテーブルから取得
+        sql = f"INSERT INTO material_rates (product_id, thickness, width, pitch, h, user) SELECT product_id, {thickness}, {width}, {pitch}, {h}, 'admin' FROM products WHERE product_code = '{safe_code}' LIMIT 1;"
+        inserts.append(sql)
+        count += 1
+
+    print(f"  → {count} material rates (重複排除済み)")
+    return inserts
+
+
+def generate_calendar(csv_path):
+    """カレンダー（休日）データSQL生成"""
+    inserts = ["-- ========== Calendar (Holidays) =========="]
+    inserts.append("-- 既存データを削除")
+    inserts.append("DELETE FROM calendar;")
+    inserts.append("ALTER TABLE calendar AUTO_INCREMENT = 1;")
+
+    if not os.path.exists(csv_path):
+        print(f"Warning: {csv_path} が見つかりません。スキップします。")
+        return inserts
+
+    print(f"Processing Calendar: {csv_path}")
+    lines = read_csv_robust(csv_path)
+    reader = csv.DictReader(lines)
+
+    count = 0
+    for row in reader:
+        date_str = row.get('Date')
+        day_off = row.get('Day Off')
+
+        if date_str and day_off:
+            date_str = date_str.strip()
+            day_off = day_off.strip()
+
+            # DD/MM/YYYY → YYYY-MM-DD に変換
+            parts = date_str.split('/')
+            if len(parts) == 3:
+                date_sql = f"{parts[2]}-{parts[1]}-{parts[0]}"
+            else:
+                continue
+
+            safe_day_off = escape_sql(day_off)
+            # holiday_type_id = 1 (Ngày Nghỉ)
+            sql = f"INSERT INTO calendar (date_holiday, holiday_type_id, user) VALUES ('{date_sql}', 1, 'admin');"
+            inserts.append(sql)
+            count += 1
+
+    print(f"  → {count} calendar entries")
+    return inserts
+
+
 def generate_customers(csv_path):
     """顧客データSQL生成（重複排除）"""
     inserts = ["-- ========== Customers =========="]
@@ -336,10 +452,13 @@ def main():
     # CSVファイルパス
     factory_csv = os.path.join(base_dir, 'シードデータ - Factories.csv')
     machine_type_csv = os.path.join(base_dir, 'シードデータ - MachineTypes.csv')
+    holiday_type_csv = os.path.join(base_dir, 'シードデータ - HolidayTypes.csv')
+    calendar_csv = os.path.join(base_dir, 'シードデータ - Holidays.csv')
     customer_csv = os.path.join(base_dir, 'シードデータ - Customer.csv')
     employee_csv = os.path.join(base_dir, 'シードデータ - employee.csv')
     product_csv = os.path.join(base_dir, 'product-list2.csv')
     machine_csv = os.path.join(base_dir, 'シードデータ - Machine-list.csv')
+    material_rate_csv = os.path.join(base_dir, 'シードデータ - MaterialRates.csv')
 
     # 出力ファイル
     output_sql = os.path.join(base_dir, 'import_all_data.sql')
@@ -365,6 +484,8 @@ def main():
     all_inserts.append("")
     all_inserts.extend(generate_machine_types(machine_type_csv))
     all_inserts.append("")
+    all_inserts.extend(generate_holiday_types(holiday_type_csv))
+    all_inserts.append("")
     all_inserts.extend(generate_customers(customer_csv))
     all_inserts.append("")
     all_inserts.extend(generate_employees(employee_csv))
@@ -376,15 +497,24 @@ def main():
     all_inserts.append("")
     all_inserts.extend(generate_machine_list(machine_csv))
     all_inserts.append("")
+    all_inserts.extend(generate_material_rates(material_rate_csv))
+    all_inserts.append("")
+    all_inserts.extend(generate_calendar(calendar_csv))
+    all_inserts.append("")
     all_inserts.append("-- 外部キー制約を再有効化")
     all_inserts.append("SET FOREIGN_KEY_CHECKS = 1;")
     all_inserts.append("")
     all_inserts.append("-- 完了確認")
-    all_inserts.append("SELECT 'customers' as tbl, COUNT(*) as cnt FROM customers")
+    all_inserts.append("SELECT 'factories' as tbl, COUNT(*) as cnt FROM factories")
+    all_inserts.append("UNION ALL SELECT 'machine_types', COUNT(*) FROM machine_types")
+    all_inserts.append("UNION ALL SELECT 'holiday_types', COUNT(*) FROM holiday_types")
+    all_inserts.append("UNION ALL SELECT 'customers', COUNT(*) FROM customers")
     all_inserts.append("UNION ALL SELECT 'employees', COUNT(*) FROM employees")
     all_inserts.append("UNION ALL SELECT 'products', COUNT(*) FROM products")
     all_inserts.append("UNION ALL SELECT 'process_name_types', COUNT(*) FROM process_name_types")
-    all_inserts.append("UNION ALL SELECT 'machine_list', COUNT(*) FROM machine_list;")
+    all_inserts.append("UNION ALL SELECT 'machine_list', COUNT(*) FROM machine_list")
+    all_inserts.append("UNION ALL SELECT 'material_rates', COUNT(*) FROM material_rates")
+    all_inserts.append("UNION ALL SELECT 'calendar', COUNT(*) FROM calendar;")
 
     # ファイル出力
     with open(output_sql, 'w', encoding='utf-8') as f:
