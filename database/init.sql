@@ -92,9 +92,7 @@ CREATE TABLE `machine_types` (
   `user` VARCHAR(100)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `machine_types` (`machine_type_name`, `user`) VALUES ('PRESS', 'admin');
-INSERT INTO `machine_types` (`machine_type_name`, `user`) VALUES ('TAP', 'admin');
-INSERT INTO `machine_types` (`machine_type_name`, `user`) VALUES ('BARREL', 'admin');
+INSERT INTO `machine_types` (`machine_type_name`, `user`) VALUES ('ĐẬP', 'admin');
 
 -- ================================================
 -- 7. machine_list (機械リスト)
@@ -444,8 +442,8 @@ INSERT INTO `holiday_types` (`holiday_type_id`, `date_type`) VALUES
 
 -- デフォルト工場
 INSERT INTO `factories` (`factory_id`, `factory_name`, `user`) VALUES
-(1, 'Main Factory', 'system'),
-(2, 'Sub Factory', 'system');
+(1, 'X1', 'system'),
+(2, 'X2', 'system');
 
 -- 管理者ユーザー (employee_no: admin, password: admin123)
 INSERT INTO `employees` (`employee_no`, `name`, `password_hash`, `is_active`, `user`) VALUES
