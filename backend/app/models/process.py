@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, Numeric, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from ..database import Base
@@ -21,8 +21,8 @@ class Process(Base):
     product_id = Column(Integer, ForeignKey("products.product_id"), nullable=False)
     process_no = Column(Integer, nullable=False)
     process_name_id = Column(Integer, ForeignKey("process_name_types.process_name_id"), nullable=False)
-    rough_cycletime = Column(Numeric(10, 2))
-    setup_time = Column(Numeric(10, 2), comment="段取時間（分）")
+    rough_cycletime = Column(Integer)
+    setup_time = Column(Integer, comment="段取時間（分）")
     production_limit = Column(Integer, comment="生産可能限界")
     timestamp = Column(DateTime, server_default=func.now(), onupdate=func.now())
     user = Column(String(100))

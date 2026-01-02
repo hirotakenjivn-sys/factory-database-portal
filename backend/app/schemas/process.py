@@ -1,15 +1,14 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
-from decimal import Decimal
 
 
 class ProcessBase(BaseModel):
     product_id: int
     process_no: int
     process_name: str
-    rough_cycletime: Optional[Decimal] = None
-    setup_time: Optional[Decimal] = None
+    rough_cycletime: Optional[int] = None
+    setup_time: Optional[int] = None
     production_limit: Optional[int] = None
 
 
@@ -21,8 +20,8 @@ class ProcessUpdate(BaseModel):
     product_id: Optional[int] = None
     process_no: Optional[int] = None
     process_name: Optional[str] = None
-    rough_cycletime: Optional[Decimal] = None
-    setup_time: Optional[Decimal] = None
+    rough_cycletime: Optional[int] = None
+    setup_time: Optional[int] = None
     production_limit: Optional[int] = None
     user: Optional[str] = None
 
