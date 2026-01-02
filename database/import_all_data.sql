@@ -483,7 +483,6 @@ INSERT INTO material_rates (product_id, thickness, width, pitch, h, user) SELECT
 INSERT INTO material_rates (product_id, thickness, width, pitch, h, user) SELECT p.product_id, 1.5, 37, 18.4, 0.512406287, 'admin' FROM products p WHERE p.product_code = '1.5*16';
 INSERT INTO material_rates (product_id, thickness, width, pitch, h, user) SELECT p.product_id, 1.5, 33, 16.35, 0.492323974, 'admin' FROM products p WHERE p.product_code = '1.5*14';
 INSERT INTO material_rates (product_id, thickness, width, pitch, h, user) SELECT p.product_id, 2.5, 20, 18.5, 0.487634865, 'admin' FROM products p WHERE p.product_code = '2.5*16';
-INSERT INTO material_rates (product_id, thickness, width, pitch, h, user) SELECT p.product_id, CONNECTOR(KMX-M222G-000), 1, 55, 31, 'admin' FROM products p WHERE p.product_code = '4002341 BRKT.';
 INSERT INTO material_rates (product_id, thickness, width, pitch, h, user) SELECT p.product_id, 0.8, 328, 31.5, 0.925524584, 'admin' FROM products p WHERE p.product_code = '4110755';
 INSERT INTO material_rates (product_id, thickness, width, pitch, h, user) SELECT p.product_id, 0.8, 305, 117.5, 0.973692082, 'admin' FROM products p WHERE p.product_code = '4110763';
 INSERT INTO material_rates (product_id, thickness, width, pitch, h, user) SELECT p.product_id, 0.4, 34, 31, 0.1985, 'admin' FROM products p WHERE p.product_code = 'PLAN3564-0047-XXX';

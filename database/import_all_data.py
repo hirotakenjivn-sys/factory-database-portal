@@ -188,6 +188,15 @@ def generate_holidays(csv_path):
     return inserts
 
 
+def is_numeric(value):
+    """数値かどうかを判定"""
+    try:
+        float(value)
+        return True
+    except (ValueError, TypeError):
+        return False
+
+
 def generate_material_rates(csv_path):
     """材料レートSQL生成"""
     inserts = ["-- ========== Material Rates =========="]
@@ -203,6 +212,7 @@ def generate_material_rates(csv_path):
     reader = csv.DictReader(lines)
 
     count = 0
+    skipped = 0
     for row in reader:
         product = row.get('Product', '').strip()
         thickness = row.get('Thickness', '').strip()
@@ -210,16 +220,20 @@ def generate_material_rates(csv_path):
         pitch = row.get('Pitch', '').strip()
         h = row.get('h', '').strip()
 
-        if product and thickness and width and pitch:
-            safe_product = escape_sql(product)
-            # hが空の場合はNULL
-            h_value = h if h else 'NULL'
+        # 数値バリデーション
+        if not (product and is_numeric(thickness) and is_numeric(width) and is_numeric(pitch)):
+            skipped += 1
+            continue
 
-            sql = f"INSERT INTO material_rates (product_id, thickness, width, pitch, h, user) SELECT p.product_id, {thickness}, {width}, {pitch}, {h_value}, 'admin' FROM products p WHERE p.product_code = '{safe_product}';"
-            inserts.append(sql)
-            count += 1
+        safe_product = escape_sql(product)
+        # hが空または非数値の場合はNULL
+        h_value = h if (h and is_numeric(h)) else 'NULL'
 
-    print(f"  → {count} material rates")
+        sql = f"INSERT INTO material_rates (product_id, thickness, width, pitch, h, user) SELECT p.product_id, {thickness}, {width}, {pitch}, {h_value}, 'admin' FROM products p WHERE p.product_code = '{safe_product}';"
+        inserts.append(sql)
+        count += 1
+
+    print(f"  → {count} material rates (skipped {skipped} invalid rows)")
     return inserts
 
 
