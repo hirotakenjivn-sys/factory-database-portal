@@ -4,7 +4,8 @@
       "Bash(docker ps:*)",
       "Bash(cat:*)",
       "Bash(python3:*)",
-      "Bash(python import_all_data.py:*)"
+      "Bash(python import_all_data.py:*)",
+      "Bash(npm run dev:*)"
     ]
   }
 }
