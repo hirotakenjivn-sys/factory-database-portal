@@ -9,6 +9,9 @@ from ..models.customer import Customer
 from ..models.product import Product
 from ..models.process import Process
 from ..models.iot_button_event import IotButtonEvent
+from ..models.employee import Employee
+from ..models.factory import MachineList
+from ..models.material import MaterialRate
 
 router = APIRouter()
 
@@ -18,23 +21,23 @@ async def get_dashboard_cards(db: Session = Depends(get_db)):
     """
     ダッシュボードカード用の統計データ
     """
+    # Employees
+    employees = db.query(func.count(Employee.employee_id)).scalar() or 0
+
+    # Machine List
+    machine_list = db.query(func.count(MachineList.machine_list_id)).scalar() or 0
+
     # Customers
     customers = db.query(func.count(Customer.customer_id)).scalar() or 0
 
-    # Products
-    products = db.query(func.count(Product.product_id)).scalar() or 0
-
-    # Processes
-    processes = db.query(func.count(Process.process_id)).scalar() or 0
-
-    # Count (IoT Events)
-    count = db.query(func.count(IotButtonEvent.event_id)).scalar() or 0
+    # Material Rates
+    material_rates = db.query(func.count(MaterialRate.material_rate_id)).scalar() or 0
 
     return {
+        "employees": employees,
+        "machine_list": machine_list,
         "customers": customers,
-        "products": products,
-        "processes": processes,
-        "count": count
+        "material_rates": material_rates
     }
 
 
