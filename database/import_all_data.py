@@ -141,7 +141,7 @@ def generate_holiday_types(csv_path):
         holiday_type = row.get('Holiday Type', '').strip()
         if holiday_type:
             safe_type = escape_sql(holiday_type)
-            sql = f"INSERT INTO holiday_types (holiday_type_name, user) VALUES ('{safe_type}', 'admin');"
+            sql = f"INSERT INTO holiday_types (date_type) VALUES ('{safe_type}');"
             inserts.append(sql)
             count += 1
 
@@ -180,7 +180,7 @@ def generate_holidays(csv_path):
                 formatted_date = date_str
 
             safe_day_off = escape_sql(day_off)
-            sql = f"INSERT INTO calendar (date, holiday_type_id, user) SELECT '{formatted_date}', ht.holiday_type_id, 'admin' FROM holiday_types ht WHERE ht.holiday_type_name = '{safe_day_off}';"
+            sql = f"INSERT INTO calendar (date_holiday, holiday_type_id, user) SELECT '{formatted_date}', ht.holiday_type_id, 'admin' FROM holiday_types ht WHERE ht.date_type = '{safe_day_off}';"
             inserts.append(sql)
             count += 1
 
