@@ -600,8 +600,9 @@ watch(searchList, () => {
 }, { deep: true })
 
 onMounted(() => {
-  loadProcesses()
-  loadProcessTable()
+  // TODO: デバッグ用に一時的に無効化
+  // loadProcesses()
+  // loadProcessTable()
   loadProcessNames()
 })
 
