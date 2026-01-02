@@ -134,15 +134,10 @@ async def create_process(
     工程登録
     """
     # Validate process_name exists in ProcessNameType
-    # Check for exact match or "PRESS" prefix match
-    process_name_check = process.process_name
-    if process.process_name.upper().startswith("PRESS"):
-        process_name_check = "PRESS"
-        
     name_type = db.query(ProcessNameType).filter(
-        ProcessNameType.process_name == process_name_check
+        ProcessNameType.process_name == process.process_name
     ).first()
-    
+
     if not name_type:
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="Invalid process name. Please select from the master list.")
@@ -175,14 +170,10 @@ async def update_process(
     
     # Validate process_name if it's being updated
     if 'process_name' in update_data:
-        process_name_check = update_data['process_name']
-        if process_name_check.upper().startswith("PRESS"):
-            process_name_check = "PRESS"
-            
         name_type = db.query(ProcessNameType).filter(
-            ProcessNameType.process_name == process_name_check
+            ProcessNameType.process_name == update_data['process_name']
         ).first()
-        
+
         if not name_type:
             from fastapi import HTTPException
             raise HTTPException(status_code=400, detail="Invalid process name. Please select from the master list.")
@@ -246,20 +237,7 @@ async def get_process_name_type(
             "type_label": "SPM" if process_type.day_or_spm else "DAY"
         }
 
-    # Check for "PRESS" variations (e.g., "PRESS 1/2")
-    if process_name.upper().startswith("PRESS"):
-        press_type = db.query(ProcessNameType).filter(
-            ProcessNameType.process_name == "PRESS"
-        ).first()
-        
-        if press_type:
-             return {
-                "process_name": process_name, # Keep the original name (e.g. PRESS 1/2)
-                "day_or_spm": press_type.day_or_spm,
-                "type_label": "SPM" if press_type.day_or_spm else "DAY"
-            }
-
-    # マスターにない場合はデフォルト（SPM）を返す
+    # マスターにない場合はデフォルトを返す
     return {
         "process_name": process_name,
         "day_or_spm": None,
