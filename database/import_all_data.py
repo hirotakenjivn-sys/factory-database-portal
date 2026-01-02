@@ -35,6 +35,71 @@ def escape_sql(value):
     return value.replace("'", "''")
 
 
+def generate_factories(csv_path):
+    """工場データSQL生成"""
+    inserts = ["-- ========== Factories =========="]
+    inserts.append("-- 既存データを削除")
+    inserts.append("DELETE FROM factories;")
+
+    if not os.path.exists(csv_path):
+        print(f"Warning: {csv_path} が見つかりません。スキップします。")
+        return inserts
+
+    print(f"Processing Factories: {csv_path}")
+    lines = read_csv_robust(csv_path)
+    reader = csv.DictReader(lines)
+
+    count = 0
+    for row in reader:
+        factory_id = row.get('Factory ID')
+        factory_name = row.get('Factory Name')
+
+        if factory_id and factory_name:
+            factory_id = factory_id.strip()
+            factory_name = factory_name.strip()
+            safe_name = escape_sql(factory_name)
+            sql = f"INSERT INTO factories (factory_id, factory_name, user) VALUES ({factory_id}, '{safe_name}', 'system');"
+            inserts.append(sql)
+            count += 1
+
+    print(f"  → {count} factories")
+    return inserts
+
+
+def generate_machine_types(csv_path):
+    """機械タイプデータSQL生成"""
+    inserts = ["-- ========== Machine Types =========="]
+    inserts.append("-- 既存データを削除")
+    inserts.append("DELETE FROM machine_types;")
+    inserts.append("ALTER TABLE machine_types AUTO_INCREMENT = 1;")
+
+    if not os.path.exists(csv_path):
+        print(f"Warning: {csv_path} が見つかりません。スキップします。")
+        return inserts
+
+    print(f"Processing Machine Types: {csv_path}")
+    lines = read_csv_robust(csv_path)
+    reader = csv.DictReader(lines)
+
+    seen = set()
+    count = 0
+    for row in reader:
+        machine_type = row.get('Machine Type')
+
+        if machine_type:
+            machine_type = machine_type.strip()
+            if machine_type in seen:
+                continue
+            seen.add(machine_type)
+            safe_type = escape_sql(machine_type)
+            sql = f"INSERT INTO machine_types (machine_type_name, user) VALUES ('{safe_type}', 'admin');"
+            inserts.append(sql)
+            count += 1
+
+    print(f"  → {count} machine types")
+    return inserts
+
+
 def generate_customers(csv_path):
     """顧客データSQL生成（重複排除）"""
     inserts = ["-- ========== Customers =========="]
@@ -69,7 +134,7 @@ def generate_customers(csv_path):
 
 
 def generate_employees(csv_path):
-    """従業員データSQL生成（重複排除）"""
+    """従業員データSQL生成（重複排除、admin含む）"""
     inserts = ["-- ========== Employees =========="]
     inserts.append("-- 既存データを削除")
     inserts.append("DELETE FROM employees;")
@@ -88,16 +153,27 @@ def generate_employees(csv_path):
     for row in reader:
         full_name = row.get('FULL NAME')
         member_id = row.get('MEMBER ID')
+        password_hash = row.get('PASSWORD_HASH', '')
 
         if full_name and member_id:
             full_name = full_name.strip()
             member_id = member_id.strip()
+            password_hash = password_hash.strip() if password_hash else ''
+
             if member_id in seen:
                 continue
             seen.add(member_id)
+
             safe_name = escape_sql(full_name)
             safe_id = escape_sql(member_id)
-            sql = f"INSERT INTO employees (employee_no, name, is_active, user) VALUES ('{safe_id}', '{safe_name}', 1, 'admin');"
+
+            if password_hash:
+                # adminなどパスワード付きユーザー
+                safe_hash = escape_sql(password_hash)
+                sql = f"INSERT INTO employees (employee_no, name, password_hash, is_active, user) VALUES ('{safe_id}', '{safe_name}', '{safe_hash}', 1, 'system');"
+            else:
+                # 通常の従業員
+                sql = f"INSERT INTO employees (employee_no, name, is_active, user) VALUES ('{safe_id}', '{safe_name}', 1, 'admin');"
             inserts.append(sql)
             count += 1
 
@@ -258,6 +334,8 @@ def main():
     base_dir = os.path.dirname(os.path.abspath(__file__))
 
     # CSVファイルパス
+    factory_csv = os.path.join(base_dir, 'シードデータ - Factories.csv')
+    machine_type_csv = os.path.join(base_dir, 'シードデータ - MachineTypes.csv')
     customer_csv = os.path.join(base_dir, 'シードデータ - Customer.csv')
     employee_csv = os.path.join(base_dir, 'シードデータ - employee.csv')
     product_csv = os.path.join(base_dir, 'product-list2.csv')
@@ -281,14 +359,20 @@ def main():
     all_inserts.append("SET FOREIGN_KEY_CHECKS = 0;")
     all_inserts.append("")
 
-    # 各データ生成
+    # 各データ生成（依存関係順）
+    # 1. 基本マスタ（他に依存しない）
+    all_inserts.extend(generate_factories(factory_csv))
+    all_inserts.append("")
+    all_inserts.extend(generate_machine_types(machine_type_csv))
+    all_inserts.append("")
     all_inserts.extend(generate_customers(customer_csv))
     all_inserts.append("")
     all_inserts.extend(generate_employees(employee_csv))
     all_inserts.append("")
-    all_inserts.extend(generate_products(product_csv))
-    all_inserts.append("")
     all_inserts.extend(generate_process_names())
+    all_inserts.append("")
+    # 2. 依存テーブル
+    all_inserts.extend(generate_products(product_csv))
     all_inserts.append("")
     all_inserts.extend(generate_machine_list(machine_csv))
     all_inserts.append("")

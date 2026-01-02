@@ -7,6 +7,18 @@ USE factory_db;
 -- 外部キー制約を一時的に無効化
 SET FOREIGN_KEY_CHECKS = 0;
 
+-- ========== Factories ==========
+-- 既存データを削除
+DELETE FROM factories;
+INSERT INTO factories (factory_id, factory_name, user) VALUES (1, 'X1', 'system');
+INSERT INTO factories (factory_id, factory_name, user) VALUES (2, 'X2', 'system');
+
+-- ========== Machine Types ==========
+-- 既存データを削除
+DELETE FROM machine_types;
+ALTER TABLE machine_types AUTO_INCREMENT = 1;
+INSERT INTO machine_types (machine_type_name, user) VALUES ('ĐẬP', 'admin');
+
 -- ========== Customers ==========
 -- 既存データを削除
 DELETE FROM customers;
@@ -109,6 +121,7 @@ INSERT INTO customers (customer_name, is_active, user) VALUES ('HANGNAM', 1, 'ad
 -- 既存データを削除
 DELETE FROM employees;
 ALTER TABLE employees AUTO_INCREMENT = 1;
+INSERT INTO employees (employee_no, name, password_hash, is_active, user) VALUES ('admin', 'Administrator', '$pbkdf2-sha256$29000$8x7jXKuVci7FWAthLEWotQ$FCBHkG2PyqTVEm7JZI39HOkgNkoKBeVXngGgxzfxfxM', 1, 'system');
 INSERT INTO employees (employee_no, name, is_active, user) VALUES ('5060001', 'LÝ THANH NHÀN', 1, 'admin');
 INSERT INTO employees (employee_no, name, is_active, user) VALUES ('125060004', 'NGUYỄN HÀNH KHÚC', 1, 'admin');
 INSERT INTO employees (employee_no, name, is_active, user) VALUES ('115100005', 'PHAN THỊ MAI', 1, 'admin');
@@ -344,6 +357,82 @@ INSERT INTO employees (employee_no, name, is_active, user) VALUES ('2505031028',
 INSERT INTO employees (employee_no, name, is_active, user) VALUES ('2517060031', 'NGUYỄN TRUNG HIẾU', 1, 'admin');
 INSERT INTO employees (employee_no, name, is_active, user) VALUES ('2520031033', 'LÊ ANH KIỆT', 1, 'admin');
 INSERT INTO employees (employee_no, name, is_active, user) VALUES ('2525031034', 'PHẠM MINH HÙNG', 1, 'admin');
+
+-- ========== Process Name Types ==========
+DELETE FROM process_name_types;
+ALTER TABLE process_name_types AUTO_INCREMENT = 1;
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('CNC', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('ĐÓNG GÓI', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('HẠ NHIỆT', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('LÀM SẠCH SP', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('NHIỆT LUYỆN', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('NHUỘM ĐEN', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('QUAY BÓNG', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RỬA', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RỬA SẠCH DẦU', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RUNG BAVIA', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RUNG BÓNG', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RUNG SẠCH', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RUNG TẨY DẦU', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RUNG TẨY TRẮNG', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('SƠN', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('IN CHỮ', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TẨY TRẮNG', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('XI MẠ', 0, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('THỬ ỐC 100%', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('VÉT BAVIA LỖ', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TÁN', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('XỬ LÝ BAVIA', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('XỬ LÝ CONG', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('XỬ LÝ MẶT PHẲNG', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('XỬ LÝ MÀI CẠNH', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('XỬ LÝ SẠCH SP', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/1', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/2', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/2', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/3', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/3', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 3/3', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/4', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/4', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 3/4', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 4/4', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/5', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/5', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 3/5', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 4/5', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 5/5', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/6', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/6', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 3/6', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 4/6', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 5/6', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 6/6', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/7', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/7', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 3/7', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 4/7', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 5/7', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 6/7', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 7/7', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/8', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/8', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 3/8', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 4/8', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 5/8', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 6/8', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 7/8', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 8/8', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 1/1', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 1/2', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 1/3', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 1/4', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 2/2', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 2/3', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 2/4', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 3/3', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 3/4', 1, 'admin');
+INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 4/4', 1, 'admin');
 
 -- ========== Products ==========
 -- 既存データを削除
@@ -1777,82 +1866,6 @@ INSERT INTO products (product_code, customer_id, is_active, user) SELECT '160TB0
 INSERT INTO products (product_code, customer_id, is_active, user) SELECT '132TB003AA01 132FR', customer_id, 1, 'admin' FROM customers WHERE customer_name = 'HANGNAM' LIMIT 1;
 INSERT INTO products (product_code, customer_id, is_active, user) SELECT 'TC20003AA1', customer_id, 1, 'admin' FROM customers WHERE customer_name = 'HANGNAM' LIMIT 1;
 INSERT INTO products (product_code, customer_id, is_active, user) SELECT 'TB20003AA1', customer_id, 1, 'admin' FROM customers WHERE customer_name = 'HANGNAM' LIMIT 1;
-
--- ========== Process Name Types ==========
-DELETE FROM process_name_types;
-ALTER TABLE process_name_types AUTO_INCREMENT = 1;
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('CNC', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('ĐÓNG GÓI', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('HẠ NHIỆT', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('LÀM SẠCH SP', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('NHIỆT LUYỆN', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('NHUỘM ĐEN', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('QUAY BÓNG', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RỬA', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RỬA SẠCH DẦU', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RUNG BAVIA', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RUNG BÓNG', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RUNG SẠCH', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RUNG TẨY DẦU', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('RUNG TẨY TRẮNG', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('SƠN', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('IN CHỮ', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TẨY TRẮNG', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('XI MẠ', 0, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('THỬ ỐC 100%', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('VÉT BAVIA LỖ', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TÁN', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('XỬ LÝ BAVIA', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('XỬ LÝ CONG', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('XỬ LÝ MẶT PHẲNG', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('XỬ LÝ MÀI CẠNH', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('XỬ LÝ SẠCH SP', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/1', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/2', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/2', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/3', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/3', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 3/3', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/4', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/4', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 3/4', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 4/4', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/5', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/5', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 3/5', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 4/5', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 5/5', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/6', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/6', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 3/6', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 4/6', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 5/6', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 6/6', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/7', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/7', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 3/7', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 4/7', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 5/7', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 6/7', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 7/7', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 1/8', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 2/8', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 3/8', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 4/8', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 5/8', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 6/8', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 7/8', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('DẬP 8/8', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 1/1', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 1/2', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 1/3', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 1/4', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 2/2', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 2/3', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 2/4', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 3/3', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 3/4', 1, 'admin');
-INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 4/4', 1, 'admin');
 
 -- ========== Machine List ==========
 -- 過去のデータを削除
