@@ -6,6 +6,25 @@
   min-height: 100vh;
 }
 
+/* サイドバー対応のラッパー */
+.app-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-content {
+  flex: 1;
+  margin-left: 200px;
+  transition: margin-left 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-content.sidebar-collapsed {
+  margin-left: 60px;
+}
+
 /* ヘッダー */
 .app-header {
   background: var(--dark);
@@ -16,7 +35,7 @@
   padding: 8px 20px;
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 999;
 }
 
 .app-header-title {
@@ -25,40 +44,11 @@
   margin: 0;
 }
 
-/* ナビゲーション */
-.app-navigation {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  background: #34495e;
-  padding: 8px 20px;
-}
-
-.nav-item {
-  color: white;
-  text-decoration: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  transition: background-color 0.2s;
-  cursor: pointer;
-}
-
-.nav-item:hover {
-  background-color: var(--primary-hover);
-}
-
-.nav-item.active {
-  background-color: var(--primary);
-  font-weight: bold;
-}
-
 /* メインコンテンツ */
 .app-main {
   flex: 1;
   padding: 25px;
-  max-width: 1200px;
+  max-width: 1400px;
   width: 100%;
   margin: 0 auto;
   background: var(--light-bg);

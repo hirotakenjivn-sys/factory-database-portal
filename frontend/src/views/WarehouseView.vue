@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <AppHeader />
-    <AppNavigation />
-    <main class="app-main">
+  <AppLayout>
       <h1 class="page-title">倉庫 - 完成品管理</h1>
 
       <!-- 完成品登録フォーム -->
@@ -85,14 +82,12 @@
           <p>完成品データがありません</p>
         </div>
       </div>
-    </main>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import AppHeader from '../components/common/AppHeader.vue'
-import AppNavigation from '../components/common/AppNavigation.vue'
+import AppLayout from '../components/common/AppLayout.vue'
 import AutocompleteInput from '../components/common/AutocompleteInput.vue'
 import CopyableText from '../components/common/CopyableText.vue'
 import api from '../utils/api'

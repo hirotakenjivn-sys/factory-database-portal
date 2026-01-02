@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <AppHeader />
-    <AppNavigation />
-
+  <AppLayout>
     <!-- エラーダイアログ -->
     <ErrorDialog
       :show="showErrorDialog"
@@ -432,14 +429,12 @@
           </div>
         </div>
       </div>
-    </main>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import AppHeader from '../components/common/AppHeader.vue'
-import AppNavigation from '../components/common/AppNavigation.vue'
+import AppLayout from '../components/common/AppLayout.vue'
 import CopyableText from '../components/common/CopyableText.vue'
 import ErrorDialog from '../components/common/ErrorDialog.vue'
 import api from '../utils/api'

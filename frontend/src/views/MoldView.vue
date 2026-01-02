@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <AppHeader />
-    <AppNavigation />
-    <main class="app-main">
+  <AppLayout>
       <h1 class="page-title">金型 - 金型故障管理</h1>
 
       <!-- 金型故障登録フォーム -->
@@ -77,14 +74,12 @@
           <p>金型故障データがありません</p>
         </div>
       </div>
-    </main>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import AppHeader from '../components/common/AppHeader.vue'
-import AppNavigation from '../components/common/AppNavigation.vue'
+import AppLayout from '../components/common/AppLayout.vue'
 import CopyableText from '../components/common/CopyableText.vue'
 import api from '../utils/api'
 import { getTodayFormatted, formatDateForDisplay, formatDateForApi } from '../utils/dateFormat'

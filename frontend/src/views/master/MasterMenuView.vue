@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <AppHeader />
-    <AppNavigation />
-    <main class="app-main">
+  <AppLayout>
       <h1 class="page-title">Master Data Management</h1>
 
       <div class="grid grid-auto">
@@ -16,13 +13,11 @@
           <p>{{ menu.description }}</p>
         </router-link>
       </div>
-    </main>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
-import AppHeader from '../../components/common/AppHeader.vue'
-import AppNavigation from '../../components/common/AppNavigation.vue'
+import AppLayout from '../../components/common/AppLayout.vue'
 
 const masterMenus = [
   { path: '/master/customers', label: 'Customer Master', description: 'Manage customer information' },

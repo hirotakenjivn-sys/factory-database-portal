@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <AppHeader />
-    <AppNavigation />
-    <main class="app-main">
+  <AppLayout>
       <h1 class="page-title">Press - Process Management</h1>
 
       <!-- Process Registration Form -->
@@ -211,14 +208,12 @@
           <p>No process data found</p>
         </div>
       </div>
-    </main>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import AppHeader from '../components/common/AppHeader.vue'
-import AppNavigation from '../components/common/AppNavigation.vue'
+import AppLayout from '../components/common/AppLayout.vue'
 import AutocompleteInput from '../components/common/AutocompleteInput.vue'
 import CopyableText from '../components/common/CopyableText.vue'
 import api from '../utils/api'

@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <AppHeader />
-    <AppNavigation />
-    <main class="app-main">
+  <AppLayout>
       <h1 class="page-title">Dashboard</h1>
 
       <div class="grid grid-4">
@@ -87,14 +84,12 @@
           </table>
         </div>
       </div>
-    </main>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import AppHeader from '../components/common/AppHeader.vue'
-import AppNavigation from '../components/common/AppNavigation.vue'
+import AppLayout from '../components/common/AppLayout.vue'
 import api from '../utils/api'
 import {
   Chart as ChartJS,

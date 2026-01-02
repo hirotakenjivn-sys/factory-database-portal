@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <AppHeader />
-    <AppNavigation />
-    <main class="app-main">
+  <AppLayout>
       <div class="trace-view">
         <div class="trace-header">
           <h1>委託記録登録</h1>
@@ -180,14 +177,12 @@
           </div>
         </div>
       </div>
-    </main>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import AppHeader from '../components/common/AppHeader.vue'
-import AppNavigation from '../components/common/AppNavigation.vue'
+import AppLayout from '../components/common/AppLayout.vue'
 import AutocompleteInput from '../components/common/AutocompleteInput.vue'
 import { useAuthStore } from '../stores/auth'
 import api from '../utils/api'

@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <AppHeader />
-    <AppNavigation />
-    <main class="app-main">
+  <AppLayout>
       <div style="margin-bottom: var(--spacing-lg)">
         <router-link to="/master/products" class="btn btn-secondary">← Back to Product List</router-link>
       </div>
@@ -192,15 +189,13 @@
       <div v-else class="empty-state">
         <p>Product not found</p>
       </div>
-    </main>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import AppHeader from '../../components/common/AppHeader.vue'
-import AppNavigation from '../../components/common/AppNavigation.vue'
+import AppLayout from '../../components/common/AppLayout.vue'
 import api from '../../utils/api'
 
 const route = useRoute()

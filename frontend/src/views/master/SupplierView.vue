@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <AppHeader />
-    <AppNavigation />
-    <main class="app-main">
+  <AppLayout>
       <div style="margin-bottom: var(--spacing-lg)">
         <router-link to="/master" class="btn btn-secondary">← Back to Master Menu</router-link>
       </div>
@@ -60,14 +57,12 @@
           <p>No supplier data found</p>
         </div>
       </div>
-    </main>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import AppHeader from '../../components/common/AppHeader.vue'
-import AppNavigation from '../../components/common/AppNavigation.vue'
+import AppLayout from '../../components/common/AppLayout.vue'
 import api from '../../utils/api'
 
 const form = ref({
