@@ -29,7 +29,7 @@ class ProcessUpdate(BaseModel):
 
 class ProcessResponse(ProcessBase):
     process_id: int
-    timestamp: datetime
+    timestamp: Optional[datetime] = None
     user: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
@@ -60,7 +60,7 @@ class ProcessNameTypeUpdate(BaseModel):
 
 class ProcessNameTypeResponse(ProcessNameTypeBase):
     process_name_id: int
-    timestamp: datetime
+    timestamp: Optional[datetime] = None
     user: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
