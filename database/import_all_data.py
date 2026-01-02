@@ -181,38 +181,53 @@ def generate_process_names():
     return inserts
 
 
-def generate_machine_list():
-    """機械リストSQL生成（新スキーマ対応）"""
+def generate_machine_list(csv_path):
+    """機械リストSQL生成（CSVから読み込み）"""
     inserts = ["-- ========== Machine List =========="]
     inserts.append("-- 過去のデータを削除")
     inserts.append("DELETE FROM `machine_list`;")
     inserts.append("ALTER TABLE `machine_list` AUTO_INCREMENT = 1;")
 
-    machines = [
-        # X1工場 (factory_id=1) - ĐẬP
-        (1, '1', 'ĐẬP'), (1, '2', 'ĐẬP'), (1, '3', 'ĐẬP'), (1, '4', 'ĐẬP'),
-        (1, '5', 'ĐẬP'), (1, '6', 'ĐẬP'), (1, '7', 'ĐẬP'), (1, '8', 'ĐẬP'),
-        (1, '9', 'ĐẬP'), (1, '10', 'ĐẬP'), (1, '11', 'ĐẬP'), (1, '12', 'ĐẬP'),
-        (1, '12-B', 'ĐẬP'), (1, '14', 'ĐẬP'), (1, '15', 'ĐẬP'), (1, '16', 'ĐẬP'),
-        (1, '17', 'ĐẬP'), (1, '18', 'ĐẬP'), (1, '19', 'ĐẬP'), (1, '21', 'ĐẬP'),
-        (1, '22', 'ĐẬP'), (1, '23', 'ĐẬP'), (1, '24', 'ĐẬP'), (1, '25', 'ĐẬP'),
-        (1, '26', 'ĐẬP'), (1, '27', 'ĐẬP'), (1, '28', 'ĐẬP'), (1, '30', 'ĐẬP'),
-        (1, '31', 'ĐẬP'),
-        # X2工場 (factory_id=2) - ĐẬP
-        (2, '1', 'ĐẬP'), (2, '2', 'ĐẬP'), (2, '3', 'ĐẬP'), (2, '4', 'ĐẬP'),
-        (2, '5', 'ĐẬP'), (2, '6', 'ĐẬP'), (2, '7', 'ĐẬP'), (2, '8', 'ĐẬP'),
-        (2, '9', 'ĐẬP'), (2, '10', 'ĐẬP'), (2, '11', 'ĐẬP'), (2, '12', 'ĐẬP'),
-        (2, '13', 'ĐẬP'), (2, '14', 'ĐẬP'), (2, '15', 'ĐẬP'), (2, '16', 'ĐẬP'),
-        (2, '17', 'ĐẬP'), (2, '18', 'ĐẬP'), (2, '19', 'ĐẬP'), (2, '20', 'ĐẬP'),
-        (2, '500T TL', 'ĐẬP'),
-    ]
+    if not os.path.exists(csv_path):
+        print(f"Warning: {csv_path} が見つかりません。スキップします。")
+        return inserts
 
-    print("Processing Machine List (embedded data)")
-    for factory_id, machine_no, machine_type in machines:
-        sql = f"INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`) SELECT {factory_id}, '{machine_no}', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = '{machine_type}';"
+    # 工場名 → factory_id マッピング
+    FACTORY_MAP = {
+        'X1': 1,
+        'X2': 2,
+    }
+
+    print(f"Processing Machine List: {csv_path}")
+    lines = read_csv_robust(csv_path)
+    reader = csv.DictReader(lines)
+
+    count = 0
+    for row in reader:
+        machine_no = row.get('Machine No')
+        factory_name = row.get('Factory Name')
+        machine_type = row.get('Machine Type')
+
+        if not machine_no or not factory_name or not machine_type:
+            continue
+
+        machine_no = machine_no.strip()
+        factory_name = factory_name.strip()
+        machine_type = machine_type.strip()
+
+        factory_id = FACTORY_MAP.get(factory_name)
+        if not factory_id:
+            print(f"  Warning: Unknown factory '{factory_name}', skipping")
+            continue
+
+        safe_machine_no = escape_sql(machine_no)
+        safe_machine_type = escape_sql(machine_type)
+
+        sql = f"INSERT INTO `machine_list` (`factory_id`, `machine_no`, `machine_type_id`, `user`) SELECT {factory_id}, '{safe_machine_no}', machine_type_id, 'admin' FROM machine_types WHERE machine_type_name = '{safe_machine_type}';"
         inserts.append(sql)
+        count += 1
 
-    print(f"  → {len(machines)} machines")
+    print(f"  → {count} machines")
     return inserts
 
 
@@ -223,6 +238,7 @@ def main():
     customer_csv = os.path.join(base_dir, 'シードデータ - Customer.csv')
     employee_csv = os.path.join(base_dir, 'シードデータ - employee.csv')
     product_csv = os.path.join(base_dir, 'product-list2.csv')
+    machine_csv = os.path.join(base_dir, 'シードデータ - Machine-list.csv')
 
     # 出力ファイル
     output_sql = os.path.join(base_dir, 'import_all_data.sql')
@@ -247,7 +263,7 @@ def main():
     all_inserts.append("")
     all_inserts.extend(generate_process_names())
     all_inserts.append("")
-    all_inserts.extend(generate_machine_list())
+    all_inserts.extend(generate_machine_list(machine_csv))
 
     # ファイル出力
     with open(output_sql, 'w', encoding='utf-8') as f:

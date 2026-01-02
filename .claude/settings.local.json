@@ -3,7 +3,8 @@
     "allow": [
       "Bash(docker ps:*)",
       "Bash(cat:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(python import_all_data.py:*)"
     ]
   }
 }
