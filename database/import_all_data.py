@@ -4,7 +4,9 @@
 統合インポートスクリプト
 CSV → SQL変換（Customer, Employee, Product, Process Names, Machine List）
 """
-syse
+import os
+import sys
+import csv
 
 # UTF-8出力設定
 if sys.platform == 'win32':
