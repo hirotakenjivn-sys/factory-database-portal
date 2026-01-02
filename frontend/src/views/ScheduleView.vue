@@ -8,7 +8,6 @@
       @close="closeErrorDialog"
     />
 
-    <main class="app-main">
       <h1 class="page-title">スケジュール - 生産計画</h1>
 
       <!-- 工場稼働時間入力 -->
