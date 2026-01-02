@@ -396,6 +396,9 @@ def main():
     all_inserts.append("SET NAMES utf8mb4;")
     all_inserts.append("USE factory_db;")
     all_inserts.append("")
+    all_inserts.append("-- 外部キー制約を一時的に無効化")
+    all_inserts.append("SET FOREIGN_KEY_CHECKS = 0;")
+    all_inserts.append("")
 
     # マスタテーブル（依存関係順）
     all_inserts.extend(generate_factories(factories_csv))
@@ -417,6 +420,9 @@ def main():
     all_inserts.extend(generate_products(product_csv))
     all_inserts.append("")
     all_inserts.extend(generate_process_names())
+    all_inserts.append("")
+    all_inserts.append("-- 外部キー制約を再有効化")
+    all_inserts.append("SET FOREIGN_KEY_CHECKS = 1;")
 
     # ファイル出力
     with open(output_sql, 'w', encoding='utf-8') as f:

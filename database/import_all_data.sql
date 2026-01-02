@@ -3,6 +3,9 @@
 SET NAMES utf8mb4;
 USE factory_db;
 
+-- 外部キー制約を一時的に無効化
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- ========== Factories ==========
 DELETE FROM factories;
 ALTER TABLE factories AUTO_INCREMENT = 1;
@@ -2505,3 +2508,6 @@ INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 2/
 INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 3/3', 1, 'admin');
 INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 3/4', 1, 'admin');
 INSERT INTO process_name_types (process_name, day_or_spm, user) VALUES ('TARO 4/4', 1, 'admin');
+
+-- 外部キー制約を再有効化
+SET FOREIGN_KEY_CHECKS = 1;
