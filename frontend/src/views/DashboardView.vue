@@ -176,7 +176,7 @@ onMounted(async () => {
   try {
     // 統計カードデータ
     const statsResponse = await api.get('/dashboard/cards')
-    stats.value = statsResponse.data
+    stats.value = { ...stats.value, ...statsResponse.data }
 
     // Financial States (Dummy Data)
     // const salesResponse = await api.get('/dashboard/sales-weekly')
