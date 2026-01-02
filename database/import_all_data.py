@@ -214,10 +214,8 @@ def generate_material_rates(csv_path):
             safe_product = escape_sql(product)
             # hが空の場合はNULL
             h_value = h if h else 'NULL'
-            if h_value != 'NULL':
-                h_value = f"'{h_value}'"
 
-            sql = f"INSERT INTO material_rates (product_code, thickness, width, pitch, h, user) VALUES ('{safe_product}', {thickness}, {width}, {pitch}, {h_value}, 'admin');"
+            sql = f"INSERT INTO material_rates (product_id, thickness, width, pitch, h, user) SELECT p.product_id, {thickness}, {width}, {pitch}, {h_value}, 'admin' FROM products p WHERE p.product_code = '{safe_product}';"
             inserts.append(sql)
             count += 1
 
