@@ -31,7 +31,7 @@ async def get_processes(
             Process.process_id,
             Process.product_id,
             Process.process_no,
-            Process.process_name,
+            ProcessNameType.process_name,
             Process.rough_cycletime,
             Process.setup_time,
             Process.production_limit,
@@ -39,6 +39,8 @@ async def get_processes(
             Process.user,
             Customer.customer_name,
             Product.product_code
+        ).join(
+            ProcessNameType, Process.process_name_id == ProcessNameType.process_name_id
         ).join(
             Product, Process.product_id == Product.product_id
         ).join(
@@ -101,8 +103,13 @@ async def get_process_table(
 
         result = []
         for product in products:
-            # この製品の工程を取得
-            processes = db.query(Process).filter(
+            # この製品の工程を取得（process_name_typesとJOIN）
+            processes = db.query(
+                Process.process_no,
+                ProcessNameType.process_name
+            ).join(
+                ProcessNameType, Process.process_name_id == ProcessNameType.process_name_id
+            ).filter(
                 Process.product_id == product.product_id
             ).order_by(Process.process_no).all()
 
@@ -145,7 +152,7 @@ async def create_process(
     """
     工程登録
     """
-    # Validate process_name exists in ProcessNameType
+    # Validate process_name exists in ProcessNameType and get the ID
     name_type = db.query(ProcessNameType).filter(
         ProcessNameType.process_name == process.process_name
     ).first()
@@ -154,12 +161,28 @@ async def create_process(
         raise HTTPException(status_code=400, detail="Invalid process name. Please select from the master list.")
 
     process_data = process.model_dump()
+    # Replace process_name with process_name_id
+    del process_data['process_name']
+    process_data['process_name_id'] = name_type.process_name_id
     process_data['user'] = current_user['username']
+
     db_process = Process(**process_data)
     db.add(db_process)
     db.commit()
     db.refresh(db_process)
-    return db_process
+
+    # Return with process_name for frontend compatibility
+    return {
+        "process_id": db_process.process_id,
+        "product_id": db_process.product_id,
+        "process_no": db_process.process_no,
+        "process_name": name_type.process_name,
+        "rough_cycletime": db_process.rough_cycletime,
+        "setup_time": db_process.setup_time,
+        "production_limit": db_process.production_limit,
+        "timestamp": db_process.timestamp,
+        "user": db_process.user
+    }
 
 
 @router.put("/processes/{process_id}", response_model=process_schema.ProcessResponse)
@@ -178,7 +201,8 @@ async def update_process(
 
     update_data = process.model_dump(exclude_unset=True, exclude_none=False)
 
-    # Validate process_name if it's being updated
+    # Validate process_name if it's being updated and convert to process_name_id
+    name_type = None
     if 'process_name' in update_data:
         name_type = db.query(ProcessNameType).filter(
             ProcessNameType.process_name == update_data['process_name']
@@ -187,6 +211,10 @@ async def update_process(
         if not name_type:
             raise HTTPException(status_code=400, detail="Invalid process name. Please select from the master list.")
 
+        # Replace process_name with process_name_id
+        del update_data['process_name']
+        update_data['process_name_id'] = name_type.process_name_id
+
     update_data['user'] = current_user['username']
 
     for key, value in update_data.items():
@@ -194,7 +222,24 @@ async def update_process(
 
     db.commit()
     db.refresh(db_process)
-    return db_process
+
+    # Get the process_name for the response
+    if not name_type:
+        name_type = db.query(ProcessNameType).filter(
+            ProcessNameType.process_name_id == db_process.process_name_id
+        ).first()
+
+    return {
+        "process_id": db_process.process_id,
+        "product_id": db_process.product_id,
+        "process_no": db_process.process_no,
+        "process_name": name_type.process_name if name_type else "",
+        "rough_cycletime": db_process.rough_cycletime,
+        "setup_time": db_process.setup_time,
+        "production_limit": db_process.production_limit,
+        "timestamp": db_process.timestamp,
+        "user": db_process.user
+    }
 
 
 @router.delete("/processes/{process_id}")

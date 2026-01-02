@@ -20,7 +20,7 @@ class Process(Base):
     process_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     product_id = Column(Integer, ForeignKey("products.product_id"), nullable=False)
     process_no = Column(Integer, nullable=False)
-    process_name = Column(String(100), nullable=False)
+    process_name_id = Column(Integer, ForeignKey("process_name_types.process_name_id"), nullable=False)
     rough_cycletime = Column(Numeric(10, 2))
     setup_time = Column(Numeric(10, 2), comment="段取時間（分）")
     production_limit = Column(Integer, comment="生産可能限界")
@@ -29,3 +29,4 @@ class Process(Base):
 
     # Relationships
     product = relationship("Product", back_populates="processes")
+    process_name_type = relationship("ProcessNameType")
