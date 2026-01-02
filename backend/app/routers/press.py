@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List
+import traceback
 from ..database import get_db
 from ..models.process import Process, ProcessNameType
 from ..models.product import Product
@@ -25,53 +26,58 @@ async def get_processes(
     工程一覧を取得（顧客名、製品コード含む）
     customer_name, product_codeで検索可能
     """
-    query = db.query(
-        Process.process_id,
-        Process.product_id,
-        Process.process_no,
-        Process.process_name,
-        Process.rough_cycletime,
-        Process.setup_time,
-        Process.production_limit,
-        Process.timestamp,
-        Process.user,
-        Customer.customer_name,
-        Product.product_code
-    ).join(
-        Product, Process.product_id == Product.product_id
-    ).join(
-        Customer, Product.customer_id == Customer.customer_id
-    )
+    try:
+        query = db.query(
+            Process.process_id,
+            Process.product_id,
+            Process.process_no,
+            Process.process_name,
+            Process.rough_cycletime,
+            Process.setup_time,
+            Process.production_limit,
+            Process.timestamp,
+            Process.user,
+            Customer.customer_name,
+            Product.product_code
+        ).join(
+            Product, Process.product_id == Product.product_id
+        ).join(
+            Customer, Product.customer_id == Customer.customer_id
+        )
 
-    if product_id:
-        query = query.filter(Process.product_id == product_id)
-    
-    if customer_name:
-        query = query.filter(Customer.customer_name.contains(customer_name))
-    
-    if product_code:
-        query = query.filter(Product.product_code.contains(product_code))
+        if product_id:
+            query = query.filter(Process.product_id == product_id)
 
-    processes = query.order_by(Process.timestamp.desc()).offset(skip).limit(limit).all()
+        if customer_name:
+            query = query.filter(Customer.customer_name.contains(customer_name))
 
-    # Convert to dict for response
-    result = []
-    for p in processes:
-        result.append({
-            "process_id": p.process_id,
-            "product_id": p.product_id,
-            "process_no": p.process_no,
-            "process_name": p.process_name,
-            "rough_cycletime": p.rough_cycletime,
-            "setup_time": p.setup_time,
-            "production_limit": p.production_limit,
-            "timestamp": p.timestamp,
-            "user": p.user,
-            "customer_name": p.customer_name,
-            "product_code": p.product_code
-        })
+        if product_code:
+            query = query.filter(Product.product_code.contains(product_code))
 
-    return result
+        processes = query.order_by(Process.timestamp.desc()).offset(skip).limit(limit).all()
+
+        # Convert to dict for response
+        result = []
+        for p in processes:
+            result.append({
+                "process_id": p.process_id,
+                "product_id": p.product_id,
+                "process_no": p.process_no,
+                "process_name": p.process_name,
+                "rough_cycletime": p.rough_cycletime,
+                "setup_time": p.setup_time,
+                "production_limit": p.production_limit,
+                "timestamp": p.timestamp,
+                "user": p.user,
+                "customer_name": p.customer_name,
+                "product_code": p.product_code
+            })
+
+        return result
+    except Exception as e:
+        print(f"Error in get_processes: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
 @router.get("/process-table")
@@ -81,47 +87,53 @@ async def get_process_table(
     """
     工程表を取得（製品ごとに工程1〜20を横に並べて表示）
     """
-    # 製品ごとに工程をグループ化
-    products = db.query(
-        Product.product_id,
-        Product.product_code,
-        Customer.customer_name
-    ).join(
-        Customer, Product.customer_id == Customer.customer_id
-    ).filter(
-        Product.is_active == True
-    ).all()
+    try:
+        # 製品ごとに工程をグループ化
+        products = db.query(
+            Product.product_id,
+            Product.product_code,
+            Customer.customer_name
+        ).join(
+            Customer, Product.customer_id == Customer.customer_id
+        ).filter(
+            Product.is_active == True
+        ).all()
 
-    result = []
-    for product in products:
-        # この製品の工程を取得
-        processes = db.query(Process).filter(
-            Process.product_id == product.product_id
-        ).order_by(Process.process_no).all()
+        result = []
+        for product in products:
+            # この製品の工程を取得
+            processes = db.query(Process).filter(
+                Process.product_id == product.product_id
+            ).order_by(Process.process_no).all()
 
-        # 工程がない製品はスキップ
-        if not processes:
-            continue
+            # 工程がない製品はスキップ
+            if not processes:
+                continue
 
-        # 工程を工程番号ごとに整理（最大20工程）
-        process_map = {}
-        for proc in processes:
-            if proc.process_no <= 20:
-                process_map[proc.process_no] = proc.process_name
+            # 工程を工程番号ごとに整理（最大20工程）
+            process_map = {}
+            for proc in processes:
+                # process_noがNoneの場合をスキップ
+                if proc.process_no is not None and proc.process_no <= 20:
+                    process_map[proc.process_no] = proc.process_name
 
-        product_row = {
-            "product_id": product.product_id,
-            "customer_name": product.customer_name,
-            "product_code": product.product_code,
-        }
+            product_row = {
+                "product_id": product.product_id,
+                "customer_name": product.customer_name,
+                "product_code": product.product_code,
+            }
 
-        # 工程1〜20のフィールドを追加
-        for i in range(1, 21):
-            product_row[f"process_{i}"] = process_map.get(i, "")
+            # 工程1〜20のフィールドを追加
+            for i in range(1, 21):
+                product_row[f"process_{i}"] = process_map.get(i, "")
 
-        result.append(product_row)
+            result.append(product_row)
 
-    return result
+        return result
+    except Exception as e:
+        print(f"Error in get_process_table: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
 @router.post("/processes", response_model=process_schema.ProcessResponse)
@@ -139,7 +151,6 @@ async def create_process(
     ).first()
 
     if not name_type:
-        from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="Invalid process name. Please select from the master list.")
 
     process_data = process.model_dump()
@@ -163,11 +174,10 @@ async def update_process(
     """
     db_process = db.query(Process).filter(Process.process_id == process_id).first()
     if not db_process:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Process not found")
 
     update_data = process.model_dump(exclude_unset=True, exclude_none=False)
-    
+
     # Validate process_name if it's being updated
     if 'process_name' in update_data:
         name_type = db.query(ProcessNameType).filter(
@@ -175,7 +185,6 @@ async def update_process(
         ).first()
 
         if not name_type:
-            from fastapi import HTTPException
             raise HTTPException(status_code=400, detail="Invalid process name. Please select from the master list.")
 
     update_data['user'] = current_user['username']
@@ -199,7 +208,6 @@ async def delete_process(
     """
     db_process = db.query(Process).filter(Process.process_id == process_id).first()
     if not db_process:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Process not found")
 
     db.delete(db_process)
