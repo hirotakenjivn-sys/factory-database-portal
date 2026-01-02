@@ -7,6 +7,25 @@
 
       <div class="grid grid-4">
         <div class="card stat-card">
+          <h3>products</h3>
+          <p class="stat-value">{{ stats.products.toLocaleString() }}</p>
+        </div>
+        <div class="card stat-card">
+          <h3>customers</h3>
+          <p class="stat-value">{{ stats.customers.toLocaleString() }}</p>
+        </div>
+        <div class="card stat-card">
+          <h3>processes</h3>
+          <p class="stat-value">{{ stats.processes.toLocaleString() }}</p>
+        </div>
+        <div class="card stat-card">
+          <h3>count</h3>
+          <p class="stat-value">{{ stats.count.toLocaleString() }}</p>
+        </div>
+      </div>
+
+      <div class="grid grid-4" style="margin-top: var(--spacing-md)">
+        <div class="card stat-card">
           <h3>employees</h3>
           <p class="stat-value">{{ stats.employees.toLocaleString() }}</p>
         </div>
@@ -15,12 +34,12 @@
           <p class="stat-value">{{ stats.machine_list.toLocaleString() }}</p>
         </div>
         <div class="card stat-card">
-          <h3>customers</h3>
-          <p class="stat-value">{{ stats.customers.toLocaleString() }}</p>
-        </div>
-        <div class="card stat-card">
           <h3>material_rates</h3>
           <p class="stat-value">{{ stats.material_rates.toLocaleString() }}</p>
+        </div>
+        <div class="card stat-card">
+          <h3>&nbsp;</h3>
+          <p class="stat-value">&nbsp;</p>
         </div>
       </div>
 
@@ -103,9 +122,12 @@ ChartJS.register(
 )
 
 const stats = ref({
+  products: 0,
+  customers: 0,
+  processes: 0,
+  count: 0,
   employees: 0,
   machine_list: 0,
-  customers: 0,
   material_rates: 0,
 })
 
