@@ -60,6 +60,11 @@ const handleLogout = () => {
   authStore.logout()
   router.push('/login')
 }
+
+// 親コンポーネントから参照できるように公開
+defineExpose({
+  isCollapsed
+})
 </script>
 
 <style scoped>
