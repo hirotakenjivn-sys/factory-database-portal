@@ -176,6 +176,7 @@ onMounted(async () => {
   try {
     // 統計カードデータ
     const statsResponse = await api.get('/dashboard/cards')
+    console.log('Dashboard cards response:', statsResponse.data)
     stats.value = { ...stats.value, ...statsResponse.data }
 
     // Financial States (Dummy Data)
@@ -218,6 +219,7 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('Failed to fetch dashboard data:', error)
+    console.error('Error details:', error.response?.data, error.response?.status)
   }
 })
 </script>

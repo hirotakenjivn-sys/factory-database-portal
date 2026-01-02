@@ -5,7 +5,10 @@
       "Bash(cat:*)",
       "Bash(python3:*)",
       "Bash(python import_all_data.py:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(python:*)",
+      "Bash(curl:*)",
+      "Bash(findstr:*)"
     ]
   }
 }
