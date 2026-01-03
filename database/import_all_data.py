@@ -440,8 +440,6 @@ def main():
     all_inserts.append("")
     all_inserts.extend(generate_holidays(holidays_csv))
     all_inserts.append("")
-    all_inserts.extend(generate_material_rates(material_rates_csv))
-    all_inserts.append("")
     all_inserts.extend(generate_customers(customer_csv))
     all_inserts.append("")
     all_inserts.extend(generate_admin_user())
@@ -449,6 +447,9 @@ def main():
     all_inserts.extend(generate_employees(employee_csv))
     all_inserts.append("")
     all_inserts.extend(generate_products(product_csv))
+    all_inserts.append("")
+    # material_ratesはproductsの後（product_idを参照するため）
+    all_inserts.extend(generate_material_rates(material_rates_csv))
     all_inserts.append("")
     all_inserts.extend(generate_process_names())
     all_inserts.append("")
