@@ -46,7 +46,6 @@ const navItems = [
   { name: 'outsource', label: 'Outsource', path: '/outsource', icon: '🏭' },
   { name: 'schedule', label: 'Schedule', path: '/schedule', icon: '📅' },
   { name: 'sales', label: 'Sales', path: '/sales', icon: '💰' },
-  { name: 'press', label: 'Press', path: '/press', icon: '⚙️' },
   { name: 'warehouse', label: 'Warehouse', path: '/warehouse', icon: '📦' },
   { name: 'mold', label: 'Mold', path: '/mold', icon: '🔧' },
   { name: 'master', label: 'Master', path: '/master', icon: '⚡' },
