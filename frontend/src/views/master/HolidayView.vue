@@ -30,7 +30,7 @@
         <div class="card" style="margin-bottom: var(--spacing-lg)">
           <div class="calendar-header">
             <button class="btn btn-secondary calendar-nav" @click="prevMonth">&lt;</button>
-            <h2 class="calendar-title">{{ calendarYear }}年 {{ calendarMonth + 1 }}月</h2>
+            <h2 class="calendar-title">{{ monthNames[calendarMonth] }} {{ calendarYear }}</h2>
             <button class="btn btn-secondary calendar-nav" @click="nextMonth">&gt;</button>
           </div>
           <div class="calendar-grid">
@@ -162,15 +162,19 @@ const activeTab = ref('holidays')
 const today = new Date()
 const calendarYear = ref(today.getFullYear())
 const calendarMonth = ref(today.getMonth())
-const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 const calendarDates = computed(() => {
   const dates = []
   const firstDay = new Date(calendarYear.value, calendarMonth.value, 1)
   const lastDay = new Date(calendarYear.value, calendarMonth.value + 1, 0)
 
-  // Add empty slots for days before the first day of month
-  for (let i = 0; i < firstDay.getDay(); i++) {
+  // Add empty slots for days before the first day of month (Monday start)
+  // getDay() returns 0 for Sunday, 1 for Monday, etc.
+  // For Monday start: Mon=0 slots, Tue=1 slot, ..., Sun=6 slots
+  const emptySlots = (firstDay.getDay() + 6) % 7
+  for (let i = 0; i < emptySlots; i++) {
     dates.push(null)
   }
 

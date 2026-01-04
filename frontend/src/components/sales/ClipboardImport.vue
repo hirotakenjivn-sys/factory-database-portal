@@ -1,21 +1,21 @@
 <template>
   <div class="clipboard-import-container">
-    <!-- クリップボード貼り付けエリア -->
+    <!-- Clipboard Paste Area -->
     <div v-if="!validatedData" class="paste-area-wrapper">
-      <p class="paste-hint">Excelからデータをコピー（Ctrl+C）して貼り付け（Ctrl+V）してください</p>
+      <p class="paste-hint">Copy data from Excel (Ctrl+C) and paste here (Ctrl+V)</p>
 
       <div class="table-preview">
         <table class="preview-table">
           <thead>
             <tr>
               <th>#</th>
-              <th>PO番号</th>
-              <th>製品コード</th>
-              <th>顧客名</th>
-              <th>数量</th>
-              <th>PO受取日</th>
-              <th>納期</th>
-              <th>状態</th>
+              <th>PO Number</th>
+              <th>Product Code</th>
+              <th>Customer</th>
+              <th>Quantity</th>
+              <th>PO Received</th>
+              <th>Delivery</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -24,7 +24,7 @@
                 <textarea
                   v-model="pastedText"
                   class="paste-textarea-embedded"
-                  placeholder="Excelから6列のデータを貼り付けてください（Ctrl+V）"
+                  placeholder="Paste 6-column data from Excel here (Ctrl+V)"
                   @paste="handlePaste"
                 ></textarea>
               </td>
@@ -34,25 +34,25 @@
       </div>
     </div>
 
-    <!-- ローディング -->
+    <!-- Loading -->
     <div v-if="isLoading" class="loading">
       <div class="spinner"></div>
-      <p>データを処理中...</p>
+      <p>Processing data...</p>
     </div>
 
-    <!-- プレビューテーブル -->
+    <!-- Preview Table -->
     <div v-if="validatedData && !isLoading" class="preview-container">
       <div class="preview-header">
-        <h3>データプレビュー</h3>
+        <h3>Data Preview</h3>
         <div class="preview-stats">
           <span class="stat">
-            全体: <strong>{{ validatedData.total_rows }}</strong>行
+            Total: <strong>{{ validatedData.total_rows }}</strong> rows
           </span>
           <span class="stat stat-error" v-if="errorRowCount > 0">
-            エラー: <strong>{{ errorRowCount }}</strong>行
+            Errors: <strong>{{ errorRowCount }}</strong> rows
           </span>
           <span class="stat stat-success" v-else>
-            エラーなし ✓
+            No errors ✓
           </span>
         </div>
       </div>
@@ -63,7 +63,7 @@
           <line x1="12" y1="16" x2="12" y2="12"></line>
           <line x1="12" y1="8" x2="12.01" y2="8"></line>
         </svg>
-        エラーのあるセルをクリックして編集できます。編集後は自動的に再検証されます。
+        Click on cells with errors to edit. Changes are automatically re-validated.
       </div>
 
       <div class="table-wrapper">
@@ -71,13 +71,13 @@
           <thead>
             <tr>
               <th>#</th>
-              <th>PO番号</th>
-              <th>製品コード</th>
-              <th>顧客名</th>
-              <th>数量</th>
-              <th>PO受取日</th>
-              <th>納期</th>
-              <th>状態</th>
+              <th>PO Number</th>
+              <th>Product Code</th>
+              <th>Customer</th>
+              <th>Quantity</th>
+              <th>PO Received</th>
+              <th>Delivery</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -170,7 +170,7 @@
                 </span>
               </td>
               <td>
-                <span v-if="row.has_errors" class="badge badge-error">エラー</span>
+                <span v-if="row.has_errors" class="badge badge-error">Error</span>
                 <span v-else class="badge badge-success">OK</span>
               </td>
             </tr>
@@ -180,7 +180,7 @@
 
       <div class="preview-actions">
         <button type="button" class="btn btn-secondary" @click="resetImport">
-          キャンセル
+          Cancel
         </button>
         <button
           type="button"
@@ -188,7 +188,7 @@
           @click="handleImport"
           :disabled="isImporting || validRowCount === 0"
         >
-          {{ isImporting ? '登録中...' : errorRowCount > 0 ? `エラー行を除いて${validRowCount}件を登録` : `${validRowCount}件を登録` }}
+          {{ isImporting ? 'Registering...' : errorRowCount > 0 ? `Register ${validRowCount} rows (excluding errors)` : `Register ${validRowCount} rows` }}
         </button>
       </div>
     </div>
@@ -208,20 +208,20 @@ const isImporting = ref(false)
 const validatedData = ref(null)
 const revalidateDebounce = ref(null)
 
-// エラー行数を動的に計算
+// Calculate error row count dynamically
 const errorRowCount = computed(() => {
   if (!validatedData.value) return 0
   return validatedData.value.data.filter(row => row.has_errors).length
 })
 
-// 有効行数を動的に計算
+// Calculate valid row count dynamically
 const validRowCount = computed(() => {
   if (!validatedData.value) return 0
   return validatedData.value.data.filter(row => !row.has_errors).length
 })
 
 const handlePaste = (event) => {
-  // ペーストイベントを検出し、自動的に検証を開始
+  // Detect paste event and automatically start validation
   setTimeout(() => {
     console.log('Pasted data detected:', pastedText.value.substring(0, 100))
     if (pastedText.value.trim()) {
@@ -231,7 +231,7 @@ const handlePaste = (event) => {
 }
 
 const parseTabDelimitedData = (text) => {
-  // 改行で分割
+  // Split by newlines
   const lines = text.trim().split(/\r?\n/)
   const rows = []
 
@@ -239,10 +239,10 @@ const parseTabDelimitedData = (text) => {
     const line = lines[i].trim()
     if (!line) continue
 
-    // タブで分割（Excelからのコピーはタブ区切り）
+    // Split by tabs (Excel copy is tab-delimited)
     const columns = line.split('\t')
 
-    // 6列あるかチェック
+    // Check if there are 6 columns
     if (columns.length === 6) {
       rows.push({
         row_number: rows.length + 1,
@@ -268,7 +268,7 @@ const parseTabDelimitedData = (text) => {
 
 const processPastedData = async () => {
   if (!pastedText.value.trim()) {
-    alert('データを貼り付けてください')
+    alert('Please paste data')
     return
   }
 
@@ -276,15 +276,15 @@ const processPastedData = async () => {
   isLoading.value = true
 
   try {
-    // タブ区切りデータを解析
+    // Parse tab-delimited data
     const parsedRows = parseTabDelimitedData(pastedText.value)
 
     if (parsedRows.length === 0) {
-      alert('有効なデータが見つかりませんでした。\n\n6列のデータ（PO番号、製品コード、顧客名、数量、PO受取日、納期）を貼り付けてください。')
+      alert('No valid data found.\n\nPlease paste 6-column data (PO Number, Product Code, Customer, Quantity, PO Received Date, Delivery Date).')
       return
     }
 
-    // バックエンドのバリデーションAPIを使用
+    // Use backend validation API
     const response = await api.post('/sales/po/clipboard/validate', {
       data: parsedRows
     })
@@ -292,7 +292,7 @@ const processPastedData = async () => {
     validatedData.value = response.data
   } catch (error) {
     console.error('Failed to validate data:', error)
-    alert(error.response?.data?.detail || 'データの検証に失敗しました')
+    alert(error.response?.data?.detail || 'Failed to validate data')
   } finally {
     isProcessing.value = false
     isLoading.value = false
@@ -300,7 +300,7 @@ const processPastedData = async () => {
 }
 
 const handleCellEdit = (rowIndex, fieldName) => {
-  // デバウンスを使って編集後に自動再検証
+  // Use debounce to auto-revalidate after editing
   if (revalidateDebounce.value) {
     clearTimeout(revalidateDebounce.value)
   }
@@ -314,25 +314,25 @@ const revalidateRow = async (rowIndex) => {
   const row = validatedData.value.data[rowIndex]
   const errors = {}
 
-  // 1. 必須フィールドチェック
+  // 1. Required fields check
   const required_fields = ['po_number', 'product_code', 'customer_name', 'po_quantity', 'date_receive_po', 'delivery_date']
   for (const field of required_fields) {
     if (!row[field] || !row[field].toString().trim()) {
-      errors[field] = `${field}が空です`
+      errors[field] = `${field} is empty`
     }
   }
 
-  // 2. 数量の検証
+  // 2. Quantity validation
   if (row.po_quantity) {
     const quantity = parseInt(row.po_quantity)
     if (isNaN(quantity) || quantity <= 0) {
-      errors.po_quantity = "数量は1以上の整数である必要があります"
+      errors.po_quantity = "Quantity must be a positive integer"
     } else {
       row.po_quantity_int = quantity
     }
   }
 
-  // 3. 日付の簡易検証
+  // 3. Simple date validation
   const dateFields = ['date_receive_po', 'delivery_date']
   for (const field of dateFields) {
     if (row[field]) {
@@ -345,12 +345,12 @@ const revalidateRow = async (rowIndex) => {
 
       const isValidFormat = datePatterns.some(pattern => pattern.test(dateStr))
       if (!isValidFormat) {
-        errors[field] = "日付形式が不正です（YYYY-MM-DD, MM/DD/YYYY等）"
+        errors[field] = "Invalid date format (YYYY-MM-DD, MM/DD/YYYY, etc.)"
       }
     }
   }
 
-  // エラーを更新
+  // Update errors
   row.errors = errors
   row.has_errors = Object.keys(errors).length > 0
 }
@@ -363,7 +363,7 @@ const handleImport = async () => {
   isImporting.value = true
 
   try {
-    // エラーがない行のみを登録用データとして準備
+    // Prepare only rows without errors for registration
     const dataToImport = validatedData.value.data.filter(row => !row.has_errors)
 
     console.log('Importing data:', dataToImport)
@@ -372,25 +372,25 @@ const handleImport = async () => {
     alert(response.data.message)
     emit('import-success')
 
-    // エラー行がある場合は、エラー行だけを残す
+    // If there are error rows, keep only the error rows
     if (errorRowCount.value > 0) {
       const errorRows = validatedData.value.data.filter(row => row.has_errors)
       validatedData.value.data = errorRows
       validatedData.value.total_rows = errorRows.length
       validatedData.value.error_rows = errorRows.length
 
-      // 行番号を振り直す
+      // Re-number the rows
       errorRows.forEach((row, index) => {
         row.row_number = index + 1
       })
     } else {
-      // エラー行がない場合は完全にリセット
+      // If no error rows, fully reset
       resetImport()
     }
   } catch (error) {
     console.error('Failed to import data:', error)
     console.error('Error details:', error.response?.data)
-    alert(error.response?.data?.detail || 'データの一括登録に失敗しました')
+    alert(error.response?.data?.detail || 'Failed to bulk import data')
   } finally {
     isImporting.value = false
   }
@@ -401,7 +401,7 @@ const resetImport = () => {
   pastedText.value = ''
 }
 
-// 製品コード入力時のオートコンプリート
+// Autocomplete for product code input
 const handleProductCodeInput = async (rowIndex) => {
   const row = validatedData.value.data[rowIndex]
   const query = row.product_code.trim()
@@ -416,7 +416,7 @@ const handleProductCodeInput = async (rowIndex) => {
       params: { search: query }
     })
 
-    // 製品コードと顧客名を含むサジェストデータを作成
+    // Create suggestion data with product code and customer name
     row.productSuggestions = response.data.map(item => ({
       product_id: item.id,
       product_code: item.code,
@@ -427,17 +427,17 @@ const handleProductCodeInput = async (rowIndex) => {
     row.productSuggestions = []
   }
 
-  // 入力中なので再検証
+  // Re-validate while typing
   handleCellEdit(rowIndex, 'product_code')
 }
 
-// オートコンプリートを表示
+// Show autocomplete
 const showAutocomplete = (rowIndex) => {
   const row = validatedData.value.data[rowIndex]
   row.showAutocomplete = true
 }
 
-// オートコンプリートを非表示
+// Hide autocomplete
 const hideAutocomplete = (rowIndex) => {
   setTimeout(() => {
     const row = validatedData.value.data[rowIndex]
@@ -445,7 +445,7 @@ const hideAutocomplete = (rowIndex) => {
   }, 200)
 }
 
-// 製品を選択
+// Select product
 const selectProduct = async (rowIndex, product) => {
   const row = validatedData.value.data[rowIndex]
   row.product_code = product.product_code
@@ -454,7 +454,7 @@ const selectProduct = async (rowIndex, product) => {
   row.showAutocomplete = false
   row.productSuggestions = []
 
-  // 製品コードと顧客名の両方を再検証
+  // Re-validate both product code and customer name
   handleCellEdit(rowIndex, 'product_code')
   handleCellEdit(rowIndex, 'customer_name')
 }

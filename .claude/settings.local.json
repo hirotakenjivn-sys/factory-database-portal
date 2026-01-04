@@ -17,7 +17,10 @@
       "Bash(git commit:*)",
       "Bash(grep:*)",
       "Bash(ls:*)",
-      "Bash(dir \"C:\\\\Users\\\\PCPV\\\\factory-database-portal\\\\database\\\\*.csv\")"
+      "Bash(dir \"C:\\\\Users\\\\PCPV\\\\factory-database-portal\\\\database\\\\*.csv\")",
+      "Bash(npm run build:*)",
+      "Bash(npx vite build)",
+      "Bash(npm install:*)"
     ]
   }
 }
