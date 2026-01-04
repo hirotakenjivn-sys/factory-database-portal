@@ -72,5 +72,12 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
 
 
 @router.get("/me")
-async def read_users_me(current_user: dict = Depends(get_current_user)):
-    return current_user
+async def read_users_me(current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+    # Get full employee info
+    user = db.query(Employee).filter(Employee.employee_id == current_user['employee_id']).first()
+    return {
+        "username": user.employee_no,
+        "employee_id": user.employee_id,
+        "name": user.name,
+        "employee_no": user.employee_no
+    }

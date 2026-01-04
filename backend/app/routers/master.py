@@ -296,7 +296,7 @@ async def delete_product(
 
 
 # ==================== Employees ====================
-@router.get("/employees", response_model=List[employee_schema.EmployeeResponse])
+@router.get("/employees")
 async def get_employees(
     skip: int = 0,
     limit: int = 100,
@@ -317,7 +317,21 @@ async def get_employees(
     # 従業員IDの降順でソート
     query = query.order_by(Employee.employee_id.desc())
     employees = query.offset(skip).limit(limit).all()
-    return employees
+
+    # has_passwordフィールドを追加
+    result = []
+    for emp in employees:
+        emp_dict = {
+            "employee_id": emp.employee_id,
+            "employee_no": emp.employee_no,
+            "name": emp.name,
+            "is_active": emp.is_active,
+            "timestamp": emp.timestamp,
+            "user": emp.user,
+            "has_password": emp.password_hash is not None
+        }
+        result.append(emp_dict)
+    return result
 
 
 @router.post("/employees", response_model=employee_schema.EmployeeCreateResponse)
@@ -406,6 +420,26 @@ async def delete_employee(
     db.delete(db_employee)
     db.commit()
     return {"message": "Employee deleted successfully"}
+
+
+@router.post("/employees/{employee_id}/revoke-password")
+async def revoke_employee_password(
+    employee_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """従業員のパスワードを削除（ログイン不可にする）"""
+    db_employee = db.query(Employee).filter(Employee.employee_id == employee_id).first()
+    if not db_employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+
+    if not db_employee.password_hash:
+        raise HTTPException(status_code=400, detail="Employee does not have a password")
+
+    db_employee.password_hash = None
+    db_employee.user = current_user['username']
+    db.commit()
+    return {"message": "Password revoked successfully"}
 
 
 # ==================== Suppliers ====================

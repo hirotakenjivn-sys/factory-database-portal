@@ -67,6 +67,7 @@
               <th>Employee ID</th>
               <th>Employee No</th>
               <th>Name</th>
+              <th>Password</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -77,13 +78,24 @@
               <td>{{ employee.employee_no }}</td>
               <td>{{ employee.name }}</td>
               <td>
+                <span v-if="employee.has_password" class="status-has-password">●</span>
+                <span v-else class="status-no-password">-</span>
+              </td>
+              <td>
                 <span :class="employee.is_active ? 'status-active' : 'status-inactive'">
                   {{ employee.is_active ? 'Active' : 'Inactive' }}
                 </span>
               </td>
               <td>
-                <div style="display: flex; gap: 8px;">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                   <button class="btn btn-secondary btn-sm" @click="handleEdit(employee)">Edit</button>
+                  <button
+                    v-if="employee.has_password"
+                    class="btn btn-warning btn-sm"
+                    @click="handleRevokePassword(employee)"
+                  >
+                    Revoke
+                  </button>
                   <button
                     v-if="editingId === employee.employee_id"
                     class="btn btn-danger btn-sm"
@@ -98,6 +110,31 @@
         </table>
         <div v-if="employees.length === 0" class="empty-state">
           <p>No employee data found</p>
+        </div>
+      </div>
+
+      <!-- Password Modal -->
+      <div v-if="showPasswordModal" class="modal-overlay" @click.self="closePasswordModal">
+        <div class="modal-content">
+          <h3>Account Created</h3>
+          <div class="password-info">
+            <div class="info-row">
+              <label>Login ID:</label>
+              <div class="copyable-field">
+                <input type="text" :value="passwordModalData.loginId" readonly />
+                <button class="btn btn-secondary btn-sm" @click="copyToClipboard(passwordModalData.loginId)">Copy</button>
+              </div>
+            </div>
+            <div class="info-row">
+              <label>Password:</label>
+              <div class="copyable-field">
+                <input type="text" :value="passwordModalData.password" readonly />
+                <button class="btn btn-secondary btn-sm" @click="copyToClipboard(passwordModalData.password)">Copy</button>
+              </div>
+            </div>
+          </div>
+          <p class="warning-text">Please save this password immediately. It cannot be retrieved later.</p>
+          <button class="btn btn-primary" @click="closePasswordModal">Close</button>
         </div>
       </div>
   </AppLayout>
@@ -119,6 +156,13 @@ const editingId = ref(null)
 const employees = ref([])
 const searchEmployeeNo = ref('')
 const searchName = ref('')
+
+// Password modal state
+const showPasswordModal = ref(false)
+const passwordModalData = ref({
+  loginId: '',
+  password: ''
+})
 
 const loadEmployees = async () => {
   try {
@@ -142,14 +186,22 @@ const handleSubmit = async () => {
     if (editingId.value) {
       const response = await api.put(`/master/employees/${editingId.value}`, form.value)
       if (response.data.generated_password) {
-        alert(`Employee updated successfully.\n\nNew Password: ${response.data.generated_password}\n\nPlease save this password immediately.`)
+        passwordModalData.value = {
+          loginId: response.data.employee_no,
+          password: response.data.generated_password
+        }
+        showPasswordModal.value = true
       } else {
         alert('Employee updated successfully')
       }
     } else {
       const response = await api.post('/master/employees', form.value)
       if (response.data.generated_password) {
-        alert(`Employee registered successfully.\n\nLogin ID: ${response.data.employee_no}\nPassword: ${response.data.generated_password}\n\nPlease save this password immediately.`)
+        passwordModalData.value = {
+          loginId: response.data.employee_no,
+          password: response.data.generated_password
+        }
+        showPasswordModal.value = true
       } else {
         alert('Employee registered successfully')
       }
@@ -162,6 +214,44 @@ const handleSubmit = async () => {
     const detail = error.response?.data?.detail || 'Failed to save employee'
     alert(detail)
   }
+}
+
+const handleRevokePassword = async (employee) => {
+  if (!confirm(`Are you sure you want to revoke password for ${employee.name} (${employee.employee_no})?\n\nThis will disable their login access.`)) {
+    return
+  }
+
+  try {
+    await api.post(`/master/employees/${employee.employee_id}/revoke-password`)
+    alert('Password revoked successfully')
+    await loadEmployees()
+  } catch (error) {
+    console.error('Failed to revoke password:', error)
+    const detail = error.response?.data?.detail || 'Failed to revoke password'
+    alert(detail)
+  }
+}
+
+const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    alert('Copied to clipboard!')
+  } catch (error) {
+    console.error('Failed to copy:', error)
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea')
+    textArea.value = text
+    document.body.appendChild(textArea)
+    textArea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textArea)
+    alert('Copied to clipboard!')
+  }
+}
+
+const closePasswordModal = () => {
+  showPasswordModal.value = false
+  passwordModalData.value = { loginId: '', password: '' }
 }
 
 const handleEdit = (employee) => {
@@ -266,9 +356,105 @@ h2 {
   color: var(--text-secondary);
 }
 
+.status-has-password {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.status-no-password {
+  color: var(--text-secondary);
+}
+
+.btn-warning {
+  background: #f39c12;
+  color: white;
+}
+
+.btn-warning:hover {
+  background: #e67e22;
+}
+
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
 .empty-state {
   text-align: center;
   padding: var(--spacing-2xl);
   color: var(--text-secondary);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background: white;
+  padding: var(--spacing-xl);
+  border-radius: 8px;
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--success);
+}
+
+.password-info {
+  background: var(--background-secondary);
+  padding: var(--spacing-md);
+  border-radius: 4px;
+  margin-bottom: var(--spacing-md);
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-row label {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.copyable-field {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.copyable-field input {
+  flex: 1;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: var(--font-size-base);
+  background: white;
+}
+
+.warning-text {
+  color: var(--error);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-lg);
 }
 </style>

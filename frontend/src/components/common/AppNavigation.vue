@@ -21,7 +21,7 @@
     <div class="sidebar-footer">
       <div class="user-info" v-if="authStore.user">
         <span class="user-icon">👤</span>
-        <span class="user-name" v-show="!isCollapsed">{{ authStore.user.username }}</span>
+        <span class="user-name" v-show="!isCollapsed">{{ displayName }}</span>
       </div>
       <button @click="handleLogout" class="logout-btn" :title="isCollapsed ? 'Logout' : ''">
         <span class="logout-icon">🚪</span>
@@ -32,13 +32,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
 const isCollapsed = ref(false)
+
+// Display name in format: Name (employee_no)
+const displayName = computed(() => {
+  const user = authStore.user
+  if (!user) return ''
+  if (user.name && user.employee_no) {
+    return `${user.name} (${user.employee_no})`
+  }
+  return user.username || ''
+})
 
 const navItems = [
   { name: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: '📊' },

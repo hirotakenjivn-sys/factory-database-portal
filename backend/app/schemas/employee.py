@@ -26,6 +26,7 @@ class EmployeeResponse(EmployeeBase):
     employee_id: int
     timestamp: datetime
     user: Optional[str] = None
+    has_password: bool = False
 
     model_config = ConfigDict(from_attributes=True)
 
