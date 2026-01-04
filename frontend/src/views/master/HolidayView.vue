@@ -56,13 +56,15 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Holiday Date</th>
+              <th @click="toggleSort" class="sortable">
+                Holiday Date {{ sortOrder === 'asc' ? '▲' : '▼' }}
+              </th>
               <th>Holiday Type</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in holidays" :key="item.calendar_id">
+            <tr v-for="item in sortedHolidays" :key="item.calendar_id">
               <td>{{ item.calendar_id }}</td>
               <td>{{ formatDateForDisplay(item.date_holiday) }}</td>
               <td>{{ item.date_type }}</td>
@@ -122,7 +124,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import AppLayout from '../../components/common/AppLayout.vue'
 import api from '../../utils/api'
 import { getTodayFormatted, formatDateForDisplay, formatDateForApi } from '../../utils/dateFormat'
@@ -140,6 +142,19 @@ const holidayTypeForm = ref({
 
 const holidayTypes = ref([])
 const holidays = ref([])
+const sortOrder = ref('asc')
+
+const sortedHolidays = computed(() => {
+  return [...holidays.value].sort((a, b) => {
+    const dateA = new Date(a.date_holiday)
+    const dateB = new Date(b.date_holiday)
+    return sortOrder.value === 'asc' ? dateA - dateB : dateB - dateA
+  })
+})
+
+const toggleSort = () => {
+  sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+}
 
 const loadHolidayTypes = async () => {
   try {
@@ -271,5 +286,14 @@ h2 {
 .tab-btn.active {
   color: var(--primary);
   border-bottom-color: var(--primary);
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sortable:hover {
+  background: var(--background-hover);
 }
 </style>
