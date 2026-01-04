@@ -59,6 +59,7 @@
             placeholder="Search Name..."
             style="width: 200px;"
           />
+          <button class="btn btn-secondary" @click="downloadCSV">Download CSV</button>
         </div>
         <table class="table">
           <thead>
@@ -204,6 +205,29 @@ const resetForm = () => {
 
 const handleSearch = () => {
   loadEmployees()
+}
+
+const downloadCSV = () => {
+  if (employees.value.length === 0) {
+    alert('No data to download')
+    return
+  }
+  const headers = ['Employee ID', 'Employee No', 'Name', 'Status']
+  const rows = employees.value.map(e => [
+    e.employee_id,
+    `"${e.employee_no.replace(/"/g, '""')}"`,
+    `"${e.name.replace(/"/g, '""')}"`,
+    e.is_active ? 'Active' : 'Inactive'
+  ])
+  const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+  link.setAttribute('href', url)
+  link.setAttribute('download', 'employees.csv')
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 onMounted(() => {

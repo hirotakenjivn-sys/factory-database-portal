@@ -59,14 +59,17 @@
       <!-- List -->
       <div class="card">
         <h2>Cycletime Setting List</h2>
-        <input
-          v-model="searchQuery"
-          @input="handleSearch"
-          class="form-input"
-          type="text"
-          placeholder="Search Product Code..."
-          style="margin-bottom: var(--spacing-md); max-width: 175px;"
-        />
+        <div style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); align-items: center;">
+          <input
+            v-model="searchQuery"
+            @input="handleSearch"
+            class="form-input"
+            type="text"
+            placeholder="Search Product Code..."
+            style="max-width: 175px;"
+          />
+          <button class="btn btn-secondary" @click="downloadCSV">Download CSV</button>
+        </div>
         <table class="table">
           <thead>
             <tr>
@@ -149,6 +152,30 @@ const handleSubmit = async () => {
 
 const handleSearch = () => {
   loadCycletimeSettings(searchQuery.value)
+}
+
+const downloadCSV = () => {
+  if (cycletimeSettings.value.length === 0) {
+    alert('No data to download')
+    return
+  }
+  const headers = ['ID', 'Product Code', 'Process Name', 'Press No', 'Cycle Time']
+  const rows = cycletimeSettings.value.map(c => [
+    c.cycletime_id,
+    `"${(c.product_code || '').replace(/"/g, '""')}"`,
+    `"${(c.process_name || '').replace(/"/g, '""')}"`,
+    `"${(c.press_no || '').replace(/"/g, '""')}"`,
+    c.cycle_time
+  ])
+  const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+  link.setAttribute('href', url)
+  link.setAttribute('download', 'cycletimes.csv')
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 onMounted(() => {

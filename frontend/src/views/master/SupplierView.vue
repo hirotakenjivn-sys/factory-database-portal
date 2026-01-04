@@ -29,14 +29,17 @@
       <!-- List -->
       <div class="card">
         <h2>Supplier List</h2>
-        <input
-          v-model="searchQuery"
-          @input="handleSearch"
-          class="form-input"
-          type="text"
-          placeholder="Search Supplier..."
-          style="margin-bottom: var(--spacing-md); max-width: 175px;"
-        />
+        <div style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); align-items: center;">
+          <input
+            v-model="searchQuery"
+            @input="handleSearch"
+            class="form-input"
+            type="text"
+            placeholder="Search Supplier..."
+            style="max-width: 175px;"
+          />
+          <button class="btn btn-secondary" @click="downloadCSV">Download CSV</button>
+        </div>
         <table class="table">
           <thead>
             <tr>
@@ -102,6 +105,28 @@ const handleSubmit = async () => {
 
 const handleSearch = () => {
   loadSuppliers(searchQuery.value)
+}
+
+const downloadCSV = () => {
+  if (suppliers.value.length === 0) {
+    alert('No data to download')
+    return
+  }
+  const headers = ['Supplier ID', 'Supplier Name', 'Business Type']
+  const rows = suppliers.value.map(s => [
+    s.supplier_id,
+    `"${(s.supplier_name || '').replace(/"/g, '""')}"`,
+    `"${(s.supplier_business || '').replace(/"/g, '""')}"`
+  ])
+  const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+  link.setAttribute('href', url)
+  link.setAttribute('download', 'suppliers.csv')
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 onMounted(() => {

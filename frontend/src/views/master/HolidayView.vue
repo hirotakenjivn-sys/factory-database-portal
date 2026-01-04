@@ -51,7 +51,10 @@
 
       <!-- Holiday List -->
       <div class="card">
-        <h2>Holiday List</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+          <h2 style="margin-bottom: 0;">Holiday List</h2>
+          <button class="btn btn-secondary" @click="downloadCSV">Download CSV</button>
+        </div>
         <table class="table">
           <thead>
             <tr>
@@ -154,6 +157,28 @@ const sortedHolidays = computed(() => {
 
 const toggleSort = () => {
   sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+}
+
+const downloadCSV = () => {
+  if (holidays.value.length === 0) {
+    alert('No data to download')
+    return
+  }
+  const headers = ['ID', 'Holiday Date', 'Holiday Type']
+  const rows = sortedHolidays.value.map(h => [
+    h.calendar_id,
+    `"${formatDateForDisplay(h.date_holiday)}"`,
+    `"${(h.date_type || '').replace(/"/g, '""')}"`
+  ])
+  const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+  link.setAttribute('href', url)
+  link.setAttribute('download', 'holidays.csv')
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 const loadHolidayTypes = async () => {
