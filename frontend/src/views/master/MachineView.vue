@@ -137,27 +137,34 @@ const handleSearch = () => {
   loadMachines(searchQuery.value)
 }
 
-const downloadCSV = () => {
-  if (machines.value.length === 0) {
-    alert('No data to download')
-    return
+const downloadCSV = async () => {
+  try {
+    const response = await api.get('/master/machines', { params: { limit: 100000 } })
+    const allData = response.data
+    if (allData.length === 0) {
+      alert('No data to download')
+      return
+    }
+    const headers = ['ID', 'Machine No', 'Machine Type', 'Factory Name']
+    const rows = allData.map(m => [
+      m.machine_list_id,
+      `"${(m.machine_no || '').replace(/"/g, '""')}"`,
+      `"${(m.machine_type_name || '').replace(/"/g, '""')}"`,
+      `"${(m.factory_name || '').replace(/"/g, '""')}"`
+    ])
+    const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', 'machines.csv')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  } catch (error) {
+    console.error('Failed to download CSV:', error)
+    alert('Failed to download CSV')
   }
-  const headers = ['ID', 'Machine No', 'Machine Type', 'Factory Name']
-  const rows = machines.value.map(m => [
-    m.machine_list_id,
-    `"${(m.machine_no || '').replace(/"/g, '""')}"`,
-    `"${(m.machine_type_name || '').replace(/"/g, '""')}"`,
-    `"${(m.factory_name || '').replace(/"/g, '""')}"`
-  ])
-  const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  const url = URL.createObjectURL(blob)
-  link.setAttribute('href', url)
-  link.setAttribute('download', 'machines.csv')
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
 }
 
 onMounted(() => {

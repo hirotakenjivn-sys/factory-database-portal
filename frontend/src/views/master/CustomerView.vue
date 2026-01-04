@@ -161,34 +161,32 @@ const handleSearch = () => {
   loadCustomers(searchQuery.value)
 }
 
-const downloadCSV = () => {
-  if (customers.value.length === 0) {
-    alert('No data to download')
-    return
-  }
-
-  const headers = ['Customer ID', 'Customer Name', 'Status']
-  const rows = customers.value.map(c => [
-    c.customer_id,
-    `"${c.customer_name.replace(/"/g, '""')}"`, // Escape quotes
-    c.is_active ? 'Active' : 'Inactive'
-  ])
-
-  const csvContent = [
-    headers.join(','),
-    ...rows.map(row => row.join(','))
-  ].join('\n')
-
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  if (link.download !== undefined) {
+const downloadCSV = async () => {
+  try {
+    const response = await api.get('/master/customers', { params: { limit: 100000 } })
+    const allData = response.data
+    if (allData.length === 0) {
+      alert('No data to download')
+      return
+    }
+    const headers = ['Customer ID', 'Customer Name', 'Status']
+    const rows = allData.map(c => [
+      c.customer_id,
+      `"${(c.customer_name || '').replace(/"/g, '""')}"`,
+      c.is_active ? 'Active' : 'Inactive'
+    ])
+    const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
     link.setAttribute('download', 'customers.csv')
-    link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  } catch (error) {
+    console.error('Failed to download CSV:', error)
+    alert('Failed to download CSV')
   }
 }
 

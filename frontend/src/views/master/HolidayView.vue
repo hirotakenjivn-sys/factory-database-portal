@@ -159,26 +159,39 @@ const toggleSort = () => {
   sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
 }
 
-const downloadCSV = () => {
-  if (holidays.value.length === 0) {
-    alert('No data to download')
-    return
+const downloadCSV = async () => {
+  try {
+    const response = await api.get('/schedule/calendar', { params: { limit: 100000 } })
+    const allData = response.data
+    if (allData.length === 0) {
+      alert('No data to download')
+      return
+    }
+    // Sort by date
+    const sorted = [...allData].sort((a, b) => {
+      const dateA = new Date(a.date_holiday)
+      const dateB = new Date(b.date_holiday)
+      return sortOrder.value === 'asc' ? dateA - dateB : dateB - dateA
+    })
+    const headers = ['ID', 'Holiday Date', 'Holiday Type']
+    const rows = sorted.map(h => [
+      h.calendar_id,
+      `"${formatDateForDisplay(h.date_holiday)}"`,
+      `"${(h.date_type || '').replace(/"/g, '""')}"`
+    ])
+    const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', 'holidays.csv')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  } catch (error) {
+    console.error('Failed to download CSV:', error)
+    alert('Failed to download CSV')
   }
-  const headers = ['ID', 'Holiday Date', 'Holiday Type']
-  const rows = sortedHolidays.value.map(h => [
-    h.calendar_id,
-    `"${formatDateForDisplay(h.date_holiday)}"`,
-    `"${(h.date_type || '').replace(/"/g, '""')}"`
-  ])
-  const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  const url = URL.createObjectURL(blob)
-  link.setAttribute('href', url)
-  link.setAttribute('download', 'holidays.csv')
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
 }
 
 const loadHolidayTypes = async () => {

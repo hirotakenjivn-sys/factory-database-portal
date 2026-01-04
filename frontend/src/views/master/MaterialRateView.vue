@@ -147,29 +147,36 @@ const handleSearch = () => {
   loadMaterialRates(searchQuery.value)
 }
 
-const downloadCSV = () => {
-  if (materialRates.value.length === 0) {
-    alert('No data to download')
-    return
+const downloadCSV = async () => {
+  try {
+    const response = await api.get('/master/material-rates', { params: { limit: 100000 } })
+    const allData = response.data
+    if (allData.length === 0) {
+      alert('No data to download')
+      return
+    }
+    const headers = ['ID', 'Product Code', 'Thickness', 'Width', 'Pitch', 'H']
+    const rows = allData.map(m => [
+      m.material_rate_id,
+      `"${(m.product_code || '').replace(/"/g, '""')}"`,
+      m.thickness,
+      m.width,
+      m.pitch,
+      m.h
+    ])
+    const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', 'material_rates.csv')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  } catch (error) {
+    console.error('Failed to download CSV:', error)
+    alert('Failed to download CSV')
   }
-  const headers = ['ID', 'Product Code', 'Thickness', 'Width', 'Pitch', 'H']
-  const rows = materialRates.value.map(m => [
-    m.material_rate_id,
-    `"${(m.product_code || '').replace(/"/g, '""')}"`,
-    m.thickness,
-    m.width,
-    m.pitch,
-    m.h
-  ])
-  const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  const url = URL.createObjectURL(blob)
-  link.setAttribute('href', url)
-  link.setAttribute('download', 'material_rates.csv')
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
 }
 
 onMounted(() => {

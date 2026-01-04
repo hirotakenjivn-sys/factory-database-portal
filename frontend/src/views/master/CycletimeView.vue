@@ -154,28 +154,35 @@ const handleSearch = () => {
   loadCycletimeSettings(searchQuery.value)
 }
 
-const downloadCSV = () => {
-  if (cycletimeSettings.value.length === 0) {
-    alert('No data to download')
-    return
+const downloadCSV = async () => {
+  try {
+    const response = await api.get('/master/cycletimes', { params: { limit: 100000 } })
+    const allData = response.data
+    if (allData.length === 0) {
+      alert('No data to download')
+      return
+    }
+    const headers = ['ID', 'Product Code', 'Process Name', 'Press No', 'Cycle Time']
+    const rows = allData.map(c => [
+      c.cycletime_id,
+      `"${(c.product_code || '').replace(/"/g, '""')}"`,
+      `"${(c.process_name || '').replace(/"/g, '""')}"`,
+      `"${(c.press_no || '').replace(/"/g, '""')}"`,
+      c.cycle_time
+    ])
+    const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', 'cycletimes.csv')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  } catch (error) {
+    console.error('Failed to download CSV:', error)
+    alert('Failed to download CSV')
   }
-  const headers = ['ID', 'Product Code', 'Process Name', 'Press No', 'Cycle Time']
-  const rows = cycletimeSettings.value.map(c => [
-    c.cycletime_id,
-    `"${(c.product_code || '').replace(/"/g, '""')}"`,
-    `"${(c.process_name || '').replace(/"/g, '""')}"`,
-    `"${(c.press_no || '').replace(/"/g, '""')}"`,
-    c.cycle_time
-  ])
-  const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  const url = URL.createObjectURL(blob)
-  link.setAttribute('href', url)
-  link.setAttribute('download', 'cycletimes.csv')
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
 }
 
 onMounted(() => {

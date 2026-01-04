@@ -107,26 +107,33 @@ const handleSearch = () => {
   loadSuppliers(searchQuery.value)
 }
 
-const downloadCSV = () => {
-  if (suppliers.value.length === 0) {
-    alert('No data to download')
-    return
+const downloadCSV = async () => {
+  try {
+    const response = await api.get('/master/suppliers', { params: { limit: 100000 } })
+    const allData = response.data
+    if (allData.length === 0) {
+      alert('No data to download')
+      return
+    }
+    const headers = ['Supplier ID', 'Supplier Name', 'Business Type']
+    const rows = allData.map(s => [
+      s.supplier_id,
+      `"${(s.supplier_name || '').replace(/"/g, '""')}"`,
+      `"${(s.supplier_business || '').replace(/"/g, '""')}"`
+    ])
+    const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', 'suppliers.csv')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  } catch (error) {
+    console.error('Failed to download CSV:', error)
+    alert('Failed to download CSV')
   }
-  const headers = ['Supplier ID', 'Supplier Name', 'Business Type']
-  const rows = suppliers.value.map(s => [
-    s.supplier_id,
-    `"${(s.supplier_name || '').replace(/"/g, '""')}"`,
-    `"${(s.supplier_business || '').replace(/"/g, '""')}"`
-  ])
-  const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  const url = URL.createObjectURL(blob)
-  link.setAttribute('href', url)
-  link.setAttribute('download', 'suppliers.csv')
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
 }
 
 onMounted(() => {

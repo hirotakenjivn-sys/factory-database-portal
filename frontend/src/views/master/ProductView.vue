@@ -230,35 +230,33 @@ const handleSearch = () => {
   loadProducts()
 }
 
-const downloadCSV = () => {
-  if (products.value.length === 0) {
-    alert('No data to download')
-    return
-  }
-
-  const headers = ['Timestamp', 'Product Code', 'Customer Name', 'Status']
-  const rows = products.value.map(p => [
-    formatTimestamp(p.timestamp),
-    `"${p.product_code}"`,
-    `"${p.customer_name.replace(/"/g, '""')}"`,
-    p.is_active ? 'Active' : 'Inactive'
-  ])
-
-  const csvContent = [
-    headers.join(','),
-    ...rows.map(row => row.join(','))
-  ].join('\n')
-
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  if (link.download !== undefined) {
+const downloadCSV = async () => {
+  try {
+    const response = await api.get('/master/products', { params: { limit: 100000 } })
+    const allProducts = response.data
+    if (allProducts.length === 0) {
+      alert('No data to download')
+      return
+    }
+    const headers = ['Timestamp', 'Product Code', 'Customer Name', 'Status']
+    const rows = allProducts.map(p => [
+      formatTimestamp(p.timestamp),
+      `"${(p.product_code || '').replace(/"/g, '""')}"`,
+      `"${(p.customer_name || '').replace(/"/g, '""')}"`,
+      p.is_active ? 'Active' : 'Inactive'
+    ])
+    const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
     link.setAttribute('download', 'products.csv')
-    link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  } catch (error) {
+    console.error('Failed to download CSV:', error)
+    alert('Failed to download CSV')
   }
 }
 
