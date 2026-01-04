@@ -215,11 +215,11 @@ CREATE TABLE `material_rates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================
--- 13a. spm (SPM設定)
+-- 13a. cycletimes (サイクルタイム設定)
 -- ================================================
-DROP TABLE IF EXISTS `spm`;
-CREATE TABLE `spm` (
-  `spm_id` INT AUTO_INCREMENT PRIMARY KEY,
+DROP TABLE IF EXISTS `cycletimes`;
+CREATE TABLE `cycletimes` (
+  `cycletime_id` INT AUTO_INCREMENT PRIMARY KEY,
   `product_id` INT NOT NULL,
   `process_name` VARCHAR(100) NOT NULL,
   `press_no` VARCHAR(100) NOT NULL,
@@ -227,8 +227,8 @@ CREATE TABLE `spm` (
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user` VARCHAR(100),
   FOREIGN KEY (`product_id`) REFERENCES `products`(`product_id`),
-  INDEX `idx_spm_product` (`product_id`),
-  INDEX `idx_spm_process_name` (`process_name`)
+  INDEX `idx_cycletimes_product` (`product_id`),
+  INDEX `idx_cycletimes_process_name` (`process_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================

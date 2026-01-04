@@ -3,10 +3,10 @@ from sqlalchemy.sql import func
 from ..database import Base
 
 
-class SPM(Base):
-    __tablename__ = "spm"
+class Cycletime(Base):
+    __tablename__ = "cycletimes"
 
-    spm_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    cycletime_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     product_id = Column(Integer, ForeignKey("products.product_id"), nullable=False)
     process_name = Column(String(100), nullable=False)
     press_no = Column(String(100), nullable=False)

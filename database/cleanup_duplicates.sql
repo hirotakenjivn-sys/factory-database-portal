@@ -43,9 +43,9 @@ ALTER TABLE po AUTO_INCREMENT = 1;
 DELETE FROM processes;
 ALTER TABLE processes AUTO_INCREMENT = 1;
 
--- spm を削除
-DELETE FROM spm;
-ALTER TABLE spm AUTO_INCREMENT = 1;
+-- cycletimes を削除
+DELETE FROM cycletimes;
+ALTER TABLE cycletimes AUTO_INCREMENT = 1;
 
 -- ========== マスタテーブルを削除 ==========
 
@@ -86,7 +86,7 @@ UNION ALL SELECT 'machine_list', COUNT(*) FROM machine_list
 UNION ALL SELECT 'po', COUNT(*) FROM po
 UNION ALL SELECT 'lot', COUNT(*) FROM lot
 UNION ALL SELECT 'finished_products', COUNT(*) FROM finished_products
-UNION ALL SELECT 'spm', COUNT(*) FROM spm
+UNION ALL SELECT 'cycletimes', COUNT(*) FROM cycletimes
 UNION ALL SELECT 'production_schedule', COUNT(*) FROM production_schedule
 UNION ALL SELECT 'stamp_traces', COUNT(*) FROM stamp_traces
 UNION ALL SELECT 'outsource_traces', COUNT(*) FROM outsource_traces

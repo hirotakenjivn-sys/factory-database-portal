@@ -10,7 +10,7 @@ from .mold import BrokenMold
 from .calendar import Calendar, HolidayType
 from .finished_product import FinishedProduct
 from .material import MaterialRate
-from .spm import SPM
+from .cycletime import Cycletime
 from .production_schedule import ProductionSchedule
 from .trace import StampTrace, OutsourceTrace
 
@@ -33,7 +33,7 @@ __all__ = [
     "HolidayType",
     "FinishedProduct",
     "MaterialRate",
-    "SPM",
+    "Cycletime",
     "ProductionSchedule",
     "StampTrace",
     "OutsourceTrace",

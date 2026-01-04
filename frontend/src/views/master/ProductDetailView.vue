@@ -159,29 +159,29 @@
           </div>
         </div>
 
-        <!-- SPM Settings -->
+        <!-- Cycletime Settings -->
         <div class="card" style="margin-bottom: var(--spacing-lg)">
-          <h2>SPM Settings</h2>
+          <h2>Cycletime Settings</h2>
           <table class="table">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Process No</th>
+                <th>Process Name</th>
                 <th>Press No</th>
                 <th>Cycle Time</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="spm in spmSettings" :key="spm.spm_id">
-                <td>{{ spm.spm_id }}</td>
-                <td>{{ spm.process_no }}</td>
-                <td>{{ spm.press_no }}</td>
-                <td>{{ spm.cycle_time }}</td>
+              <tr v-for="ct in cycletimeSettings" :key="ct.cycletime_id">
+                <td>{{ ct.cycletime_id }}</td>
+                <td>{{ ct.process_name }}</td>
+                <td>{{ ct.press_no }}</td>
+                <td>{{ ct.cycle_time }}</td>
               </tr>
             </tbody>
           </table>
-          <div v-if="spmSettings.length === 0" class="empty-state">
-            <p>No SPM setting data found</p>
+          <div v-if="cycletimeSettings.length === 0" class="empty-state">
+            <p>No cycletime setting data found</p>
           </div>
         </div>
       </div>
@@ -204,7 +204,7 @@ const productId = parseInt(route.params.id)
 const loading = ref(true)
 const product = ref(null)
 const materialRates = ref([])
-const spmSettings = ref([])
+const cycletimeSettings = ref([])
 const processes = ref([])
 
 // 工程追加フォーム
@@ -245,12 +245,12 @@ const loadMaterialRates = async () => {
   }
 }
 
-const loadSpmSettings = async () => {
+const loadCycletimeSettings = async () => {
   try {
-    const response = await api.get('/master/spm')
-    spmSettings.value = response.data.filter(s => s.product_id === productId)
+    const response = await api.get('/master/cycletimes')
+    cycletimeSettings.value = response.data.filter(c => c.product_id === productId)
   } catch (error) {
-    console.error('Failed to load SPM settings:', error)
+    console.error('Failed to load cycletime settings:', error)
   }
 }
 
@@ -350,7 +350,7 @@ onMounted(async () => {
   await Promise.all([
     loadProduct(),
     loadMaterialRates(),
-    loadSpmSettings(),
+    loadCycletimeSettings(),
     loadProcesses(),
   ])
   loading.value = false

@@ -17,7 +17,7 @@ import SupplierView from '../views/master/SupplierView.vue'
 import ProcessNameView from '../views/master/ProcessNameView.vue'
 import MaterialRateView from '../views/master/MaterialRateView.vue'
 import MachineView from '../views/master/MachineView.vue'
-import SpmView from '../views/master/SpmView.vue'
+import CycletimeView from '../views/master/CycletimeView.vue'
 import HolidayView from '../views/master/HolidayView.vue'
 
 const router = createRouter({
@@ -135,9 +135,9 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/master/spm',
-      name: 'Spm',
-      component: SpmView,
+      path: '/master/cycletimes',
+      name: 'Cycletimes',
+      component: CycletimeView,
       meta: { requiresAuth: true },
     },
     {

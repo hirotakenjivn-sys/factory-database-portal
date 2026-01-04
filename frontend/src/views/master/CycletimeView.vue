@@ -4,11 +4,11 @@
         <router-link to="/master" class="btn btn-secondary">← Back to Master Menu</router-link>
       </div>
 
-      <h1 class="page-title">SPM Master</h1>
+      <h1 class="page-title">Cycletime Master</h1>
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>Register SPM Setting</h2>
+        <h2>Register Cycletime Setting</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
@@ -58,7 +58,7 @@
 
       <!-- List -->
       <div class="card">
-        <h2>SPM Setting List</h2>
+        <h2>Cycletime Setting List</h2>
         <input
           v-model="searchQuery"
           @input="handleSearch"
@@ -78,8 +78,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in spmSettings" :key="item.spm_id">
-              <td>{{ item.spm_id }}</td>
+            <tr v-for="item in cycletimeSettings" :key="item.cycletime_id">
+              <td>{{ item.cycletime_id }}</td>
               <td>
                 <CopyableText v-if="item.product_code" :text="item.product_code" />
                 <span v-else>-</span>
@@ -90,8 +90,8 @@
             </tr>
           </tbody>
         </table>
-        <div v-if="spmSettings.length === 0" class="empty-state">
-          <p>No SPM setting data found</p>
+        <div v-if="cycletimeSettings.length === 0" class="empty-state">
+          <p>No cycletime setting data found</p>
         </div>
       </div>
   </AppLayout>
@@ -111,17 +111,17 @@ const form = ref({
   cycle_time: null,
 })
 
-const spmSettings = ref([])
+const cycletimeSettings = ref([])
 const searchQuery = ref('')
 
-const loadSpmSettings = async (search = '') => {
+const loadCycletimeSettings = async (search = '') => {
   try {
     const params = search ? { search } : {}
-    const response = await api.get('/master/spm', { params })
-    spmSettings.value = response.data
+    const response = await api.get('/master/cycletimes', { params })
+    cycletimeSettings.value = response.data
   } catch (error) {
-    console.error('Failed to load SPM settings:', error)
-    alert('Failed to load SPM settings')
+    console.error('Failed to load cycletime settings:', error)
+    alert('Failed to load cycletime settings')
   }
 }
 
@@ -132,27 +132,27 @@ const handleSubmit = async () => {
   }
 
   try {
-    await api.post('/master/spm', form.value)
-    alert('SPM setting registered successfully')
+    await api.post('/master/cycletimes', form.value)
+    alert('Cycletime setting registered successfully')
     form.value = {
       product_id: null,
       process_name: '',
       press_no: '',
       cycle_time: null,
     }
-    await loadSpmSettings()
+    await loadCycletimeSettings()
   } catch (error) {
-    console.error('Failed to create SPM settings:', error)
-    alert('Failed to register SPM setting')
+    console.error('Failed to create cycletime settings:', error)
+    alert('Failed to register cycletime setting')
   }
 }
 
 const handleSearch = () => {
-  loadSpmSettings(searchQuery.value)
+  loadCycletimeSettings(searchQuery.value)
 }
 
 onMounted(() => {
-  loadSpmSettings()
+  loadCycletimeSettings()
 })
 </script>
 

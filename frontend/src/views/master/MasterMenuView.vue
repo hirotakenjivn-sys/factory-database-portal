@@ -27,7 +27,7 @@ const masterMenus = [
   { path: '/master/process-names', label: 'Process Name Master', description: 'Manage process names and types' },
   { path: '/master/material-rates', label: 'Material Spec Master', description: 'Manage material specifications' },
   { path: '/master/machines', label: 'Machine List Master', description: 'Manage machine equipment' },
-  { path: '/master/spm', label: 'Production Press Settings Master', description: 'Manage production press settings' },
+  { path: '/master/cycletimes', label: 'Cycletime Master', description: 'Manage cycletime settings' },
   { path: '/master/holidays', label: 'Holiday Master', description: 'Manage holidays' },
 ]
 </script>

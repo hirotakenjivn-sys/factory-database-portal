@@ -9,7 +9,7 @@ from ..models.supplier import Supplier
 from ..models.lot import Lot
 from ..models.factory import Factory, MachineList, MachineType
 from ..models.material import MaterialRate
-from ..models.spm import SPM
+from ..models.cycletime import Cycletime
 from ..models.process import ProcessNameType, Process
 from ..models.po import PO
 from ..models.finished_product import FinishedProduct
@@ -23,7 +23,7 @@ from ..schemas import supplier as supplier_schema
 from ..schemas import process as process_schema
 from ..schemas import factory as factory_schema
 from ..schemas import material as material_schema
-from ..schemas import spm as spm_schema
+from ..schemas import cycletime as cycletime_schema
 from .auth import get_current_user
 from ..utils.auth import get_password_hash, generate_strong_password
 
@@ -217,10 +217,10 @@ async def delete_product(
         if lots_count > 0:
             raise HTTPException(status_code=400, detail="Cannot delete product with associated lots")
 
-        # SPM settings
-        spm_count = db.query(SPM).filter(SPM.product_id == product_id).count()
-        if spm_count > 0:
-            raise HTTPException(status_code=400, detail="Cannot delete product with associated SPM settings")
+        # Cycletime settings
+        cycletime_count = db.query(Cycletime).filter(Cycletime.product_id == product_id).count()
+        if cycletime_count > 0:
+            raise HTTPException(status_code=400, detail="Cannot delete product with associated cycletime settings")
 
         # Material rates
         material_rates_count = db.query(MaterialRate).filter(MaterialRate.product_id == product_id).count()
@@ -804,48 +804,48 @@ async def create_machine(
     return db_machine
 
 
-# ==================== SPM ====================
-@router.get("/spm", response_model=List[spm_schema.SPMWithDetails])
-async def get_spm(
+# ==================== Cycletimes ====================
+@router.get("/cycletimes", response_model=List[cycletime_schema.CycletimeWithDetails])
+async def get_cycletimes(
     skip: int = 0,
     limit: int = 100,
     search: str = None,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ):
-    """SPM設定一覧を取得"""
-    query = db.query(SPM).join(Product, SPM.product_id == Product.product_id)
+    """サイクルタイム設定一覧を取得"""
+    query = db.query(Cycletime).join(Product, Cycletime.product_id == Product.product_id)
     if search:
         query = query.filter(Product.product_code.contains(search))
-    spm_list = query.offset(skip).limit(limit).all()
+    cycletime_list = query.offset(skip).limit(limit).all()
 
     # データを整形
     result = []
-    for s in spm_list:
+    for c in cycletime_list:
         result.append({
-            "spm_id": s.spm_id,
-            "product_id": s.product_id,
-            "process_name": s.process_name,
-            "press_no": s.press_no,
-            "cycle_time": s.cycle_time,
-            "timestamp": s.timestamp,
-            "user": s.user,
-            "product_code": db.query(Product).filter(Product.product_id == s.product_id).first().product_code,
+            "cycletime_id": c.cycletime_id,
+            "product_id": c.product_id,
+            "process_name": c.process_name,
+            "press_no": c.press_no,
+            "cycle_time": c.cycle_time,
+            "timestamp": c.timestamp,
+            "user": c.user,
+            "product_code": db.query(Product).filter(Product.product_id == c.product_id).first().product_code,
         })
     return result
 
 
-@router.post("/spm", response_model=spm_schema.SPMResponse)
-async def create_spm(
-    spm: spm_schema.SPMCreate,
+@router.post("/cycletimes", response_model=cycletime_schema.CycletimeResponse)
+async def create_cycletime(
+    cycletime: cycletime_schema.CycletimeCreate,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ):
-    """SPM設定を登録"""
-    spm_data = spm.model_dump()
-    spm_data['user'] = current_user['username']
-    db_spm = SPM(**spm_data)
-    db.add(db_spm)
+    """サイクルタイム設定を登録"""
+    cycletime_data = cycletime.model_dump()
+    cycletime_data['user'] = current_user['username']
+    db_cycletime = Cycletime(**cycletime_data)
+    db.add(db_cycletime)
     db.commit()
-    db.refresh(db_spm)
-    return db_spm
+    db.refresh(db_cycletime)
+    return db_cycletime
