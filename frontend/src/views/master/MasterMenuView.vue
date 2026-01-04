@@ -31,7 +31,7 @@ const masterMenus = [
   { path: '/master/machines', label: 'MACHINE LIST', icon: '🏭', key: 'machine_list' },
   { path: '/master/cycletimes', label: 'CYCLETIME', icon: '⏱️', key: 'cycletimes' },
   { path: '/master/holidays', label: 'HOLIDAY', icon: '📅', key: 'calendar' },
-  { path: '/press', label: 'PRESS', icon: '⚙️', key: null },
+  { path: '/press', label: 'PROCESS', icon: '⚙️', key: 'processes' },
 ]
 
 const counts = ref({})

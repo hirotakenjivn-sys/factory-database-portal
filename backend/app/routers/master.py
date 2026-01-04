@@ -45,6 +45,7 @@ async def get_table_counts(db: Session = Depends(get_db)):
         "machine_list": db.query(MachineList).count(),
         "cycletimes": db.query(Cycletime).count(),
         "calendar": db.query(Calendar).count(),
+        "processes": db.query(Process).count(),
     }
 
 
