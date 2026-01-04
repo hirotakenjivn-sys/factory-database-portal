@@ -26,6 +26,30 @@
 
       <!-- Holiday Registration Tab -->
       <div v-if="activeTab === 'holidays'">
+        <!-- Calendar Display -->
+        <div class="card" style="margin-bottom: var(--spacing-lg)">
+          <div class="calendar-header">
+            <button class="btn btn-secondary calendar-nav" @click="prevMonth">&lt;</button>
+            <h2 class="calendar-title">{{ calendarYear }}年 {{ calendarMonth + 1 }}月</h2>
+            <button class="btn btn-secondary calendar-nav" @click="nextMonth">&gt;</button>
+          </div>
+          <div class="calendar-grid">
+            <div class="calendar-day-header" v-for="day in weekDays" :key="day">{{ day }}</div>
+            <div
+              v-for="(date, index) in calendarDates"
+              :key="index"
+              :class="getDateClass(date)"
+              @click="date && selectDate(date)"
+            >
+              <span v-if="date">{{ date.getDate() }}</span>
+            </div>
+          </div>
+          <div class="calendar-legend">
+            <span class="legend-item"><span class="legend-color holiday"></span> Holiday</span>
+            <span class="legend-item"><span class="legend-color today"></span> Today</span>
+          </div>
+        </div>
+
         <!-- Holiday Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
         <h2>Register Holiday</h2>
@@ -133,6 +157,87 @@ import api from '../../utils/api'
 import { getTodayFormatted, formatDateForDisplay, formatDateForApi } from '../../utils/dateFormat'
 
 const activeTab = ref('holidays')
+
+// Calendar state
+const today = new Date()
+const calendarYear = ref(today.getFullYear())
+const calendarMonth = ref(today.getMonth())
+const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+const calendarDates = computed(() => {
+  const dates = []
+  const firstDay = new Date(calendarYear.value, calendarMonth.value, 1)
+  const lastDay = new Date(calendarYear.value, calendarMonth.value + 1, 0)
+
+  // Add empty slots for days before the first day of month
+  for (let i = 0; i < firstDay.getDay(); i++) {
+    dates.push(null)
+  }
+
+  // Add all days of the month
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    dates.push(new Date(calendarYear.value, calendarMonth.value, d))
+  }
+
+  return dates
+})
+
+const holidayDatesSet = computed(() => {
+  const set = new Set()
+  holidays.value.forEach(h => {
+    const date = new Date(h.date_holiday)
+    set.add(`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`)
+  })
+  return set
+})
+
+const isHoliday = (date) => {
+  if (!date) return false
+  return holidayDatesSet.value.has(`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`)
+}
+
+const isToday = (date) => {
+  if (!date) return false
+  return date.getFullYear() === today.getFullYear() &&
+         date.getMonth() === today.getMonth() &&
+         date.getDate() === today.getDate()
+}
+
+const getDateClass = (date) => {
+  if (!date) return 'calendar-day empty'
+  const classes = ['calendar-day']
+  if (isHoliday(date)) classes.push('holiday')
+  if (isToday(date)) classes.push('today')
+  if (date.getDay() === 0) classes.push('sunday')
+  if (date.getDay() === 6) classes.push('saturday')
+  return classes.join(' ')
+}
+
+const prevMonth = () => {
+  if (calendarMonth.value === 0) {
+    calendarMonth.value = 11
+    calendarYear.value--
+  } else {
+    calendarMonth.value--
+  }
+}
+
+const nextMonth = () => {
+  if (calendarMonth.value === 11) {
+    calendarMonth.value = 0
+    calendarYear.value++
+  } else {
+    calendarMonth.value++
+  }
+}
+
+const selectDate = (date) => {
+  if (!date) return
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  form.value.date_holiday = `${day}/${month}/${year}`
+}
 
 const form = ref({
   date_holiday: getTodayFormatted(),
@@ -333,5 +438,112 @@ h2 {
 
 .sortable:hover {
   background: var(--background-hover);
+}
+
+/* Calendar Styles */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.calendar-title {
+  margin: 0;
+  min-width: 150px;
+  text-align: center;
+}
+
+.calendar-nav {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: var(--spacing-md);
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-weight: 600;
+  padding: var(--spacing-sm);
+  background: var(--background-secondary);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.calendar-day {
+  text-align: center;
+  padding: var(--spacing-sm);
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.calendar-day:hover:not(.empty) {
+  background: var(--background-hover);
+}
+
+.calendar-day.empty {
+  background: transparent;
+  border-color: transparent;
+  cursor: default;
+}
+
+.calendar-day.holiday {
+  background: #ffebee;
+  color: #c62828;
+  font-weight: 600;
+}
+
+.calendar-day.today {
+  border: 2px solid var(--primary);
+  font-weight: 700;
+}
+
+.calendar-day.sunday {
+  color: #c62828;
+}
+
+.calendar-day.saturday {
+  color: #1565c0;
+}
+
+.calendar-legend {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+}
+
+.legend-color.holiday {
+  background: #ffebee;
+}
+
+.legend-color.today {
+  border: 2px solid var(--primary);
 }
 </style>
