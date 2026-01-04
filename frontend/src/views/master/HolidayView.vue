@@ -45,7 +45,8 @@
             </div>
           </div>
           <div class="calendar-legend">
-            <span class="legend-item"><span class="legend-color holiday"></span> Holiday</span>
+            <span class="legend-item"><span class="legend-color holiday-weekly"></span> Weekly Holiday</span>
+            <span class="legend-item"><span class="legend-color holiday-public"></span> Public Holiday</span>
             <span class="legend-item"><span class="legend-color today"></span> Today</span>
           </div>
         </div>
@@ -186,18 +187,20 @@ const calendarDates = computed(() => {
   return dates
 })
 
-const holidayDatesSet = computed(() => {
-  const set = new Set()
+const holidayDatesMap = computed(() => {
+  const map = new Map()
   holidays.value.forEach(h => {
     const date = new Date(h.date_holiday)
-    set.add(`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`)
+    const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+    map.set(key, h.date_type)
   })
-  return set
+  return map
 })
 
-const isHoliday = (date) => {
-  if (!date) return false
-  return holidayDatesSet.value.has(`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`)
+const getHolidayType = (date) => {
+  if (!date) return null
+  const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+  return holidayDatesMap.value.get(key) || null
 }
 
 const isToday = (date) => {
@@ -210,7 +213,16 @@ const isToday = (date) => {
 const getDateClass = (date) => {
   if (!date) return 'calendar-day empty'
   const classes = ['calendar-day']
-  if (isHoliday(date)) classes.push('holiday')
+
+  const holidayType = getHolidayType(date)
+  if (holidayType) {
+    if (holidayType === 'Ngày nghỉ hàng tuần') {
+      classes.push('holiday-weekly')
+    } else {
+      classes.push('holiday-public')
+    }
+  }
+
   if (isToday(date)) classes.push('today')
   if (date.getDay() === 0) classes.push('sunday')
   if (date.getDay() === 6) classes.push('saturday')
@@ -503,7 +515,13 @@ h2 {
   cursor: default;
 }
 
-.calendar-day.holiday {
+.calendar-day.holiday-weekly {
+  background: #e3f2fd;
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.calendar-day.holiday-public {
   background: #ffebee;
   color: #c62828;
   font-weight: 600;
@@ -543,7 +561,11 @@ h2 {
   border: 1px solid var(--border);
 }
 
-.legend-color.holiday {
+.legend-color.holiday-weekly {
+  background: #e3f2fd;
+}
+
+.legend-color.holiday-public {
   background: #ffebee;
 }
 
