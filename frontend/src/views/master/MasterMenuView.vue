@@ -10,7 +10,6 @@
           class="card master-menu-card"
         >
           <h3>{{ menu.label }}</h3>
-          <p>{{ menu.description }}</p>
         </router-link>
       </div>
   </AppLayout>
@@ -20,15 +19,15 @@
 import AppLayout from '../../components/common/AppLayout.vue'
 
 const masterMenus = [
-  { path: '/master/customers', label: 'Customer Master', description: 'Manage customer information' },
-  { path: '/master/products', label: 'Product Code Master', description: 'Manage product codes' },
-  { path: '/master/employees', label: 'Employee Master', description: 'Manage employee information' },
-  { path: '/master/suppliers', label: 'Supplier Master', description: 'Manage supplier information' },
-  { path: '/master/process-names', label: 'Process Name Master', description: 'Manage process names and types' },
-  { path: '/master/material-rates', label: 'Material Spec Master', description: 'Manage material specifications' },
-  { path: '/master/machines', label: 'Machine List Master', description: 'Manage machine equipment' },
-  { path: '/master/cycletimes', label: 'Cycletime Master', description: 'Manage cycletime settings' },
-  { path: '/master/holidays', label: 'Holiday Master', description: 'Manage holidays' },
+  { path: '/master/customers', label: 'customer' },
+  { path: '/master/products', label: 'product' },
+  { path: '/master/employees', label: 'employee' },
+  { path: '/master/suppliers', label: 'supplier' },
+  { path: '/master/process-names', label: 'process name type' },
+  { path: '/master/material-rates', label: 'material rate' },
+  { path: '/master/machines', label: 'machine list' },
+  { path: '/master/cycletimes', label: 'cycletime' },
+  { path: '/master/holidays', label: 'holiday' },
 ]
 </script>
 
@@ -49,11 +48,6 @@ const masterMenus = [
 
 .master-menu-card h3 {
   color: var(--primary);
-  margin-bottom: var(--spacing-sm);
-}
-
-.master-menu-card p {
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
+  margin: 0;
 }
 </style>
