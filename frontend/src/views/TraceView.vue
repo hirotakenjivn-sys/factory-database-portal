@@ -2,64 +2,64 @@
   <AppLayout>
       <div class="trace-view">
         <div class="trace-header">
-          <h1>プレス記録登録</h1>
-          <p class="trace-subtitle">内製作業のトレース情報を登録</p>
+          <h1>Press Record Registration</h1>
+          <p class="trace-subtitle">Register trace information for in-house operations</p>
         </div>
 
-        <!-- 登録フォーム -->
+        <!-- Registration Form -->
         <div class="form-section">
-          <!-- 従業員エラー警告 -->
+          <!-- Employee Error Warning -->
           <div v-if="employeeError" class="alert alert-warning" style="margin-bottom: 1.5rem;">
-            <strong>⚠ 警告:</strong> {{ employeeError }}
+            <strong>⚠ Warning:</strong> {{ employeeError }}
             <br>
-            <small>従業員マスタに現在のログインユーザーが登録されているか確認してください。</small>
+            <small>Please verify that the current login user is registered in the Employee Master.</small>
           </div>
 
           <form @submit.prevent="submitTrace" class="trace-form">
             <div class="form-row">
               <div class="form-group">
-                <label for="product-code">プロダクトコード <span class="required">*</span></label>
+                <label for="product-code">Product Code <span class="required">*</span></label>
                 <AutocompleteInput
                   v-model="form.product_code"
                   endpoint="/master/autocomplete/products"
                   display-field="product_code"
                   value-field="product_code"
-                  placeholder="例: P-12345"
+                  placeholder="e.g. P-12345"
                   required
                   @select="onProductSelect"
                 />
               </div>
 
               <div class="form-group">
-                <label for="customer-name">顧客名</label>
+                <label for="customer-name">Customer Name</label>
                 <input
                   id="customer-name"
                   v-model="customerName"
                   type="text"
                   class="form-control"
                   readonly
-                  placeholder="プロダクトコード入力後に自動表示"
+                  placeholder="Auto-displayed after entering product code"
                 >
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label for="lot-number">ロット番号 <span class="required">*</span></label>
+                <label for="lot-number">Lot Number <span class="required">*</span></label>
                 <input
                   id="lot-number"
                   v-model="form.lot_number"
                   type="text"
                   class="form-control"
-                  placeholder="例: SECC 120923 JFE"
+                  placeholder="e.g. SECC 120923 JFE"
                   required
                 >
               </div>
 
               <div class="form-group">
-                <label for="process">工程 <span class="required">*</span></label>
+                <label for="process">Process <span class="required">*</span></label>
                 <select id="process" v-model="form.process_id" class="form-control" required>
-                  <option value="">選択してください</option>
+                  <option value="">Please select</option>
                   <option v-for="process in filteredProcesses" :key="process.process_id" :value="process.process_id">
                     {{ process.process_name }}
                   </option>
@@ -69,7 +69,7 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label for="employee">作業者 <span class="required">*</span></label>
+                <label for="employee">Operator <span class="required">*</span></label>
                 <input
                   id="employee"
                   v-model="employeeName"
@@ -84,7 +84,7 @@
               </div>
 
               <div class="form-group">
-                <label for="date">作業日 <span class="required">*</span></label>
+                <label for="date">Work Date <span class="required">*</span></label>
                 <input
                   id="date"
                   v-model="form.date"
@@ -97,27 +97,27 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label for="ok-quantity">OK数量 <span class="required">*</span></label>
+                <label for="ok-quantity">OK Quantity <span class="required">*</span></label>
                 <input
                   id="ok-quantity"
                   v-model.number="form.ok_quantity"
                   type="number"
                   min="0"
                   class="form-control"
-                  placeholder="数量を入力してください"
+                  placeholder="Enter quantity"
                   required
                 >
               </div>
 
               <div class="form-group">
-                <label for="ng-quantity">NG数量 <span class="required">*</span></label>
+                <label for="ng-quantity">NG Quantity <span class="required">*</span></label>
                 <input
                   id="ng-quantity"
                   v-model.number="form.ng_quantity"
                   type="number"
                   min="0"
                   class="form-control"
-                  placeholder="数量を入力してください"
+                  placeholder="Enter quantity"
                   required
                 >
               </div>
@@ -125,42 +125,42 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label for="result">結果 <span class="required">*</span></label>
+                <label for="result">Result <span class="required">*</span></label>
                 <select id="result" v-model="form.result" class="form-control" required>
-                  <option value="pass">合格</option>
-                  <option value="fail">不合格</option>
-                  <option value="rework">再加工</option>
+                  <option value="pass">Pass</option>
+                  <option value="fail">Fail</option>
+                  <option value="rework">Rework</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <!-- 空欄 -->
+                <!-- Empty -->
               </div>
             </div>
 
             <div class="form-group full-width">
-              <label for="note">備考</label>
+              <label for="note">Note</label>
               <textarea
                 id="note"
                 v-model="form.note"
                 class="form-control"
                 rows="3"
-                placeholder="備考を入力してください"
+                placeholder="Enter notes"
               ></textarea>
             </div>
 
             <div class="form-actions">
               <button type="button" @click="resetForm" class="btn btn-secondary">
-                クリア
+                Clear
               </button>
               <button type="submit" class="btn btn-primary" :disabled="isSubmitDisabled">
-                {{ submitting ? '登録中...' : '登録' }}
+                {{ submitting ? 'Registering...' : 'Register' }}
               </button>
             </div>
           </form>
         </div>
 
-        <!-- 成功/エラーメッセージ -->
+        <!-- Success/Error Messages -->
         <div v-if="successMessage" class="alert alert-success">
           {{ successMessage }}
         </div>
@@ -168,23 +168,23 @@
           {{ errorMessage }}
         </div>
 
-        <!-- 登録済みトレース履歴 -->
+        <!-- Registered Trace History -->
         <div v-if="recentTraces.length > 0" class="recent-traces">
-          <h2>最近の登録履歴</h2>
+          <h2>Recent Registration History</h2>
           <div class="table-container">
             <table class="trace-table">
               <thead>
                 <tr>
-                  <th>登録日時</th>
-                  <th>製品番号</th>
-                  <th>ロット番号</th>
-                  <th>工程名</th>
-                  <th>作業者</th>
-                  <th>OK数量</th>
-                  <th>NG数量</th>
-                  <th>結果</th>
-                  <th>梱包完了(done)</th>
-                  <th>備考</th>
+                  <th>Registered Date</th>
+                  <th>Product Code</th>
+                  <th>Lot Number</th>
+                  <th>Process Name</th>
+                  <th>Operator</th>
+                  <th>OK Qty</th>
+                  <th>NG Qty</th>
+                  <th>Result</th>
+                  <th>Packing Done</th>
+                  <th>Note</th>
                 </tr>
               </thead>
               <tbody>
@@ -316,11 +316,11 @@ const formatDateTime = (dateTimeString) => {
 const getResultLabel = (result) => {
   switch (result) {
     case 'pass':
-      return '合格'
+      return 'Pass'
     case 'fail':
-      return '不合格'
+      return 'Fail'
     case 'rework':
-      return '再加工'
+      return 'Rework'
     default:
       return '-'
   }
@@ -365,34 +365,34 @@ const resetForm = () => {
 }
 
 const submitTrace = async () => {
-  // バリデーション
+  // Validation
   if (!form.value.product_id) {
-    errorMessage.value = '製品コードを入力してください'
+    errorMessage.value = 'Please enter product code'
     return
   }
 
   if (!form.value.lot_number || form.value.lot_number.trim() === '') {
-    errorMessage.value = 'ロット番号を入力してください'
+    errorMessage.value = 'Please enter lot number'
     return
   }
 
   if (!form.value.process_id) {
-    errorMessage.value = '工程を選択してください'
+    errorMessage.value = 'Please select a process'
     return
   }
 
   if (!form.value.employee_id) {
-    errorMessage.value = '作業者情報が取得できていません。従業員マスタに登録されているか確認してください。'
+    errorMessage.value = 'Operator information not found. Please verify registration in Employee Master.'
     return
   }
 
   if (form.value.ok_quantity === null || form.value.ok_quantity === '') {
-    errorMessage.value = 'OK数量を入力してください'
+    errorMessage.value = 'Please enter OK quantity'
     return
   }
 
   if (form.value.ng_quantity === null || form.value.ng_quantity === '') {
-    errorMessage.value = 'NG数量を入力してください'
+    errorMessage.value = 'Please enter NG quantity'
     return
   }
 
@@ -401,7 +401,7 @@ const submitTrace = async () => {
   errorMessage.value = ''
 
   try {
-    // デバッグ用: 送信するデータをログ出力
+    // Debug: Log data being sent
     const payload = {
       product_id: form.value.product_id,
       lot_number: form.value.lot_number,
@@ -413,21 +413,21 @@ const submitTrace = async () => {
       date: form.value.date,
       note: form.value.note
     }
-    console.log('トレース登録リクエスト:', payload)
-    
-    // トレースを登録（バックエンドでproduction_conditionを処理）
+    console.log('Trace registration request:', payload)
+
+    // Register trace (production_condition handled by backend)
     await api.post('/trace/stamp-trace-simple', payload)
 
-    successMessage.value = 'プレス記録を登録しました'
+    successMessage.value = 'Press record registered successfully'
     resetForm()
     await fetchRecentTraces()
   } catch (error) {
-    console.error('トレース登録エラー:', error)
-    console.error('エラーレスポンス:', error.response)
-    const errorDetail = error.response?.data?.detail || error.message || 'トレース登録に失敗しました'
-    errorMessage.value = `エラー: ${errorDetail}`
+    console.error('Trace registration error:', error)
+    console.error('Error response:', error.response)
+    const errorDetail = error.response?.data?.detail || error.message || 'Failed to register trace'
+    errorMessage.value = `Error: ${errorDetail}`
     if (error.response?.status) {
-      errorMessage.value += ` (ステータス: ${error.response.status})`
+      errorMessage.value += ` (Status: ${error.response.status})`
     }
   } finally {
     submitting.value = false
@@ -436,45 +436,45 @@ const submitTrace = async () => {
 
 const fetchMasterData = async () => {
   try {
-    // 工程一覧を取得
+    // Get process list
     const processResponse = await api.get('/process/list')
     processList.value = processResponse.data
 
-    // ログインユーザー情報を設定
+    // Set login user information
     if (!authStore.user) {
-      employeeError.value = 'ログイン情報を取得できません。再ログインしてください。'
+      employeeError.value = 'Cannot retrieve login information. Please login again.'
       return
     }
 
     employeeName.value = authStore.user.username
 
-    // ユーザー名（従業員番号）から従業員IDを取得
+    // Get employee ID from username (employee number)
     try {
-      // 全件取得ではなく、従業員番号で検索して取得する（ページネーション対策）
+      // Search by employee number instead of fetching all (pagination workaround)
       const employeeResponse = await api.get('/master/employees', {
         params: { employee_no: authStore.user.username }
       })
-      
-      // 部分一致検索なので、完全一致するものを探す
+
+      // Find exact match since search is partial match
       const employee = employeeResponse.data.find(emp =>
         emp.employee_no === authStore.user.username
       )
-      
+
       if (employee) {
         form.value.employee_id = employee.employee_id
         employeeError.value = ''
       } else {
-        employeeError.value = 'ログインIDに対応する従業員情報が見つかりません。'
-        errorMessage.value = '作業者情報を取得できませんでした。'
+        employeeError.value = 'Employee information not found for login ID.'
+        errorMessage.value = 'Could not retrieve operator information.'
       }
     } catch (error) {
-      console.error('従業員情報取得エラー:', error)
-      employeeError.value = '従業員情報の取得に失敗しました。'
-      errorMessage.value = '作業者情報を取得できませんでした。'
+      console.error('Employee information fetch error:', error)
+      employeeError.value = 'Failed to retrieve employee information.'
+      errorMessage.value = 'Could not retrieve operator information.'
     }
   } catch (error) {
-    console.error('マスタデータ取得エラー:', error)
-    errorMessage.value = 'マスタデータの取得に失敗しました'
+    console.error('Master data fetch error:', error)
+    errorMessage.value = 'Failed to retrieve master data'
   }
 }
 
@@ -483,7 +483,7 @@ const fetchRecentTraces = async () => {
     const response = await api.get('/trace/stamp-traces?limit=10')
     recentTraces.value = response.data
   } catch (error) {
-    console.error('トレース履歴取得エラー:', error)
+    console.error('Trace history fetch error:', error)
   }
 }
 

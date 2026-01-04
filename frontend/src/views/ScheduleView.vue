@@ -8,11 +8,11 @@
       @close="closeErrorDialog"
     />
 
-      <h1 class="page-title">スケジュール - 生産計画</h1>
+      <h1 class="page-title">Schedule - Production Plan</h1>
 
-      <!-- 工場稼働時間入力 -->
+      <!-- Factory Working Hours Input -->
       <div class="working-hours-top">
-        <label class="working-hours-label">工場稼働時間（h）</label>
+        <label class="working-hours-label">Factory Working Hours (h)</label>
         <input
           v-model.number="workingHours"
           class="working-hours-input-compact"
@@ -23,51 +23,51 @@
         />
       </div>
 
-      <!-- タブナビゲーション -->
+      <!-- Tab Navigation -->
       <div class="tabs" style="margin-bottom: var(--spacing-lg)">
         <button
           @click="activeTab = 'productionPlan'"
           :class="{ active: activeTab === 'productionPlan' }"
           class="tab-btn"
         >
-          全体生産計画
+          Overall Production Plan
         </button>
         <button
           @click="activeTab = 'pressPlan'"
           :class="{ active: activeTab === 'pressPlan' }"
           class="tab-btn"
         >
-          今週のプレス計画
+          This Week's Press Plan
         </button>
         <button
           @click="activeTab = 'progress'"
           :class="{ active: activeTab === 'progress' }"
           class="tab-btn"
         >
-          進捗確認
+          Progress Check
         </button>
         <button
           @click="activeTab = 'progress2'"
           :class="{ active: activeTab === 'progress2' }"
           class="tab-btn"
         >
-          進捗確認２
+          Progress Check 2
         </button>
       </div>
 
-      <!-- 進捗確認タブ -->
+      <!-- Progress Check Tab -->
       <div v-if="activeTab === 'progress'" class="card">
-        <h2>進捗確認</h2>
+        <h2>Progress Check</h2>
 
-        <!-- 検索フィールド -->
+        <!-- Search Fields -->
         <div style="display: flex; gap: 8px; margin-bottom: var(--spacing-md);">
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">顧客名</label>
-            <input v-model="searchProgress.customer_name" class="form-input" type="text" placeholder="顧客名で検索..." />
+            <label class="form-label" style="margin-bottom: 0;">Customer Name</label>
+            <input v-model="searchProgress.customer_name" class="form-input" type="text" placeholder="Search by customer..." />
           </div>
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">製品コード</label>
-            <input v-model="searchProgress.product_code" class="form-input" type="text" placeholder="製品コードで検索..." />
+            <label class="form-label" style="margin-bottom: 0;">Product Code</label>
+            <input v-model="searchProgress.product_code" class="form-input" type="text" placeholder="Search by product code..." />
           </div>
         </div>
 
@@ -75,12 +75,12 @@
           <table class="table process-table">
             <thead>
               <tr>
-                <th class="sticky-col">顧客名</th>
-                <th class="sticky-col-2">製品コード</th>
-                <th class="sticky-col-3">PO数量合計</th>
+                <th class="sticky-col">Customer</th>
+                <th class="sticky-col-2">Product Code</th>
+                <th class="sticky-col-3">Total PO Qty</th>
                 <th class="sticky-col-4">PO No.</th>
-                <th class="sticky-col-5">納期</th>
-                <th v-for="i in 20" :key="i">工程{{ i }}</th>
+                <th class="sticky-col-5">Delivery</th>
+                <th v-for="i in 20" :key="i">Process{{ i }}</th>
               </tr>
             </thead>
             <tbody>
@@ -122,22 +122,22 @@
           </table>
         </div>
         <div v-if="filteredProgressTable.length === 0" class="empty-state">
-          <p>データがありません</p>
+          <p>No data available</p>
         </div>
       </div>
 
       <div v-if="activeTab === 'progress2'" class="card">
-        <h2>進捗確認２（プレス機制約なし）</h2>
+        <h2>Progress Check 2 (No Press Constraints)</h2>
 
-        <!-- 検索フィールド -->
+        <!-- Search Fields -->
         <div style="display: flex; gap: 8px; margin-bottom: var(--spacing-md);">
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">顧客名</label>
-            <input v-model="searchProgress2.customer_name" class="form-input" type="text" placeholder="顧客名で検索..." />
+            <label class="form-label" style="margin-bottom: 0;">Customer Name</label>
+            <input v-model="searchProgress2.customer_name" class="form-input" type="text" placeholder="Search by customer..." />
           </div>
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">製品コード</label>
-            <input v-model="searchProgress2.product_code" class="form-input" type="text" placeholder="製品コードで検索..." />
+            <label class="form-label" style="margin-bottom: 0;">Product Code</label>
+            <input v-model="searchProgress2.product_code" class="form-input" type="text" placeholder="Search by product code..." />
           </div>
         </div>
 
@@ -145,12 +145,12 @@
           <table class="table process-table">
             <thead>
               <tr>
-                <th class="sticky-col">顧客名</th>
-                <th class="sticky-col-2">製品コード</th>
-                <th class="sticky-col-3">PO数量合計</th>
+                <th class="sticky-col">Customer</th>
+                <th class="sticky-col-2">Product Code</th>
+                <th class="sticky-col-3">Total PO Qty</th>
                 <th class="sticky-col-4">PO No.</th>
-                <th class="sticky-col-5">納期</th>
-                <th v-for="i in 20" :key="i">工程{{ i }}</th>
+                <th class="sticky-col-5">Delivery</th>
+                <th v-for="i in 20" :key="i">Process{{ i }}</th>
               </tr>
             </thead>
             <tbody>
@@ -192,76 +192,76 @@
           </table>
         </div>
         <div v-if="filteredProgressTable2.length === 0" class="empty-state">
-          <p>データがありません</p>
+          <p>No data available</p>
         </div>
       </div>
 
-      <!-- 全体生産計画タブ -->
+      <!-- Overall Production Plan Tab -->
       <div v-if="activeTab === 'productionPlan'" class="card">
-        <h2>全体生産計画</h2>
+        <h2>Overall Production Plan</h2>
 
         <div class="info-box" style="margin-bottom: var(--spacing-md);">
-          <p><strong>機能説明:</strong></p>
+          <p><strong>Feature Description:</strong></p>
           <ul style="margin: 8px 0; padding-left: 20px;">
-            <li>今週のPOをもとに全工程の生産計画を計算</li>
-            <li>プレス工程が連続し機械が異なる場合は並列実行を考慮</li>
-            <li>段取り時間60分を適用</li>
-            <li>生産締切日・総加工時間（DD"day"HH"hour"形式）を表示</li>
+            <li>Calculate production plan for all processes based on this week's POs</li>
+            <li>Consider parallel execution when consecutive press processes use different machines</li>
+            <li>Apply 60 minutes setup time</li>
+            <li>Display production deadline and total processing time (DD"day"HH"hour" format)</li>
           </ul>
         </div>
 
-        <!-- 計算ボタン -->
+        <!-- Calculate Button -->
         <div class="calculate-section">
           <button @click="generateComprehensivePlan" class="calculate-btn" :disabled="loadingComprehensive">
             <span class="calculate-icon">⚙️</span>
-            {{ loadingComprehensive ? '計算中...' : '全体生産計画を計算' }}
+            {{ loadingComprehensive ? 'Calculating...' : 'Calculate Production Plan' }}
           </button>
         </div>
 
-        <!-- ローディング中 -->
+        <!-- Loading -->
         <div v-if="loadingComprehensive" class="progress-section">
           <p class="progress-text">{{ loadingMessage }}</p>
         </div>
 
-        <!-- 全体生産計画結果 -->
+        <!-- Overall Production Plan Results -->
         <div v-if="comprehensivePlan.products && comprehensivePlan.products.length > 0" class="comprehensive-plan-results" style="margin-top: var(--spacing-xl);">
-          <h3>全体生産計画結果</h3>
+          <h3>Production Plan Results</h3>
 
           <div style="margin-bottom: 8px;">
-            <strong>製品数:</strong> {{ comprehensivePlan.products_count }}件
+            <strong>Products:</strong> {{ comprehensivePlan.products_count }}
             <span v-if="comprehensivePlan.schedules_count" style="margin-left: 16px;">
-              <strong>スケジュール件数:</strong> {{ comprehensivePlan.schedules_count }}件
+              <strong>Schedules:</strong> {{ comprehensivePlan.schedules_count }}
             </span>
             <span v-if="comprehensivePlan.makespan" style="margin-left: 16px;">
-              <strong>完了予定:</strong> {{ formatScheduleDateTime(comprehensivePlan.makespan) }}
+              <strong>Expected Completion:</strong> {{ formatScheduleDateTime(comprehensivePlan.makespan) }}
             </span>
           </div>
 
-          <!-- 検索フィルタ -->
+          <!-- Search Filter -->
           <div style="display: flex; gap: 8px; margin-bottom: var(--spacing-md);">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">顧客名</label>
-              <input v-model="searchComprehensive.customer_name" class="form-input" type="text" placeholder="顧客名で検索..." />
+              <label class="form-label" style="margin-bottom: 0;">Customer Name</label>
+              <input v-model="searchComprehensive.customer_name" class="form-input" type="text" placeholder="Search by customer..." />
             </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">製品コード</label>
-              <input v-model="searchComprehensive.product_code" class="form-input" type="text" placeholder="製品コードで検索..." />
+              <label class="form-label" style="margin-bottom: 0;">Product Code</label>
+              <input v-model="searchComprehensive.product_code" class="form-input" type="text" placeholder="Search by product code..." />
             </div>
           </div>
 
-          <!-- 製品ごとのサマリーテーブル -->
+          <!-- Product Summary Table -->
           <div class="table-scroll-container">
             <table class="table">
               <thead>
                 <tr>
-                  <th>顧客名</th>
-                  <th>製品コード</th>
-                  <th>PO番号</th>
-                  <th>PO数量</th>
-                  <th>工程数</th>
-                  <th>総加工時間</th>
-                  <th>生産締切日</th>
-                  <th>納期</th>
+                  <th>Customer</th>
+                  <th>Product Code</th>
+                  <th>PO Number</th>
+                  <th>PO Quantity</th>
+                  <th>Processes</th>
+                  <th>Total Time</th>
+                  <th>Prod. Deadline</th>
+                  <th>Delivery</th>
                 </tr>
               </thead>
               <tbody>
@@ -290,32 +290,32 @@
         </div>
       </div>
 
-      <!-- 今週のプレス計画タブ -->
+      <!-- This Week's Press Plan Tab -->
       <div v-if="activeTab === 'pressPlan'" class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
-          <h2 style="margin-bottom: 0;">今週のプレス計画</h2>
+          <h2 style="margin-bottom: 0;">This Week's Press Plan</h2>
           <button @click="isSimpleView = !isSimpleView" class="btn btn-secondary">
             <span class="calculate-icon">👁️</span>
-            {{ isSimpleView ? '詳細表示' : '簡易表示' }}
+            {{ isSimpleView ? 'Detailed View' : 'Simple View' }}
           </button>
         </div>
 
-        <!-- ローディング中 -->
+        <!-- Loading -->
         <div v-if="loadingPressSchedule" class="progress-section">
           <p class="progress-text">{{ loadingMessage }}</p>
         </div>
 
-        <!-- プレス計画テーブル -->
+        <!-- Press Plan Table -->
         <div v-if="pressSchedule.machines && pressSchedule.machines.length > 0" class="press-schedule-container" style="margin-top: 0;">
           <div class="table-scroll-container">
             <table class="table press-schedule-table">
               <thead>
                 <tr>
-                  <th class="sticky-col-press">機械番号</th>
+                  <th class="sticky-col-press">Machine No.</th>
                   <th v-for="dateStr in pressSchedule.dates" :key="dateStr" style="text-align: center;">
                     <div>{{ formatDateHeader(dateStr) }}</div>
                     <div style="font-size: 0.85em; color: #666; margin-top: 4px;">
-                      稼働: {{ calculateDailyWorkingHours(dateStr) }}
+                      Working: {{ calculateDailyWorkingHours(dateStr) }}
                     </div>
                   </th>
                 </tr>
@@ -341,24 +341,24 @@
                           </div>
                         </div>
 
-                        <!-- 詳細表示 -->
+                        <!-- Detailed View -->
                         <div v-else>
                           <div class="task-header">
                             <strong>{{ task.product_code }}</strong>
-                            <span v-if="task.split_info" class="split-badge">{{ task.split_info }}日目</span>
+                            <span v-if="task.split_info" class="split-badge">Day {{ task.split_info }}</span>
                             <span class="task-time">{{ task.start_time }} - {{ task.end_time }}</span>
                           </div>
                           <div class="task-time-info">
-                            (加工{{ formatProcessingTime(task.setup_time + task.processing_time) }})
+                            (Processing {{ formatProcessingTime(task.setup_time + task.processing_time) }})
                           </div>
                           <div class="task-process-name">
-                            工程: {{ task.process_name }}
+                            Process: {{ task.process_name }}
                           </div>
                           <div class="task-details">
-                            <div>顧客: {{ task.customer_name }}</div>
-                            <div>数量: <span :class="{ 'quantity-split': task.split_info }">{{ task.day_quantity.toLocaleString() }}</span>/{{ task.po_quantity.toLocaleString() }}</div>
-                            <div>納期: {{ task.delivery_date }}</div>
-                            <div>生産締切: {{ task.production_deadline }}</div>
+                            <div>Customer: {{ task.customer_name }}</div>
+                            <div>Qty: <span :class="{ 'quantity-split': task.split_info }">{{ task.day_quantity.toLocaleString() }}</span>/{{ task.po_quantity.toLocaleString() }}</div>
+                            <div>Delivery: {{ task.delivery_date }}</div>
+                            <div>Deadline: {{ task.production_deadline }}</div>
                           </div>
                         </div>
                       </div>
@@ -371,14 +371,14 @@
           </div>
         </div>
 
-        <!-- データがない場合 -->
+        <!-- No Data -->
         <div v-if="!loadingPressSchedule && pressSchedule.machines && pressSchedule.machines.length === 0" class="empty-state">
-          <p>PRESSマシンが登録されていません、またはスケジュールが生成されていません。</p>
-          <p>「全体生産計画」タブで計画を計算してください。</p>
+          <p>No PRESS machines registered or no schedule generated.</p>
+          <p>Please calculate the plan in the "Overall Production Plan" tab.</p>
         </div>
       </div>
 
-      <!-- トレースカード（モーダル） -->
+      <!-- Trace Card (Modal) -->
       <div v-if="showTraceModal" class="modal-overlay" @click="closeTraceModal">
         <div class="modal-card" @click.stop>
           <div class="modal-header">
@@ -386,28 +386,28 @@
             <button @click="closeTraceModal" class="modal-close">×</button>
           </div>
           <div class="modal-body">
-            <!-- ローディング中 -->
+            <!-- Loading -->
             <div v-if="loadingTraces" style="text-align: center; padding: 20px;">
-              <p>トレースデータを読み込み中...</p>
+              <p>Loading trace data...</p>
             </div>
 
-            <!-- トレースデータが空 -->
+            <!-- No Trace Data -->
             <div v-else-if="!traces || traces.length === 0" style="text-align: center; padding: 20px; color: #666;">
-              <p>未完了のトレースはありません</p>
+              <p>No incomplete traces</p>
             </div>
 
-            <!-- トレースデータ表示 -->
+            <!-- Trace Data Display -->
             <div v-else class="table-scroll-container" style="max-height: 500px;">
               <table class="table">
                 <thead>
                   <tr>
-                    <th>登録日時</th>
-                    <th>製品番号</th>
-                    <th>ロット番号</th>
-                    <th>工程名</th>
-                    <th>作業者</th>
-                    <th>OK数量</th>
-                    <th>NG数量</th>
+                    <th>Registered Date</th>
+                    <th>Product Code</th>
+                    <th>Lot Number</th>
+                    <th>Process Name</th>
+                    <th>Operator</th>
+                    <th>OK Qty</th>
+                    <th>NG Qty</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -441,26 +441,26 @@ import { formatDateForDisplay } from '../utils/dateFormat'
 
 const activeTab = ref('productionPlan')
 
-// 進捗確認用データ
+// Progress check data
 const progressTable = ref([])
 const searchProgress = ref({
   customer_name: '',
   product_code: ''
 })
 
-// 進捗確認２用データ（プレス機制約なし）
+// Progress check 2 data (no press constraints)
 const progressTable2 = ref([])
 const searchProgress2 = ref({
   customer_name: '',
   product_code: ''
 })
 
-// 工場稼働時間
+// Factory working hours
 const workingHours = ref(8)
 
-// プレス計画用データ
+// Press plan data
 const loadingPressSchedule = ref(false)
-const loadingMessage = ref('読み込み中...')
+const loadingMessage = ref('Loading...')
 const isSimpleView = ref(false)
 const pressSchedule = ref({
   dates: [],
@@ -468,7 +468,7 @@ const pressSchedule = ref({
   schedule: {}
 })
 
-// 全体生産計画用データ
+// Overall production plan data
 const comprehensivePlan = ref({
   products: [],
   schedules_count: 0,
@@ -489,18 +489,18 @@ const searchFullSchedule = ref({
   status: ''
 })
 
-// モーダル関連
+// Modal related
 const showTraceModal = ref(false)
 const selectedTrace = ref({})
 const traces = ref([])
 const loadingTraces = ref(false)
 
-// エラーダイアログ関連
+// Error dialog related
 const showErrorDialog = ref(false)
-const errorDialogTitle = ref('エラー')
+const errorDialogTitle = ref('Error')
 const errorDialogMessage = ref('')
 
-const showError = (message, title = 'エラー') => {
+const showError = (message, title = 'Error') => {
   errorDialogMessage.value = message
   errorDialogTitle.value = title
   showErrorDialog.value = true
@@ -819,10 +819,10 @@ const isProcessDelayed = (process, productionDeadline) => {
   }
 }
 
-// 生成された生産計画から今週のプレス計画を表示
+// Display this week's press plan from generated production plan
 const loadPressScheduleFromPlan = async () => {
   loadingPressSchedule.value = true
-  loadingMessage.value = '今週のプレス計画を読み込み中...'
+  loadingMessage.value = 'Loading this week\'s press plan...'
 
   try {
     const response = await api.get('/schedule/press-weekly-schedule-from-plan', {
@@ -833,9 +833,9 @@ const loadPressScheduleFromPlan = async () => {
     pressSchedule.value = response.data
 
     if (response.data.machines.length === 0) {
-      showError('PRESS機が登録されていません', '警告')
+      showError('No PRESS machines registered', 'Warning')
     } else {
-      // スケジュールの件数をカウント
+      // Count schedules
       let scheduleCount = 0
       for (const machineNo in response.data.schedule) {
         for (const dateStr in response.data.schedule[machineNo]) {
@@ -844,18 +844,18 @@ const loadPressScheduleFromPlan = async () => {
       }
 
       if (scheduleCount === 0) {
-        showError('今週のPRESS工程スケジュールがありません。\n先に「生産計画スケジュール」タブで計画を生成してください。', '警告')
+        showError('No PRESS process schedules for this week.\nPlease generate a plan in the "Production Plan" tab first.', 'Warning')
       }
     }
 
-    // 全工程から進捗確認データを生成
+    // Generate progress check data from all processes
     await generateProgressFromAllSchedule()
   } catch (error) {
     console.error('Failed to load press schedule from plan:', error)
-    showError('プレス計画の読み込みに失敗しました: ' + (error.response?.data?.detail || error.message))
+    showError('Failed to load press plan: ' + (error.response?.data?.detail || error.message))
   } finally {
     loadingPressSchedule.value = false
-    loadingMessage.value = '読み込み中...'
+    loadingMessage.value = 'Loading...'
   }
 }
 
@@ -928,23 +928,23 @@ const formatScheduleDate = (dateStr) => {
   return `${day}/${month}/${year}`
 }
 
-// 状態ラベルを取得
+// Get status label
 const getStatusLabel = (status) => {
   const labels = {
-    scheduled: '予定',
-    waiting: '待機中',
-    in_progress: '進行中',
-    completed: '完了'
+    scheduled: 'Scheduled',
+    waiting: 'Waiting',
+    in_progress: 'In Progress',
+    completed: 'Completed'
   }
   return labels[status] || status
 }
 
-// 状態クラスを取得
+// Get status class
 const getStatusClass = (status) => {
   return `status-badge status-${status}`
 }
 
-// スケジュール行のクラスを取得
+// Get schedule row class
 const getScheduleRowClass = (schedule) => {
   if (schedule.status === 'waiting') return 'schedule-row-waiting'
   if (schedule.status === 'in_progress') return 'schedule-row-progress'
@@ -952,9 +952,9 @@ const getScheduleRowClass = (schedule) => {
   return ''
 }
 
-// 保存された全体生産計画を取得
+// Fetch saved overall production plan
 const fetchComprehensivePlan = async () => {
-  // まずキャッシュをチェック
+  // First check cache
   const cachedPlan = sessionStorage.getItem('comprehensivePlan')
   if (cachedPlan) {
     try {
@@ -984,18 +984,18 @@ const fetchComprehensivePlan = async () => {
         await loadPressScheduleFromPlan()
       }
       
-      console.log('全体生産計画をキャッシュから読み込みました')
+      console.log('Loaded production plan from cache')
       return
     } catch (error) {
-      console.error('キャッシュの読み込みに失敗しました:', error)
-      // キャッシュが壊れている場合は削除
+      console.error('Failed to load from cache:', error)
+      // Remove corrupted cache
       sessionStorage.removeItem('comprehensivePlan')
     }
   }
 
-  // キャッシュがない場合はAPIから取得
+  // Fetch from API if no cache
   loadingComprehensive.value = true
-  loadingMessage.value = '全体生産計画を読み込み中...'
+  loadingMessage.value = 'Loading production plan...'
 
   try {
     const response = await api.get('/schedule/comprehensive-production-plan', {
@@ -1037,7 +1037,7 @@ const fetchComprehensivePlan = async () => {
     console.error('Failed to fetch comprehensive plan:', error)
   } finally {
     loadingComprehensive.value = false
-    loadingMessage.value = '読み込み中...'
+    loadingMessage.value = 'Loading...'
   }
 }
 
@@ -1046,14 +1046,14 @@ onMounted(() => {
   loadProgressSchedule2()
 })
 
-// 全体生産計画を計算
+// Calculate overall production plan
 const generateComprehensivePlan = async () => {
-  if (!confirm('全体生産計画を計算しますか？既存のスケジュールは削除されます。')) {
+  if (!confirm('Calculate production plan? Existing schedules will be deleted.')) {
     return
   }
 
   loadingComprehensive.value = true
-  loadingMessage.value = '全体生産計画を計算中...'
+  loadingMessage.value = 'Calculating production plan...'
 
   try {
     const response = await api.post('/schedule/comprehensive-production-plan', {
@@ -1082,18 +1082,18 @@ const generateComprehensivePlan = async () => {
         })
       })
 
-      showError(response.data.message, '成功')
+      showError(response.data.message, 'Success')
 
-      // プレス計画と進捗確認を更新
+      // Update press plan and progress check
       await loadPressScheduleFromPlan()
     }
   } catch (error) {
     console.error('Failed to generate comprehensive plan:', error)
     const errorDetail = error.response?.data?.detail || error.message
-    showError('全体生産計画の計算に失敗しました:\n\n' + errorDetail, '全体生産計画エラー')
+    showError('Failed to calculate production plan:\n\n' + errorDetail, 'Production Plan Error')
   } finally {
     loadingComprehensive.value = false
-    loadingMessage.value = '読み込み中...'
+    loadingMessage.value = 'Loading...'
   }
 }
 

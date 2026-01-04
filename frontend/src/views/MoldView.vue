@@ -1,52 +1,52 @@
 <template>
   <AppLayout>
-      <h1 class="page-title">金型 - 金型故障管理</h1>
+      <h1 class="page-title">Mold - Broken Mold Management</h1>
 
-      <!-- 金型故障登録フォーム -->
+      <!-- Broken Mold Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>金型故障登録</h2>
+        <h2>Register Broken Mold</h2>
         <form @submit.prevent="handleSubmit" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
           <div style="width: 81px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">工程ID</label>
+            <label class="form-label" style="margin-bottom: 0;">Process ID</label>
             <input v-model.number="form.process_id" class="form-input" type="number" required />
           </div>
           <div style="width: 113px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">故障日</label>
+            <label class="form-label" style="margin-bottom: 0;">Broken Date</label>
             <input v-model="form.date_broken" class="form-input" type="text" placeholder="DD/MM/YYYY" required />
           </div>
           <div style="width: 113px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">希望修理日</label>
+            <label class="form-label" style="margin-bottom: 0;">Desired Repair</label>
             <input v-model="form.date_hope_repaired" class="form-input" type="text" placeholder="DD/MM/YYYY" />
           </div>
           <div style="width: 113px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">修理予定日</label>
+            <label class="form-label" style="margin-bottom: 0;">Scheduled Repair</label>
             <input v-model="form.date_schedule_repaired" class="form-input" type="text" placeholder="DD/MM/YYYY" />
           </div>
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-            <label class="form-label" style="margin-bottom: 0;">備考</label>
+            <label class="form-label" style="margin-bottom: 0;">Note</label>
             <input v-model="form.note" class="form-input" type="text" />
           </div>
           <div>
-            <button type="submit" class="btn btn-primary">登録</button>
+            <button type="submit" class="btn btn-primary">Register</button>
           </div>
         </form>
       </div>
 
-      <!-- 金型故障一覧 -->
+      <!-- Broken Mold List -->
       <div class="card">
-        <h2>金型故障一覧</h2>
+        <h2>Broken Mold List</h2>
         <table class="table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>製品コード</th>
-              <th>工程名</th>
-              <th>工程No</th>
-              <th>故障日</th>
-              <th>希望修理日</th>
-              <th>修理予定日</th>
-              <th>備考</th>
-              <th>操作</th>
+              <th>Product Code</th>
+              <th>Process Name</th>
+              <th>Process No</th>
+              <th>Broken Date</th>
+              <th>Desired Repair</th>
+              <th>Scheduled Repair</th>
+              <th>Note</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -64,14 +64,14 @@
               <td>{{ item.note || '-' }}</td>
               <td>
                 <button @click="handleDelete(item.broken_mold_id)" class="btn btn-danger btn-sm">
-                  削除
+                  Delete
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
         <div v-if="brokenMolds.length === 0" class="empty-state">
-          <p>金型故障データがありません</p>
+          <p>No broken mold data found</p>
         </div>
       </div>
   </AppLayout>
@@ -100,13 +100,13 @@ const loadBrokenMolds = async () => {
     brokenMolds.value = response.data
   } catch (error) {
     console.error('Failed to load broken molds:', error)
-    alert('金型故障データの読み込みに失敗しました')
+    alert('Failed to load broken mold data')
   }
 }
 
 const handleSubmit = async () => {
   try {
-    // DD/MM/YYYY形式をYYYY-MM-DD形式に変換してAPIに送信
+    // Convert DD/MM/YYYY format to YYYY-MM-DD for API
     const submitData = {
       ...form.value,
       date_broken: formatDateForApi(form.value.date_broken),
@@ -115,7 +115,7 @@ const handleSubmit = async () => {
     }
 
     await api.post('/mold/broken-molds', submitData)
-    alert('金型故障登録成功')
+    alert('Broken mold registered successfully')
     form.value = {
       process_id: null,
       date_broken: getTodayFormatted(),
@@ -126,22 +126,22 @@ const handleSubmit = async () => {
     await loadBrokenMolds()
   } catch (error) {
     console.error('Failed to create broken mold:', error)
-    alert('金型故障登録に失敗しました')
+    alert('Failed to register broken mold')
   }
 }
 
 const handleDelete = async (id) => {
-  if (!confirm('この金型故障記録を削除しますか？')) {
+  if (!confirm('Are you sure you want to delete this broken mold record?')) {
     return
   }
 
   try {
     await api.delete(`/mold/broken-molds/${id}`)
-    alert('削除成功')
+    alert('Deleted successfully')
     await loadBrokenMolds()
   } catch (error) {
     console.error('Failed to delete broken mold:', error)
-    alert('削除に失敗しました')
+    alert('Failed to delete')
   }
 }
 

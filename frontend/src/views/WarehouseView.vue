@@ -1,62 +1,62 @@
 <template>
   <AppLayout>
-      <h1 class="page-title">倉庫 - 完成品管理</h1>
+      <h1 class="page-title">Warehouse - Finished Products</h1>
 
-      <!-- 完成品登録フォーム -->
+      <!-- Finished Product Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>完成品登録</h2>
+        <h2>Register Finished Product</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">製品コード</label>
+              <label class="form-label" style="margin-bottom: 0;">Product Code</label>
               <AutocompleteInput
                 v-model="form.product_id"
                 endpoint="/master/autocomplete/products"
                 display-field="code"
                 value-field="id"
-                placeholder="製品コードを入力..."
+                placeholder="Enter product code..."
                 required
               />
             </div>
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">ロット番号</label>
+              <label class="form-label" style="margin-bottom: 0;">Lot Number</label>
               <AutocompleteInput
                 v-model="form.lot_id"
                 endpoint="/master/autocomplete/lots"
                 display-field="number"
                 value-field="id"
-                placeholder="ロット番号を入力..."
+                placeholder="Enter lot number..."
                 required
               />
             </div>
             <div style="width: 81px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">完成数量</label>
+              <label class="form-label" style="margin-bottom: 0;">Quantity</label>
               <input v-model.number="form.finished_quantity" class="form-input" type="number" required />
             </div>
             <div style="width: 113px; display: flex; flex-direction: column; gap: 2px;">
-              <label class="form-label" style="margin-bottom: 0;">完成日</label>
+              <label class="form-label" style="margin-bottom: 0;">Finish Date</label>
               <input v-model="form.date_finished" class="form-input" type="text" placeholder="DD/MM/YYYY" required />
             </div>
             <div>
-              <button type="submit" class="btn btn-primary">登録</button>
+              <button type="submit" class="btn btn-primary">Register</button>
             </div>
           </div>
         </form>
       </div>
 
-      <!-- 完成品一覧 -->
+      <!-- Finished Products List -->
       <div class="card">
-        <h2>完成品一覧</h2>
+        <h2>Finished Products List</h2>
         <table class="table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>顧客名</th>
-              <th>製品コード</th>
-              <th>ロット番号</th>
-              <th>完成数量</th>
-              <th>完成日</th>
-              <th>操作</th>
+              <th>Customer</th>
+              <th>Product Code</th>
+              <th>Lot Number</th>
+              <th>Quantity</th>
+              <th>Finish Date</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -72,14 +72,14 @@
               <td>{{ formatDateForDisplay(item.date_finished) }}</td>
               <td>
                 <button @click="handleDelete(item.finished_product_id)" class="btn btn-danger btn-sm">
-                  削除
+                  Delete
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
         <div v-if="finishedProducts.length === 0" class="empty-state">
-          <p>完成品データがありません</p>
+          <p>No finished product data found</p>
         </div>
       </div>
   </AppLayout>
@@ -108,25 +108,25 @@ const loadFinishedProducts = async () => {
     finishedProducts.value = response.data
   } catch (error) {
     console.error('Failed to load finished products:', error)
-    alert('完成品の読み込みに失敗しました')
+    alert('Failed to load finished products')
   }
 }
 
 const handleSubmit = async () => {
   if (!form.value.product_id || !form.value.lot_id) {
-    alert('製品コードとロット番号を選択してください')
+    alert('Please select product code and lot number')
     return
   }
 
   try {
-    // DD/MM/YYYY形式をYYYY-MM-DD形式に変換してAPIに送信
+    // Convert DD/MM/YYYY format to YYYY-MM-DD for API
     const submitData = {
       ...form.value,
       date_finished: formatDateForApi(form.value.date_finished)
     }
 
     await api.post('/warehouse/finished-products', submitData)
-    alert('完成品登録成功')
+    alert('Finished product registered successfully')
     form.value = {
       product_id: null,
       lot_id: null,
@@ -136,22 +136,22 @@ const handleSubmit = async () => {
     await loadFinishedProducts()
   } catch (error) {
     console.error('Failed to create finished product:', error)
-    alert('完成品登録に失敗しました')
+    alert('Failed to register finished product')
   }
 }
 
 const handleDelete = async (id) => {
-  if (!confirm('この完成品を削除しますか？')) {
+  if (!confirm('Are you sure you want to delete this finished product?')) {
     return
   }
 
   try {
     await api.delete(`/warehouse/finished-products/${id}`)
-    alert('削除成功')
+    alert('Deleted successfully')
     await loadFinishedProducts()
   } catch (error) {
     console.error('Failed to delete finished product:', error)
-    alert('削除に失敗しました')
+    alert('Failed to delete')
   }
 }
 

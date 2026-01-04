@@ -2,57 +2,57 @@
   <AppLayout>
       <div class="trace-view">
         <div class="trace-header">
-          <h1>委託記録登録</h1>
-          <p class="trace-subtitle">委託作業のトレース情報を登録</p>
+          <h1>Outsource Record Registration</h1>
+          <p class="trace-subtitle">Register trace information for outsourced operations</p>
         </div>
 
-        <!-- 登録フォーム -->
+        <!-- Registration Form -->
         <div class="form-section">
           <form @submit.prevent="submitTrace" class="trace-form">
             <div class="form-row">
               <div class="form-group">
-                <label for="product-code">プロダクトコード <span class="required">*</span></label>
+                <label for="product-code">Product Code <span class="required">*</span></label>
                 <AutocompleteInput
                   v-model="form.product_code"
                   endpoint="/master/autocomplete/products"
                   display-field="product_code"
                   value-field="product_code"
-                  placeholder="例: P-12345"
+                  placeholder="e.g. P-12345"
                   required
                   @select="onProductSelect"
                 />
               </div>
 
               <div class="form-group">
-                <label for="customer-name">顧客名</label>
+                <label for="customer-name">Customer Name</label>
                 <input
                   id="customer-name"
                   v-model="customerName"
                   type="text"
                   class="form-control"
                   readonly
-                  placeholder="プロダクトコード入力後に自動表示"
+                  placeholder="Auto-displayed after entering product code"
                 >
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label for="lot-number">ロット番号 <span class="required">*</span></label>
+                <label for="lot-number">Lot Number <span class="required">*</span></label>
                 <input
                   id="lot-number"
                   v-model="form.lot_number"
                   type="text"
                   class="form-control"
-                  placeholder="例: SECC 120923 JFE"
+                  placeholder="e.g. SECC 120923 JFE"
                   required
                 >
               </div>
 
               <div class="form-group">
-                <label for="process">工程 <span class="required">*</span></label>
+                <label for="process">Process <span class="required">*</span></label>
                 <select id="process" v-model="form.process_id" class="form-control" required>
-                  <option value="">選択してください</option>
+                  <option value="">Please select</option>
                   <option v-for="process in filteredProcesses" :key="process.process_id" :value="process.process_id">
                     {{ process.process_name }}
                   </option>
@@ -62,20 +62,20 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label for="supplier-name">委託先 <span class="required">*</span></label>
+                <label for="supplier-name">Supplier <span class="required">*</span></label>
                 <AutocompleteInput
                   v-model="form.supplier_id"
                   endpoint="/master/suppliers"
                   display-field="supplier_name"
                   value-field="supplier_id"
-                  placeholder="例: 株式会社ABC"
+                  placeholder="e.g. ABC Company"
                   required
                   @select="onSupplierSelect"
                 />
               </div>
 
               <div class="form-group">
-                <label for="date">作業日 <span class="required">*</span></label>
+                <label for="date">Work Date <span class="required">*</span></label>
                 <input
                   id="date"
                   v-model="form.date"
@@ -88,55 +88,55 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label for="ok-quantity">OK数量 <span class="required">*</span></label>
+                <label for="ok-quantity">OK Quantity <span class="required">*</span></label>
                 <input
                   id="ok-quantity"
                   v-model.number="form.ok_quantity"
                   type="number"
                   min="0"
                   class="form-control"
-                  placeholder="数量を入力してください"
+                  placeholder="Enter quantity"
                   required
                 >
               </div>
 
               <div class="form-group">
-                <label for="ng-quantity">NG数量 <span class="required">*</span></label>
+                <label for="ng-quantity">NG Quantity <span class="required">*</span></label>
                 <input
                   id="ng-quantity"
                   v-model.number="form.ng_quantity"
                   type="number"
                   min="0"
                   class="form-control"
-                  placeholder="数量を入力してください"
+                  placeholder="Enter quantity"
                   required
                 >
               </div>
             </div>
 
             <div class="form-group full-width">
-              <label for="note">備考</label>
+              <label for="note">Note</label>
               <textarea
                 id="note"
                 v-model="form.note"
                 class="form-control"
                 rows="3"
-                placeholder="備考を入力してください"
+                placeholder="Enter notes"
               ></textarea>
             </div>
 
             <div class="form-actions">
               <button type="button" @click="resetForm" class="btn btn-secondary">
-                クリア
+                Clear
               </button>
               <button type="submit" class="btn btn-primary" :disabled="isSubmitDisabled">
-                {{ submitting ? '登録中...' : '登録' }}
+                {{ submitting ? 'Registering...' : 'Register' }}
               </button>
             </div>
           </form>
         </div>
 
-        <!-- 成功/エラーメッセージ -->
+        <!-- Success/Error Messages -->
         <div v-if="successMessage" class="alert alert-success">
           {{ successMessage }}
         </div>
@@ -144,21 +144,21 @@
           {{ errorMessage }}
         </div>
 
-        <!-- 登録済みトレース履歴 -->
+        <!-- Registered Trace History -->
         <div v-if="recentTraces.length > 0" class="recent-traces">
-          <h2>最近の登録履歴</h2>
+          <h2>Recent Registration History</h2>
           <div class="table-container">
             <table class="trace-table">
               <thead>
                 <tr>
-                  <th>登録日時</th>
-                  <th>製品番号</th>
-                  <th>ロット番号</th>
-                  <th>工程名</th>
-                  <th>委託先</th>
-                  <th>OK数量</th>
-                  <th>NG数量</th>
-                  <th>備考</th>
+                  <th>Registered Date</th>
+                  <th>Product Code</th>
+                  <th>Lot Number</th>
+                  <th>Process Name</th>
+                  <th>Supplier</th>
+                  <th>OK Qty</th>
+                  <th>NG Qty</th>
+                  <th>Note</th>
                 </tr>
               </thead>
               <tbody>
@@ -189,14 +189,14 @@ import api from '../utils/api'
 
 const authStore = useAuthStore()
 
-// マスタデータ
+// Master data
 const processList = ref([])
 const recentTraces = ref([])
 
-// 表示用
+// Display
 const customerName = ref('')
 
-// フォーム
+// Form
 const form = ref({
   product_code: '',
   product_id: null,
@@ -210,20 +210,20 @@ const form = ref({
   note: ''
 })
 
-// 状態管理
+// State management
 const submitting = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-// フィルタリングされたリスト
+// Filtered list
 const filteredProcesses = computed(() => {
   if (!form.value.product_id) return []
   const processes = processList.value.filter(process => process.product_id === form.value.product_id)
-  // process_no順にソート（工程1から順番に表示）
+  // Sort by process_no (display process 1 first)
   return processes.sort((a, b) => a.process_no - b.process_no)
 })
 
-// 送信ボタンの無効化条件
+// Submit button disable condition
 const isSubmitDisabled = computed(() => {
   return submitting.value ||
          !form.value.product_id ||
@@ -234,7 +234,7 @@ const isSubmitDisabled = computed(() => {
          form.value.ng_quantity === null
 })
 
-// イベントハンドラ
+// Event handlers
 const onProductSelect = (product) => {
   if (product) {
     form.value.product_id = product.id
@@ -295,34 +295,34 @@ const resetForm = () => {
 }
 
 const submitTrace = async () => {
-  // バリデーション
+  // Validation
   if (!form.value.product_id) {
-    errorMessage.value = '製品コードを入力してください'
+    errorMessage.value = 'Please enter product code'
     return
   }
 
   if (!form.value.lot_number || form.value.lot_number.trim() === '') {
-    errorMessage.value = 'ロット番号を入力してください'
+    errorMessage.value = 'Please enter lot number'
     return
   }
 
   if (!form.value.process_id) {
-    errorMessage.value = '工程を選択してください'
+    errorMessage.value = 'Please select a process'
     return
   }
 
   if (!form.value.supplier_id) {
-    errorMessage.value = '委託先を選択してください'
+    errorMessage.value = 'Please select a supplier'
     return
   }
 
   if (form.value.ok_quantity === null || form.value.ok_quantity === '') {
-    errorMessage.value = 'OK数量を入力してください'
+    errorMessage.value = 'Please enter OK quantity'
     return
   }
 
   if (form.value.ng_quantity === null || form.value.ng_quantity === '') {
-    errorMessage.value = 'NG数量を入力してください'
+    errorMessage.value = 'Please enter NG quantity'
     return
   }
 
@@ -331,7 +331,7 @@ const submitTrace = async () => {
   errorMessage.value = ''
 
   try {
-    // 委託トレースを登録
+    // Register outsource trace
     await api.post('/trace/outsource-trace-simple', {
       product_id: form.value.product_id,
       lot_number: form.value.lot_number,
@@ -343,12 +343,12 @@ const submitTrace = async () => {
       note: form.value.note
     })
 
-    successMessage.value = '委託記録を登録しました'
+    successMessage.value = 'Outsource record registered successfully'
     resetForm()
     await fetchRecentTraces()
   } catch (error) {
-    console.error('トレース登録エラー:', error)
-    errorMessage.value = error.response?.data?.detail || 'トレース登録に失敗しました'
+    console.error('Trace registration error:', error)
+    errorMessage.value = error.response?.data?.detail || 'Failed to register trace'
   } finally {
     submitting.value = false
   }
@@ -356,12 +356,12 @@ const submitTrace = async () => {
 
 const fetchMasterData = async () => {
   try {
-    // 工程一覧を取得
+    // Get process list
     const processResponse = await api.get('/process/list')
     processList.value = processResponse.data
   } catch (error) {
-    console.error('マスタデータ取得エラー:', error)
-    errorMessage.value = 'マスタデータの取得に失敗しました'
+    console.error('Master data fetch error:', error)
+    errorMessage.value = 'Failed to retrieve master data'
   }
 }
 
@@ -370,7 +370,7 @@ const fetchRecentTraces = async () => {
     const response = await api.get('/trace/outsource-traces?limit=10')
     recentTraces.value = response.data
   } catch (error) {
-    console.error('トレース履歴取得エラー:', error)
+    console.error('Trace history fetch error:', error)
   }
 }
 
