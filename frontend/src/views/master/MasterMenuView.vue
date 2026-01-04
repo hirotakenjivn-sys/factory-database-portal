@@ -10,27 +10,44 @@
           class="card master-menu-card"
         >
           <span class="menu-icon">{{ menu.icon }}</span>
-          <h3>{{ menu.label }}</h3>
+          <h3>{{ menu.label }}<template v-if="menu.key"> ({{ counts[menu.key] ?? '-' }})</template></h3>
         </router-link>
       </div>
   </AppLayout>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import AppLayout from '../../components/common/AppLayout.vue'
+import api from '../../utils/api'
 
 const masterMenus = [
-  { path: '/master/customers', label: 'CUSTOMER', icon: '👥' },
-  { path: '/master/products', label: 'PRODUCT', icon: '📦' },
-  { path: '/master/employees', label: 'EMPLOYEE', icon: '👷' },
-  { path: '/master/suppliers', label: 'SUPPLIER', icon: '🚚' },
-  { path: '/master/process-names', label: 'PROCESS NAME TYPE', icon: '🔄' },
-  { path: '/master/material-rates', label: 'MATERIAL RATE', icon: '📐' },
-  { path: '/master/machines', label: 'MACHINE LIST', icon: '🏭' },
-  { path: '/master/cycletimes', label: 'CYCLETIME', icon: '⏱️' },
-  { path: '/master/holidays', label: 'HOLIDAY', icon: '📅' },
-  { path: '/press', label: 'PRESS', icon: '⚙️' },
+  { path: '/master/customers', label: 'CUSTOMER', icon: '👥', key: 'customers' },
+  { path: '/master/products', label: 'PRODUCT', icon: '📦', key: 'products' },
+  { path: '/master/employees', label: 'EMPLOYEE', icon: '👷', key: 'employees' },
+  { path: '/master/suppliers', label: 'SUPPLIER', icon: '🚚', key: 'suppliers' },
+  { path: '/master/process-names', label: 'PROCESS NAME TYPE', icon: '🔄', key: 'process_name_types' },
+  { path: '/master/material-rates', label: 'MATERIAL RATE', icon: '📐', key: 'material_rates' },
+  { path: '/master/machines', label: 'MACHINE LIST', icon: '🏭', key: 'machine_list' },
+  { path: '/master/cycletimes', label: 'CYCLETIME', icon: '⏱️', key: 'cycletimes' },
+  { path: '/master/holidays', label: 'HOLIDAY', icon: '📅', key: 'calendar' },
+  { path: '/press', label: 'PRESS', icon: '⚙️', key: null },
 ]
+
+const counts = ref({})
+
+const loadCounts = async () => {
+  try {
+    const response = await api.get('/master/table-counts')
+    counts.value = response.data
+  } catch (error) {
+    console.error('Failed to load table counts:', error)
+  }
+}
+
+onMounted(() => {
+  loadCounts()
+})
 </script>
 
 <style scoped>

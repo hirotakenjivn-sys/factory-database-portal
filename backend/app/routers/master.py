@@ -16,6 +16,7 @@ from ..models.finished_product import FinishedProduct
 from ..models.production_schedule import ProductionSchedule
 from ..models.trace import StampTrace, OutsourceTrace
 from ..models.mold import BrokenMold
+from ..models.calendar import Calendar
 from ..schemas import customer as customer_schema
 from ..schemas import product as product_schema
 from ..schemas import employee as employee_schema
@@ -28,6 +29,24 @@ from .auth import get_current_user
 from ..utils.auth import get_password_hash, generate_strong_password
 
 router = APIRouter()
+
+
+# ==================== Table Counts ====================
+@router.get("/table-counts")
+async def get_table_counts(db: Session = Depends(get_db)):
+    """Get record counts for all master tables"""
+    return {
+        "customers": db.query(Customer).count(),
+        "products": db.query(Product).count(),
+        "employees": db.query(Employee).count(),
+        "suppliers": db.query(Supplier).count(),
+        "process_name_types": db.query(ProcessNameType).count(),
+        "material_rates": db.query(MaterialRate).count(),
+        "machine_list": db.query(MachineList).count(),
+        "cycletimes": db.query(Cycletime).count(),
+        "calendar": db.query(Calendar).count(),
+    }
+
 
 # ==================== Customers ====================
 @router.get("/customers", response_model=List[customer_schema.CustomerResponse])
