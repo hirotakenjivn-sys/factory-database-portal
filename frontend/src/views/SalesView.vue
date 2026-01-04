@@ -233,7 +233,7 @@ const searchFilters = ref({
   product_code: ''
 })
 
-// 納期計算
+// Delivery calculation
 const deliveryCalculation = ref(null)
 
 let searchTimeout = null
@@ -260,7 +260,7 @@ const loadPOs = async () => {
 }
 
 const handleSearch = () => {
-  // デバウンス処理（入力後300ms待ってから検索）
+  // Debounce (search after 300ms delay)
   if (searchTimeout) {
     clearTimeout(searchTimeout)
   }
