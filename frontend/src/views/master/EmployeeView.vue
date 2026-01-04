@@ -42,7 +42,7 @@
       <!-- List -->
       <div class="card">
         <h2>Employee List</h2>
-        <div style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); flex-wrap: wrap;">
+        <div style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); flex-wrap: wrap; align-items: center;">
           <input
             v-model="searchEmployeeNo"
             @input="handleSearch"
@@ -59,6 +59,10 @@
             placeholder="Search Name..."
             style="width: 200px;"
           />
+          <div style="display: flex; align-items: center; gap: var(--spacing-xs);">
+            <input v-model="filterHasPassword" type="checkbox" id="filter_has_password" @change="handleSearch" />
+            <label for="filter_has_password" style="margin: 0; cursor: pointer; white-space: nowrap;">Has Password</label>
+          </div>
           <button class="btn btn-secondary" @click="downloadCSV">Download CSV</button>
         </div>
         <table class="table">
@@ -156,6 +160,7 @@ const editingId = ref(null)
 const employees = ref([])
 const searchEmployeeNo = ref('')
 const searchName = ref('')
+const filterHasPassword = ref(false)
 
 // Password modal state
 const showPasswordModal = ref(false)
@@ -172,6 +177,9 @@ const loadEmployees = async () => {
     }
     if (searchName.value) {
       params.name = searchName.value
+    }
+    if (filterHasPassword.value) {
+      params.has_password = true
     }
     const response = await api.get('/master/employees', { params })
     employees.value = response.data

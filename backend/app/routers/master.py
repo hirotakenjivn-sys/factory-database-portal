@@ -302,6 +302,7 @@ async def get_employees(
     limit: int = 100,
     employee_no: str = None,
     name: str = None,
+    has_password: bool = None,
     db: Session = Depends(get_db)
 ):
     query = db.query(Employee)
@@ -313,6 +314,10 @@ async def get_employees(
     # 名前で検索
     if name:
         query = query.filter(Employee.name.contains(name))
+
+    # パスワード有無でフィルタ
+    if has_password is True:
+        query = query.filter(Employee.password_hash.isnot(None))
 
     # 従業員IDの降順でソート
     query = query.order_by(Employee.employee_id.desc())
