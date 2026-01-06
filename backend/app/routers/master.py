@@ -625,6 +625,7 @@ async def get_process_names(
     query = db.query(ProcessNameType)
     if search:
         query = query.filter(ProcessNameType.process_name.contains(search))
+    query = query.order_by(ProcessNameType.process_name_id.desc())
     process_names = query.offset(skip).limit(limit).all()
     return process_names
 
