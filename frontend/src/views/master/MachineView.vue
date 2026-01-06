@@ -6,6 +6,26 @@
 
       <h1 class="page-title">Machine List Master</h1>
 
+      <!-- Tab Navigation -->
+      <div class="tabs" style="margin-bottom: var(--spacing-lg)">
+        <button
+          @click="activeTab = 'machines'"
+          :class="{ active: activeTab === 'machines' }"
+          class="tab-btn"
+        >
+          Machine List
+        </button>
+        <button
+          @click="activeTab = 'machine-types'"
+          :class="{ active: activeTab === 'machine-types' }"
+          class="tab-btn"
+        >
+          Machine Type Management
+        </button>
+      </div>
+
+      <!-- Machine List Tab -->
+      <div v-if="activeTab === 'machines'">
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
         <h2>Register Machine</h2>
@@ -78,6 +98,46 @@
           <p>No machine data found</p>
         </div>
       </div>
+      </div>
+
+      <!-- Machine Type Management Tab -->
+      <div v-if="activeTab === 'machine-types'">
+        <!-- Machine Type Registration Form -->
+        <div class="card" style="margin-bottom: var(--spacing-lg)">
+          <h2>Register Machine Type</h2>
+          <form @submit.prevent="handleMachineTypeSubmit" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
+            <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
+              <label class="form-label" style="margin-bottom: 0;">Machine Type Name</label>
+              <input v-model="machineTypeForm.machine_type_name" class="form-input" type="text" required />
+            </div>
+            <div>
+              <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Machine Type List -->
+        <div class="card">
+          <h2>Machine Type List</h2>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Machine Type Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="type in machineTypes" :key="type.machine_type_id">
+                <td>{{ type.machine_type_id }}</td>
+                <td>{{ type.machine_type_name }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-if="machineTypes.length === 0" class="empty-state">
+            <p>No machine type data found</p>
+          </div>
+        </div>
+      </div>
   </AppLayout>
 </template>
 
@@ -87,10 +147,16 @@ import AppLayout from '../../components/common/AppLayout.vue'
 import AutocompleteInput from '../../components/common/AutocompleteInput.vue'
 import api from '../../utils/api'
 
+const activeTab = ref('machines')
+
 const form = ref({
   machine_no: '',
   machine_type_id: null,
   factory_id: null,
+})
+
+const machineTypeForm = ref({
+  machine_type_name: '',
 })
 
 const machines = ref([])
@@ -135,6 +201,20 @@ const handleSubmit = async () => {
 
 const handleSearch = () => {
   loadMachines(searchQuery.value)
+}
+
+const handleMachineTypeSubmit = async () => {
+  try {
+    await api.post('/master/machine-types', machineTypeForm.value)
+    alert('Machine type registered successfully')
+    machineTypeForm.value = {
+      machine_type_name: '',
+    }
+    await loadMachineTypes()
+  } catch (error) {
+    console.error('Failed to create machine type:', error)
+    alert('Failed to register machine type')
+  }
 }
 
 const downloadCSV = async () => {
@@ -186,5 +266,33 @@ h2 {
   text-align: center;
   padding: var(--spacing-2xl);
   color: var(--text-secondary);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--spacing-sm);
+  border-bottom: 2px solid var(--border);
+}
+
+.tab-btn {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+  background: var(--background-hover);
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
 }
 </style>
