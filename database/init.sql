@@ -150,22 +150,7 @@ CREATE TABLE `broken_mold` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================
--- 9. using_machine (使用機械)
--- ================================================
-DROP TABLE IF EXISTS `using_machine`;
-CREATE TABLE `using_machine` (
-  `using_machine_id` INT AUTO_INCREMENT PRIMARY KEY,
-  `process_id` INT NOT NULL,
-  `machine` VARCHAR(100),
-  `priority` INT,
-  `exact_cycletime` DECIMAL(10, 2),
-  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `user` VARCHAR(100),
-  FOREIGN KEY (`process_id`) REFERENCES `processes`(`process_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ================================================
--- 10. working_hours (稼働時間)
+-- 9. working_hours (稼働時間)
 -- ================================================
 DROP TABLE IF EXISTS `working_hours`;
 CREATE TABLE `working_hours` (
