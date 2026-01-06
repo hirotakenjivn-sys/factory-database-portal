@@ -88,55 +88,48 @@ async def get_process_table(
 ):
     """
     工程表を取得（製品ごとに工程1〜20を横に並べて表示）
+    N+1クエリ問題を解消: 1回のJOINクエリで全データ取得
     """
     try:
-        # 製品ごとに工程をグループ化
-        products = db.query(
+        # 1回のクエリで全データを取得（N+1問題解消）
+        query = db.query(
             Product.product_id,
             Product.product_code,
-            Customer.customer_name
+            Customer.customer_name,
+            Process.process_no,
+            ProcessNameType.process_name
         ).join(
             Customer, Product.customer_id == Customer.customer_id
+        ).join(
+            Process, Product.product_id == Process.product_id
+        ).join(
+            ProcessNameType, Process.process_name_id == ProcessNameType.process_name_id
         ).filter(
-            Product.is_active == True
-        ).all()
+            Product.is_active == True,
+            Process.process_no != None,
+            Process.process_no <= 20
+        ).order_by(Product.product_id, Process.process_no).all()
 
-        result = []
-        for product in products:
-            # この製品の工程を取得（process_name_typesとJOIN）
-            processes = db.query(
-                Process.process_no,
-                ProcessNameType.process_name
-            ).join(
-                ProcessNameType, Process.process_name_id == ProcessNameType.process_name_id
-            ).filter(
-                Process.product_id == product.product_id
-            ).order_by(Process.process_no).all()
+        # Pythonで製品ごとにグループ化
+        product_map = {}
+        for row in query:
+            product_id = row.product_id
 
-            # 工程がない製品はスキップ
-            if not processes:
-                continue
+            if product_id not in product_map:
+                product_map[product_id] = {
+                    "product_id": product_id,
+                    "customer_name": row.customer_name,
+                    "product_code": row.product_code,
+                }
+                # 工程1〜20のフィールドを初期化
+                for i in range(1, 21):
+                    product_map[product_id][f"process_{i}"] = ""
 
-            # 工程を工程番号ごとに整理（最大20工程）
-            process_map = {}
-            for proc in processes:
-                # process_noがNoneの場合をスキップ
-                if proc.process_no is not None and proc.process_no <= 20:
-                    process_map[proc.process_no] = proc.process_name
+            # 工程名をセット
+            if row.process_no is not None:
+                product_map[product_id][f"process_{row.process_no}"] = row.process_name or ""
 
-            product_row = {
-                "product_id": product.product_id,
-                "customer_name": product.customer_name,
-                "product_code": product.product_code,
-            }
-
-            # 工程1〜20のフィールドを追加
-            for i in range(1, 21):
-                product_row[f"process_{i}"] = process_map.get(i, "")
-
-            result.append(product_row)
-
-        return result
+        return list(product_map.values())
     except Exception as e:
         print(f"Error in get_process_table: {str(e)}")
         print(traceback.format_exc())

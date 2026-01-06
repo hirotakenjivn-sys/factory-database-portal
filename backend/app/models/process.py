@@ -18,9 +18,9 @@ class Process(Base):
     __tablename__ = "processes"
 
     process_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    product_id = Column(Integer, ForeignKey("products.product_id"), nullable=False)
+    product_id = Column(Integer, ForeignKey("products.product_id"), nullable=False, index=True)
     process_no = Column(Integer, nullable=False)
-    process_name_id = Column(Integer, ForeignKey("process_name_types.process_name_id"), nullable=False)
+    process_name_id = Column(Integer, ForeignKey("process_name_types.process_name_id"), nullable=False, index=True)
     rough_cycletime = Column(Integer)
     setup_time = Column(Integer, comment="段取時間（分）")
     production_limit = Column(Integer, comment="生産可能限界")
