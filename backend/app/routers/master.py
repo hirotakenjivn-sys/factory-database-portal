@@ -910,6 +910,25 @@ async def delete_machine(
 
 
 # ==================== Cycletimes ====================
+@router.get("/product/{product_id}/process-names")
+async def get_product_process_names(
+    product_id: int,
+    db: Session = Depends(get_db)
+):
+    """製品に紐づく工程名一覧を取得（cycletime用）"""
+    processes = db.query(
+        Process.process_id,
+        Process.process_no,
+        ProcessNameType.process_name
+    ).join(
+        ProcessNameType, Process.process_name_id == ProcessNameType.process_name_id
+    ).filter(
+        Process.product_id == product_id
+    ).order_by(Process.process_no).all()
+
+    return [{"process_id": p.process_id, "process_no": p.process_no, "process_name": p.process_name} for p in processes]
+
+
 @router.get("/cycletimes", response_model=List[cycletime_schema.CycletimeWithDetails])
 async def get_cycletimes(
     skip: int = 0,

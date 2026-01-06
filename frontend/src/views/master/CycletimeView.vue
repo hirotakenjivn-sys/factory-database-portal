@@ -16,22 +16,21 @@
               <AutocompleteInput
                 v-model="form.product_id"
                 endpoint="/master/autocomplete/products"
-                display-field="code"
+                display-field="product_code"
                 value-field="id"
                 placeholder="Enter Product Code..."
+                @select="handleProductSelect"
                 required
               />
             </div>
             <div style="width: 150px; display: flex; flex-direction: column; gap: 2px;">
               <label class="form-label" style="margin-bottom: 0;">Process Name</label>
-              <AutocompleteInput
-                v-model="form.process_name"
-                endpoint="/master/autocomplete/process-names"
-                display-field="name"
-                value-field="name"
-                placeholder="Enter Process Name..."
-                required
-              />
+              <select v-model="form.process_name" class="form-input" required :disabled="!form.product_id">
+                <option value="">Select Process</option>
+                <option v-for="process in productProcesses" :key="process.process_id" :value="process.process_name">
+                  {{ process.process_name }}
+                </option>
+              </select>
             </div>
             <div style="width: 120px; display: flex; flex-direction: column; gap: 2px;">
               <label class="form-label" style="margin-bottom: 0;">Press No</label>
@@ -115,6 +114,7 @@ const form = ref({
 })
 
 const cycletimeSettings = ref([])
+const productProcesses = ref([])
 const searchQuery = ref('')
 
 const loadCycletimeSettings = async (search = '') => {
@@ -125,6 +125,22 @@ const loadCycletimeSettings = async (search = '') => {
   } catch (error) {
     console.error('Failed to load cycletime settings:', error)
     alert('Failed to load cycletime settings')
+  }
+}
+
+const handleProductSelect = async (item) => {
+  // Reset process name when product changes
+  form.value.process_name = ''
+  productProcesses.value = []
+
+  if (!item || !item.id) return
+
+  try {
+    // Load process names for the selected product
+    const response = await api.get(`/master/product/${item.id}/process-names`)
+    productProcesses.value = response.data
+  } catch (error) {
+    console.error('Failed to load product processes:', error)
   }
 }
 
@@ -143,6 +159,7 @@ const handleSubmit = async () => {
       press_no: '',
       cycle_time: null,
     }
+    productProcesses.value = []
     await loadCycletimeSettings()
   } catch (error) {
     console.error('Failed to create cycletime settings:', error)
