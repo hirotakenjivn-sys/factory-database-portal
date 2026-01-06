@@ -25,7 +25,7 @@
             </div>
             <div style="width: 150px; display: flex; flex-direction: column; gap: 2px;">
               <label class="form-label" style="margin-bottom: 0;">Process Name</label>
-              <select v-model="form.process_name" class="form-input" required :disabled="!form.product_id">
+              <select v-model="form.process_name" class="form-input" required :disabled="!form.product_id" @change="handleProcessSelect">
                 <option value="">Select Process</option>
                 <option v-for="process in productProcesses" :key="process.process_id" :value="process.process_name">
                   {{ process.process_name }}
@@ -129,8 +129,9 @@ const loadCycletimeSettings = async (search = '') => {
 }
 
 const handleProductSelect = async (item) => {
-  // Reset process name when product changes
+  // Reset process name and cycle time when product changes
   form.value.process_name = ''
+  form.value.cycle_time = null
   productProcesses.value = []
 
   if (!item || !item.id) return
@@ -141,6 +142,14 @@ const handleProductSelect = async (item) => {
     productProcesses.value = response.data
   } catch (error) {
     console.error('Failed to load product processes:', error)
+  }
+}
+
+const handleProcessSelect = () => {
+  // Find the selected process and set rough_cycletime as initial cycle_time
+  const selectedProcess = productProcesses.value.find(p => p.process_name === form.value.process_name)
+  if (selectedProcess && selectedProcess.rough_cycletime) {
+    form.value.cycle_time = selectedProcess.rough_cycletime
   }
 }
 

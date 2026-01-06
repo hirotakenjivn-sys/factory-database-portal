@@ -919,6 +919,7 @@ async def get_product_process_names(
     processes = db.query(
         Process.process_id,
         Process.process_no,
+        Process.rough_cycletime,
         ProcessNameType.process_name
     ).join(
         ProcessNameType, Process.process_name_id == ProcessNameType.process_name_id
@@ -926,7 +927,7 @@ async def get_product_process_names(
         Process.product_id == product_id
     ).order_by(Process.process_no).all()
 
-    return [{"process_id": p.process_id, "process_no": p.process_no, "process_name": p.process_name} for p in processes]
+    return [{"process_id": p.process_id, "process_no": p.process_no, "process_name": p.process_name, "rough_cycletime": p.rough_cycletime} for p in processes]
 
 
 @router.get("/cycletimes", response_model=List[cycletime_schema.CycletimeWithDetails])
