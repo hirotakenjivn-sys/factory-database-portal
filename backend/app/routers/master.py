@@ -601,7 +601,14 @@ async def autocomplete_machines(
     db: Session = Depends(get_db)
 ):
     """機械番号のオートコンプリート用エンドポイント"""
-    query = db.query(MachineList.machine_no).outerjoin(MachineType, MachineList.machine_type_id == MachineType.machine_type_id)
+    query = db.query(
+        MachineList.machine_no,
+        Factory.factory_name
+    ).join(
+        Factory, MachineList.factory_id == Factory.factory_id
+    ).outerjoin(
+        MachineType, MachineList.machine_type_id == MachineType.machine_type_id
+    )
 
     if machine_type:
         query = query.filter(MachineType.machine_type_name == machine_type)
@@ -610,7 +617,7 @@ async def autocomplete_machines(
         query = query.filter(MachineList.machine_no.contains(search))
 
     machines = query.limit(20).all()
-    return [{"machine_no": m.machine_no} for m in machines]
+    return [{"machine_no": m.machine_no, "factory_name": m.factory_name, "display": f"{m.machine_no} ({m.factory_name})"} for m in machines]
 
 
 # ==================== Process Names ====================

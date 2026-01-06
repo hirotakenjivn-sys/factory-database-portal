@@ -32,12 +32,12 @@
                 </option>
               </select>
             </div>
-            <div style="width: 120px; display: flex; flex-direction: column; gap: 2px;">
+            <div style="width: 150px; display: flex; flex-direction: column; gap: 2px;">
               <label class="form-label" style="margin-bottom: 0;">Press No</label>
               <AutocompleteInput
                 v-model="form.press_no"
                 endpoint="/master/autocomplete/machines"
-                display-field="machine_no"
+                display-field="display"
                 value-field="machine_no"
                 placeholder="Enter Press No..."
                 :filter-params="{ machine_type: 'PRESS' }"
