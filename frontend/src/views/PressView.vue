@@ -416,17 +416,19 @@ const handleProductSelect = async () => {
     return
   }
 
-  try {
-    // Get selected product info from process table data
-    const response = await api.get('/press/process-table')
-    const products = response.data
-    const product = products.find(p => p.product_id === form.value.product_id)
+  // まずキャッシュ済みのprocessTableから検索
+  const cachedProduct = processTable.value.find(p => p.product_id === form.value.product_id)
+  if (cachedProduct) {
+    selectedProductProcess.value = cachedProduct
+    return
+  }
 
-    if (product) {
-      selectedProductProcess.value = product
-    } else {
-      selectedProductProcess.value = null
-    }
+  // キャッシュにない場合のみAPIを呼ぶ
+  try {
+    const response = await api.get('/press/process-table')
+    processTable.value = response.data
+    const product = response.data.find(p => p.product_id === form.value.product_id)
+    selectedProductProcess.value = product || null
   } catch (error) {
     console.error('Failed to load product process:', error)
   }
@@ -600,9 +602,8 @@ watch(searchList, () => {
 }, { deep: true })
 
 onMounted(() => {
-  // TODO: デバッグ用に一時的に無効化
-  // loadProcesses()
-  // loadProcessTable()
+  loadProcesses()
+  loadProcessTable()
   loadProcessNames()
 })
 

@@ -46,7 +46,8 @@ CREATE TABLE `process_name_types` (
   `process_name` VARCHAR(100) NOT NULL,
   `day_or_spm` BOOLEAN COMMENT 'TRUE: SPM, FALSE: DAY',
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `user` VARCHAR(100)
+  `user` VARCHAR(100),
+  INDEX `idx_process_name` (`process_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================
@@ -66,6 +67,7 @@ CREATE TABLE `processes` (
   FOREIGN KEY (`product_id`) REFERENCES `products`(`product_id`),
   FOREIGN KEY (`process_name_id`) REFERENCES `process_name_types`(`process_name_id`),
   INDEX `idx_processes_product` (`product_id`),
+  INDEX `idx_processes_name_id` (`process_name_id`),
   UNIQUE KEY `uk_product_process` (`product_id`, `process_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
