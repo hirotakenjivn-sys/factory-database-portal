@@ -20,7 +20,9 @@
       "Bash(dir \"C:\\\\Users\\\\PCPV\\\\factory-database-portal\\\\database\\\\*.csv\")",
       "Bash(npm run build:*)",
       "Bash(npx vite build)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(dir \"C:\\\\Users\\\\PCPV\\\\factory-database-portal\"\")",
+      "Bash(dir:*)"
     ]
   }
 }

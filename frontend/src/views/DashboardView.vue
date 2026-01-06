@@ -35,8 +35,8 @@
           <p class="stat-value">{{ stats.material_rates.toLocaleString() }}</p>
         </div>
         <div class="card stat-card">
-          <h3>&nbsp;</h3>
-          <p class="stat-value">&nbsp;</p>
+          <h3>factory_db</h3>
+          <p class="stat-value">{{ stats.db_size_mb }} MB</p>
         </div>
       </div>
 
@@ -142,6 +142,7 @@ const stats = ref({
   employees: 0,
   machine_list: 0,
   material_rates: 0,
+  db_size_mb: 0,
 })
 
 const machineStatus = ref([

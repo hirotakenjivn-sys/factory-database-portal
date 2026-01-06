@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, text
 from datetime import date, timedelta
 from ..database import get_db
 from ..models.po import PO
@@ -42,6 +42,15 @@ async def get_dashboard_cards(db: Session = Depends(get_db)):
     # Material Rates
     material_rates = db.query(func.count(MaterialRate.material_rate_id)).scalar() or 0
 
+    # Database size in MB
+    db_size_query = text("""
+        SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS size_mb
+        FROM information_schema.tables
+        WHERE table_schema = DATABASE()
+    """)
+    db_size_result = db.execute(db_size_query).scalar()
+    db_size_mb = float(db_size_result) if db_size_result else 0.0
+
     return {
         "products": products,
         "customers": customers,
@@ -49,7 +58,8 @@ async def get_dashboard_cards(db: Session = Depends(get_db)):
         "count": count,
         "employees": employees,
         "machine_list": machine_list,
-        "material_rates": material_rates
+        "material_rates": material_rates,
+        "db_size_mb": db_size_mb
     }
 
 
