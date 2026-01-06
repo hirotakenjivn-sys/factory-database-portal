@@ -28,7 +28,7 @@
       <div v-if="activeTab === 'machines'">
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>Register Machine</h2>
+        <h2>{{ editingMachineId ? 'Edit Machine' : 'Register Machine' }}</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
@@ -55,8 +55,13 @@
                 required
               />
             </div>
-            <div>
-              <button type="submit" class="btn btn-primary">Register</button>
+            <div style="display: flex; gap: 8px;">
+              <button type="submit" class="btn btn-primary">
+                {{ editingMachineId ? 'Update' : 'Register' }}
+              </button>
+              <button v-if="editingMachineId" type="button" class="btn btn-secondary" @click="cancelMachineEdit">
+                Cancel
+              </button>
             </div>
           </div>
         </form>
@@ -83,6 +88,7 @@
               <th>Machine No</th>
               <th>Machine Type</th>
               <th>Factory Name</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -91,6 +97,18 @@
               <td>{{ item.machine_no }}</td>
               <td>{{ item.machine_type_name || '-' }}</td>
               <td>{{ item.factory_name || '-' }}</td>
+              <td>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-secondary btn-sm" @click="handleMachineEdit(item)">Edit</button>
+                  <button
+                    v-if="editingMachineId === item.machine_list_id"
+                    class="btn btn-danger btn-sm"
+                    @click="handleMachineDelete(item.machine_list_id)"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -104,14 +122,19 @@
       <div v-if="activeTab === 'machine-types'">
         <!-- Machine Type Registration Form -->
         <div class="card" style="margin-bottom: var(--spacing-lg)">
-          <h2>Register Machine Type</h2>
+          <h2>{{ editingMachineTypeId ? 'Edit Machine Type' : 'Register Machine Type' }}</h2>
           <form @submit.prevent="handleMachineTypeSubmit" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
               <label class="form-label" style="margin-bottom: 0;">Machine Type Name</label>
               <input v-model="machineTypeForm.machine_type_name" class="form-input" type="text" required />
             </div>
-            <div>
-              <button type="submit" class="btn btn-primary">Register</button>
+            <div style="display: flex; gap: 8px;">
+              <button type="submit" class="btn btn-primary">
+                {{ editingMachineTypeId ? 'Update' : 'Register' }}
+              </button>
+              <button v-if="editingMachineTypeId" type="button" class="btn btn-secondary" @click="cancelMachineTypeEdit">
+                Cancel
+              </button>
             </div>
           </form>
         </div>
@@ -124,12 +147,25 @@
               <tr>
                 <th>ID</th>
                 <th>Machine Type Name</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="type in machineTypes" :key="type.machine_type_id">
                 <td>{{ type.machine_type_id }}</td>
                 <td>{{ type.machine_type_name }}</td>
+                <td>
+                  <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-secondary btn-sm" @click="handleMachineTypeEdit(type)">Edit</button>
+                    <button
+                      v-if="editingMachineTypeId === type.machine_type_id"
+                      class="btn btn-danger btn-sm"
+                      @click="handleMachineTypeDelete(type.machine_type_id)"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -149,15 +185,19 @@ import api from '../../utils/api'
 
 const activeTab = ref('machines')
 
+// Machine form
 const form = ref({
   machine_no: '',
   machine_type_id: null,
   factory_id: null,
 })
+const editingMachineId = ref(null)
 
+// Machine Type form
 const machineTypeForm = ref({
   machine_type_name: '',
 })
+const editingMachineTypeId = ref(null)
 
 const machines = ref([])
 const machineTypes = ref([])
@@ -183,38 +223,118 @@ const loadMachines = async (search = '') => {
   }
 }
 
+// Machine CRUD
 const handleSubmit = async () => {
   try {
-    await api.post('/master/machines', form.value)
-    alert('Machine registered successfully')
-    form.value = {
-      machine_no: '',
-      machine_type_id: null,
-      factory_id: null,
+    if (editingMachineId.value) {
+      await api.put(`/master/machines/${editingMachineId.value}`, form.value)
+      alert('Machine updated successfully')
+    } else {
+      await api.post('/master/machines', form.value)
+      alert('Machine registered successfully')
     }
+    resetMachineForm()
     await loadMachines()
   } catch (error) {
-    console.error('Failed to create machine:', error)
-    alert('Failed to register machine')
+    console.error('Failed to save machine:', error)
+    const detail = error.response?.data?.detail || 'Failed to save machine'
+    alert(detail)
   }
+}
+
+const handleMachineEdit = (item) => {
+  editingMachineId.value = item.machine_list_id
+  form.value = {
+    machine_no: item.machine_no,
+    machine_type_id: item.machine_type_id,
+    factory_id: item.factory_id,
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const handleMachineDelete = async (id) => {
+  if (!confirm('Are you sure you want to delete this machine?')) return
+
+  try {
+    await api.delete(`/master/machines/${id}`)
+    alert('Machine deleted successfully')
+    resetMachineForm()
+    await loadMachines()
+  } catch (error) {
+    console.error('Failed to delete machine:', error)
+    const detail = error.response?.data?.detail || 'Failed to delete machine'
+    alert(detail)
+  }
+}
+
+const cancelMachineEdit = () => {
+  resetMachineForm()
+}
+
+const resetMachineForm = () => {
+  form.value = {
+    machine_no: '',
+    machine_type_id: null,
+    factory_id: null,
+  }
+  editingMachineId.value = null
 }
 
 const handleSearch = () => {
   loadMachines(searchQuery.value)
 }
 
+// Machine Type CRUD
 const handleMachineTypeSubmit = async () => {
   try {
-    await api.post('/master/machine-types', machineTypeForm.value)
-    alert('Machine type registered successfully')
-    machineTypeForm.value = {
-      machine_type_name: '',
+    if (editingMachineTypeId.value) {
+      await api.put(`/master/machine-types/${editingMachineTypeId.value}`, machineTypeForm.value)
+      alert('Machine type updated successfully')
+    } else {
+      await api.post('/master/machine-types', machineTypeForm.value)
+      alert('Machine type registered successfully')
     }
+    resetMachineTypeForm()
     await loadMachineTypes()
   } catch (error) {
-    console.error('Failed to create machine type:', error)
-    alert('Failed to register machine type')
+    console.error('Failed to save machine type:', error)
+    const detail = error.response?.data?.detail || 'Failed to save machine type'
+    alert(detail)
   }
+}
+
+const handleMachineTypeEdit = (type) => {
+  editingMachineTypeId.value = type.machine_type_id
+  machineTypeForm.value = {
+    machine_type_name: type.machine_type_name,
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const handleMachineTypeDelete = async (id) => {
+  if (!confirm('Are you sure you want to delete this machine type?')) return
+
+  try {
+    await api.delete(`/master/machine-types/${id}`)
+    alert('Machine type deleted successfully')
+    resetMachineTypeForm()
+    await loadMachineTypes()
+  } catch (error) {
+    console.error('Failed to delete machine type:', error)
+    const detail = error.response?.data?.detail || 'Failed to delete machine type'
+    alert(detail)
+  }
+}
+
+const cancelMachineTypeEdit = () => {
+  resetMachineTypeForm()
+}
+
+const resetMachineTypeForm = () => {
+  machineTypeForm.value = {
+    machine_type_name: '',
+  }
+  editingMachineTypeId.value = null
 }
 
 const downloadCSV = async () => {
@@ -294,5 +414,19 @@ h2 {
 .tab-btn.active {
   color: var(--primary);
   border-bottom-color: var(--primary);
+}
+
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.btn-danger {
+  background: var(--error);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c0392b;
 }
 </style>

@@ -864,6 +864,51 @@ async def create_machine(
     return db_machine
 
 
+@router.put("/machines/{machine_list_id}")
+async def update_machine(
+    machine_list_id: int,
+    machine_data: dict,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """機械を更新"""
+    machine = db.query(MachineList).filter(MachineList.machine_list_id == machine_list_id).first()
+    if not machine:
+        raise HTTPException(status_code=404, detail="Machine not found")
+
+    machine_no = machine_data.get("machine_no")
+    machine_type_id = machine_data.get("machine_type_id")
+    factory_id = machine_data.get("factory_id")
+
+    if machine_no:
+        machine.machine_no = machine_no
+    if machine_type_id is not None:
+        machine.machine_type_id = machine_type_id
+    if factory_id:
+        machine.factory_id = factory_id
+    machine.user = current_user['username']
+
+    db.commit()
+    db.refresh(machine)
+    return machine
+
+
+@router.delete("/machines/{machine_list_id}")
+async def delete_machine(
+    machine_list_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """機械を削除"""
+    machine = db.query(MachineList).filter(MachineList.machine_list_id == machine_list_id).first()
+    if not machine:
+        raise HTTPException(status_code=404, detail="Machine not found")
+
+    db.delete(machine)
+    db.commit()
+    return {"message": "Machine deleted successfully"}
+
+
 # ==================== Cycletimes ====================
 @router.get("/cycletimes", response_model=List[cycletime_schema.CycletimeWithDetails])
 async def get_cycletimes(
