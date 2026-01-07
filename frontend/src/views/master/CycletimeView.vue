@@ -8,7 +8,7 @@
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>Register Cycletime Setting</h2>
+        <h2>{{ editingId ? 'Edit Cycletime Setting' : 'Register Cycletime Setting' }}</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
@@ -48,8 +48,13 @@
               <label class="form-label" style="margin-bottom: 0;">Cycle Time</label>
               <input v-model.number="form.cycle_time" class="form-input" type="number" step="0.01" required />
             </div>
-            <div>
-              <button type="submit" class="btn btn-primary">Register</button>
+            <div style="display: flex; gap: 8px;">
+              <button type="submit" class="btn btn-primary">
+                {{ editingId ? 'Update' : 'Register' }}
+              </button>
+              <button v-if="editingId" type="button" class="btn btn-secondary" @click="cancelEdit">
+                Cancel
+              </button>
             </div>
           </div>
         </form>
@@ -77,6 +82,7 @@
               <th>Process Name</th>
               <th>Press No</th>
               <th>Cycle Time</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -89,6 +95,18 @@
               <td>{{ item.process_name }}</td>
               <td>{{ item.press_no }}</td>
               <td>{{ item.cycle_time }}</td>
+              <td>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-secondary btn-sm" @click="handleEdit(item)">Edit</button>
+                  <button
+                    v-if="editingId === item.cycletime_id"
+                    class="btn btn-danger btn-sm"
+                    @click="handleDelete(item.cycletime_id)"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -113,6 +131,7 @@ const form = ref({
   cycle_time: null,
 })
 
+const editingId = ref(null)
 const cycletimeSettings = ref([])
 const productProcesses = ref([])
 const searchQuery = ref('')
@@ -160,20 +179,68 @@ const handleSubmit = async () => {
   }
 
   try {
-    await api.post('/master/cycletimes', form.value)
-    alert('Cycletime setting registered successfully')
-    form.value = {
-      product_id: null,
-      process_name: '',
-      press_no: '',
-      cycle_time: null,
+    if (editingId.value) {
+      await api.put(`/master/cycletimes/${editingId.value}`, form.value)
+      alert('Cycletime setting updated successfully')
+    } else {
+      await api.post('/master/cycletimes', form.value)
+      alert('Cycletime setting registered successfully')
     }
-    productProcesses.value = []
+    resetForm()
     await loadCycletimeSettings()
   } catch (error) {
-    console.error('Failed to create cycletime settings:', error)
-    alert('Failed to register cycletime setting')
+    console.error('Failed to save cycletime settings:', error)
+    const detail = error.response?.data?.detail || 'Failed to save cycletime setting'
+    alert(detail)
   }
+}
+
+const handleEdit = async (item) => {
+  editingId.value = item.cycletime_id
+  form.value = {
+    product_id: item.product_id,
+    process_name: item.process_name,
+    press_no: item.press_no,
+    cycle_time: item.cycle_time,
+  }
+  // Load process names for the product
+  try {
+    const response = await api.get(`/master/product/${item.product_id}/process-names`)
+    productProcesses.value = response.data
+  } catch (error) {
+    console.error('Failed to load product processes:', error)
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const handleDelete = async (id) => {
+  if (!confirm('Are you sure you want to delete this cycletime setting?')) return
+
+  try {
+    await api.delete(`/master/cycletimes/${id}`)
+    alert('Cycletime setting deleted successfully')
+    resetForm()
+    loadCycletimeSettings()
+  } catch (error) {
+    console.error('Failed to delete cycletime setting:', error)
+    const detail = error.response?.data?.detail || 'Failed to delete cycletime setting'
+    alert(detail)
+  }
+}
+
+const cancelEdit = () => {
+  resetForm()
+}
+
+const resetForm = () => {
+  form.value = {
+    product_id: null,
+    process_name: '',
+    press_no: '',
+    cycle_time: null,
+  }
+  editingId.value = null
+  productProcesses.value = []
 }
 
 const handleSearch = () => {

@@ -981,3 +981,40 @@ async def create_cycletime(
     db.commit()
     db.refresh(db_cycletime)
     return db_cycletime
+
+
+@router.put("/cycletimes/{cycletime_id}", response_model=cycletime_schema.CycletimeResponse)
+async def update_cycletime(
+    cycletime_id: int,
+    cycletime: cycletime_schema.CycletimeUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """サイクルタイム設定を更新"""
+    db_cycletime = db.query(Cycletime).filter(Cycletime.cycletime_id == cycletime_id).first()
+    if not db_cycletime:
+        raise HTTPException(status_code=404, detail="Cycletime setting not found")
+
+    for key, value in cycletime.model_dump(exclude_unset=True).items():
+        setattr(db_cycletime, key, value)
+
+    db_cycletime.user = current_user['username']
+    db.commit()
+    db.refresh(db_cycletime)
+    return db_cycletime
+
+
+@router.delete("/cycletimes/{cycletime_id}")
+async def delete_cycletime(
+    cycletime_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """サイクルタイム設定を削除"""
+    db_cycletime = db.query(Cycletime).filter(Cycletime.cycletime_id == cycletime_id).first()
+    if not db_cycletime:
+        raise HTTPException(status_code=404, detail="Cycletime setting not found")
+
+    db.delete(db_cycletime)
+    db.commit()
+    return {"message": "Cycletime setting deleted successfully"}
