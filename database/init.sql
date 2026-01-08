@@ -435,3 +435,130 @@ INSERT INTO `factories` (`factory_id`, `factory_name`, `user`) VALUES
 -- 管理者ユーザー (employee_no: admin, password: admin123)
 INSERT INTO `employees` (`employee_no`, `name`, `password_hash`, `is_active`, `user`) VALUES
 ('admin', 'Administrator', '$pbkdf2-sha256$29000$8x7jXKuVci7FWAthLEWotQ$FCBHkG2PyqTVEm7JZI39HOkgNkoKBeVXngGgxzfxfxM', TRUE, 'system');
+
+-- ================================================
+-- 23. material_types (材料タイプマスタ)
+-- ================================================
+DROP TABLE IF EXISTS `material_stock_snapshot`;
+DROP TABLE IF EXISTS `material_transactions`;
+DROP TABLE IF EXISTS `material_lots`;
+DROP TABLE IF EXISTS `material_items`;
+DROP TABLE IF EXISTS `material_specs`;
+DROP TABLE IF EXISTS `material_forms`;
+DROP TABLE IF EXISTS `material_types`;
+
+CREATE TABLE `material_types` (
+  `material_type_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `material_name` VARCHAR(100) NOT NULL,
+  `note` TEXT,
+  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user` VARCHAR(100),
+  INDEX `idx_material_name` (`material_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ================================================
+-- 24. material_forms (材料形状マスタ)
+-- ================================================
+CREATE TABLE `material_forms` (
+  `material_form_code` VARCHAR(20) PRIMARY KEY,
+  `form_name` VARCHAR(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- デフォルト形状
+INSERT INTO `material_forms` (`material_form_code`, `form_name`) VALUES
+('COIL', 'Coil'),
+('SHEET', 'Sheet');
+
+-- ================================================
+-- 25. material_specs (材料仕様)
+-- ================================================
+CREATE TABLE `material_specs` (
+  `material_spec_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `material_type_id` INT NOT NULL,
+  `material_form_code` VARCHAR(20) NOT NULL,
+  `thickness_mm` DECIMAL(10,3),
+  `width_mm` DECIMAL(10,2),
+  `length_mm` DECIMAL(10,2),
+  `thickness_tol_plus` DECIMAL(10,4),
+  `thickness_tol_minus` DECIMAL(10,4),
+  `width_tol_plus` DECIMAL(10,3),
+  `width_tol_minus` DECIMAL(10,3),
+  `length_tol_plus` DECIMAL(10,3),
+  `length_tol_minus` DECIMAL(10,3),
+  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user` VARCHAR(100),
+  FOREIGN KEY (`material_type_id`) REFERENCES `material_types`(`material_type_id`),
+  FOREIGN KEY (`material_form_code`) REFERENCES `material_forms`(`material_form_code`),
+  INDEX `idx_material_type` (`material_type_id`),
+  INDEX `idx_material_form` (`material_form_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ================================================
+-- 26. material_items (材料品目)
+-- ================================================
+CREATE TABLE `material_items` (
+  `material_code` VARCHAR(50) PRIMARY KEY,
+  `material_spec_id` INT NOT NULL,
+  `description` VARCHAR(255),
+  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user` VARCHAR(100),
+  FOREIGN KEY (`material_spec_id`) REFERENCES `material_specs`(`material_spec_id`),
+  INDEX `idx_material_spec` (`material_spec_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ================================================
+-- 27. material_lots (材料ロット)
+-- ================================================
+CREATE TABLE `material_lots` (
+  `lot_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `material_code` VARCHAR(50) NOT NULL,
+  `lot_no` VARCHAR(100) NOT NULL,
+  `supplier_id` INT,
+  `received_date` DATE,
+  `inspection_status` VARCHAR(20) DEFAULT 'PENDING',
+  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user` VARCHAR(100),
+  FOREIGN KEY (`material_code`) REFERENCES `material_items`(`material_code`),
+  FOREIGN KEY (`supplier_id`) REFERENCES `suppliers`(`supplier_id`),
+  INDEX `idx_material_code` (`material_code`),
+  INDEX `idx_lot_no` (`lot_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ================================================
+-- 28. material_transactions (材料入出庫トランザクション)
+-- ================================================
+CREATE TABLE `material_transactions` (
+  `transaction_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `transaction_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `lot_id` INT NOT NULL,
+  `factory_id` INT NOT NULL,
+  `sheet_qty` INT DEFAULT 0,
+  `coil_qty` INT DEFAULT 0,
+  `weight_kg` DECIMAL(12,3) DEFAULT 0,
+  `transaction_type` VARCHAR(10) NOT NULL COMMENT 'IN or OUT',
+  `note` TEXT,
+  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user` VARCHAR(100),
+  FOREIGN KEY (`lot_id`) REFERENCES `material_lots`(`lot_id`),
+  FOREIGN KEY (`factory_id`) REFERENCES `factories`(`factory_id`),
+  INDEX `idx_lot` (`lot_id`),
+  INDEX `idx_factory` (`factory_id`),
+  INDEX `idx_transaction_date` (`transaction_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ================================================
+-- 29. material_stock_snapshot (材料在庫スナップショット)
+-- ================================================
+CREATE TABLE `material_stock_snapshot` (
+  `lot_id` INT NOT NULL,
+  `factory_id` INT NOT NULL,
+  `sheet_qty` INT DEFAULT 0,
+  `coil_qty` INT DEFAULT 0,
+  `weight_kg` DECIMAL(12,3) DEFAULT 0,
+  `last_updated` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user` VARCHAR(100),
+  PRIMARY KEY (`lot_id`, `factory_id`),
+  FOREIGN KEY (`lot_id`) REFERENCES `material_lots`(`lot_id`),
+  FOREIGN KEY (`factory_id`) REFERENCES `factories`(`factory_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
