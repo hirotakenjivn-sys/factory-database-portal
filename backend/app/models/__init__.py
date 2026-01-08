@@ -13,6 +13,15 @@ from .material import MaterialRate
 from .cycletime import Cycletime
 from .production_schedule import ProductionSchedule
 from .trace import StampTrace, OutsourceTrace
+from .material_management import (
+    MaterialType,
+    MaterialForm,
+    MaterialSpec,
+    MaterialItem,
+    MaterialLot,
+    MaterialTransaction,
+    MaterialStockSnapshot,
+)
 
 __all__ = [
     "Customer",
@@ -37,4 +46,11 @@ __all__ = [
     "ProductionSchedule",
     "StampTrace",
     "OutsourceTrace",
+    "MaterialType",
+    "MaterialForm",
+    "MaterialSpec",
+    "MaterialItem",
+    "MaterialLot",
+    "MaterialTransaction",
+    "MaterialStockSnapshot",
 ]

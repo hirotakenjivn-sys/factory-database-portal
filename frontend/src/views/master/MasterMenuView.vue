@@ -32,6 +32,14 @@ const masterMenus = [
   { path: '/master/cycletimes', label: 'CYCLETIME', icon: '⏱️', key: 'cycletimes' },
   { path: '/master/holidays', label: 'HOLIDAY', icon: '📅', key: 'calendar' },
   { path: '/press', label: 'PROCESS', icon: '⚙️', key: 'processes' },
+  // Material Management
+  { path: '/master/material-types', label: 'MATERIAL TYPES', icon: '🧱' },
+  { path: '/master/material-specs', label: 'MATERIAL SPECS', icon: '📋' },
+  { path: '/master/material-items', label: 'MATERIAL ITEMS', icon: '📦' },
+  { path: '/master/material-lots', label: 'MATERIAL LOTS', icon: '🧾' },
+  { path: '/master/material-transactions', label: 'MATERIAL TRANSACTIONS', icon: '⬆️⬇️' },
+  { path: '/master/material-stock', label: 'MATERIAL STOCK', icon: '📊' },
+  { path: '/master/material-trace', label: 'MATERIAL TRACE', icon: '🔍' },
 ]
 
 const counts = ref({})

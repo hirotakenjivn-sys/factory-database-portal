@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
-from .routers import auth, dashboard, sales, press, master, warehouse, mold, schedule, process, trace, admin, iot
+from .routers import auth, dashboard, sales, press, master, warehouse, mold, schedule, process, trace, admin, iot, material_mgmt
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -34,6 +34,7 @@ app.include_router(process.router, prefix="/api/process", tags=["process"])
 app.include_router(trace.router, prefix="/api/trace", tags=["trace"])
 app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 app.include_router(iot.router, prefix="/api/iot", tags=["iot"])
+app.include_router(material_mgmt.router, prefix="/api/material", tags=["material"])
 
 
 @app.get("/")

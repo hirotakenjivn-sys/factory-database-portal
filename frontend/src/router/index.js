@@ -19,6 +19,13 @@ import MaterialRateView from '../views/master/MaterialRateView.vue'
 import MachineView from '../views/master/MachineView.vue'
 import CycletimeView from '../views/master/CycletimeView.vue'
 import HolidayView from '../views/master/HolidayView.vue'
+import MaterialMasterView from '../views/master/MaterialMasterView.vue'
+import MaterialSpecView from '../views/master/MaterialSpecView.vue'
+import MaterialItemView from '../views/master/MaterialItemView.vue'
+import MaterialLotView from '../views/master/MaterialLotView.vue'
+import MaterialTransactionView from '../views/master/MaterialTransactionView.vue'
+import MaterialStockView from '../views/master/MaterialStockView.vue'
+import MaterialTraceView from '../views/master/MaterialTraceView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -144,6 +151,48 @@ const router = createRouter({
       path: '/master/holidays',
       name: 'Holidays',
       component: HolidayView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/master/material-types',
+      name: 'MaterialTypes',
+      component: MaterialMasterView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/master/material-specs',
+      name: 'MaterialSpecs',
+      component: MaterialSpecView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/master/material-items',
+      name: 'MaterialItems',
+      component: MaterialItemView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/master/material-lots',
+      name: 'MaterialLots',
+      component: MaterialLotView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/master/material-transactions',
+      name: 'MaterialTransactions',
+      component: MaterialTransactionView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/master/material-stock',
+      name: 'MaterialStock',
+      component: MaterialStockView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/master/material-trace',
+      name: 'MaterialTrace',
+      component: MaterialTraceView,
       meta: { requiresAuth: true },
     },
   ],
