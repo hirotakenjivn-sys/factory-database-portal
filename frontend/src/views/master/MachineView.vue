@@ -214,7 +214,10 @@ const loadMachineTypes = async () => {
 
 const loadMachines = async (search = '') => {
   try {
-    const params = search ? { search } : {}
+    const params = { limit: 100 }
+    if (search) {
+      params.search = search
+    }
     const response = await api.get('/master/machines', { params })
     machines.value = response.data
   } catch (error) {

@@ -818,9 +818,11 @@ async def get_machines(
     current_user: dict = Depends(get_current_user)
 ):
     """機械一覧を取得"""
-    query = db.query(MachineList).join(Factory, MachineList.factory_id == Factory.factory_id).outerjoin(MachineType, MachineList.machine_type_id == MachineType.machine_type_id)
+    query = db.query(MachineList).outerjoin(Factory, MachineList.factory_id == Factory.factory_id).outerjoin(MachineType, MachineList.machine_type_id == MachineType.machine_type_id)
     if search:
         query = query.filter(MachineList.machine_no.contains(search))
+    # 降順でソート
+    query = query.order_by(MachineList.machine_list_id.desc())
     machines = query.offset(skip).limit(limit).all()
 
     # データを整形
