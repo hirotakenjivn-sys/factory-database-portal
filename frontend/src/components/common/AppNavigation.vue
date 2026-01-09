@@ -215,4 +215,46 @@ defineExpose({
   min-width: 24px;
   text-align: center;
 }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .app-sidebar {
+    position: fixed;
+    left: -250px;
+    top: 0;
+    bottom: 0;
+    width: 250px;
+    height: 100vh;
+    transition: left 0.3s ease;
+  }
+
+  .app-sidebar.mobile-open {
+    left: 0;
+  }
+
+  .app-sidebar.collapsed {
+    width: 250px;
+    left: -250px;
+  }
+
+  .app-sidebar.collapsed.mobile-open {
+    left: 0;
+  }
+
+  .sidebar-toggle {
+    display: none;
+  }
+
+  .nav-label {
+    display: inline !important;
+  }
+
+  .user-name {
+    display: inline !important;
+  }
+
+  .logout-label {
+    display: inline !important;
+  }
+}
 </style>
