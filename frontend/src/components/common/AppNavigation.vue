@@ -94,7 +94,7 @@ defineExpose({
   position: fixed;
   left: 0;
   top: 0;
-  height: 100vh;
+  bottom: 0;
   width: 200px;
   background: #2c3e50;
   display: flex;
@@ -224,7 +224,6 @@ defineExpose({
     top: 0;
     bottom: 0;
     width: 250px;
-    height: 100vh;
     transition: left 0.3s ease;
   }
 
