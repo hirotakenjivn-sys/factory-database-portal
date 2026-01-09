@@ -33,12 +33,12 @@ const masterMenus = [
   { path: '/master/holidays', label: 'HOLIDAY', icon: '📅', key: 'calendar' },
   { path: '/press', label: 'PROCESS', icon: '⚙️', key: 'processes' },
   // Material Management
-  { path: '/master/material-types', label: 'MATERIAL TYPES', icon: '🧱' },
-  { path: '/master/material-specs', label: 'MATERIAL SPECS', icon: '📋' },
-  { path: '/master/material-items', label: 'MATERIAL ITEMS', icon: '📦' },
-  { path: '/master/material-lots', label: 'MATERIAL LOTS', icon: '🧾' },
-  { path: '/master/material-transactions', label: 'MATERIAL TRANSACTIONS', icon: '⬆️⬇️' },
-  { path: '/master/material-stock', label: 'MATERIAL STOCK', icon: '📊' },
+  { path: '/master/material-types', label: 'MATERIAL TYPES', icon: '🧱', key: 'material_types' },
+  { path: '/master/material-specs', label: 'MATERIAL SPECS', icon: '📋', key: 'material_specs' },
+  { path: '/master/material-items', label: 'MATERIAL ITEMS', icon: '📦', key: 'material_items' },
+  { path: '/master/material-lots', label: 'MATERIAL LOTS', icon: '🧾', key: 'material_lots' },
+  { path: '/master/material-transactions', label: 'MATERIAL TRANSACTIONS', icon: '⬆️⬇️', key: 'material_transactions' },
+  { path: '/master/material-stock', label: 'MATERIAL STOCK', icon: '📊', key: 'material_stock' },
   { path: '/master/material-trace', label: 'MATERIAL TRACE', icon: '🔍' },
 ]
 

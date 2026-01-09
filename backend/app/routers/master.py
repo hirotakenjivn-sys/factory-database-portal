@@ -17,6 +17,10 @@ from ..models.production_schedule import ProductionSchedule
 from ..models.trace import StampTrace, OutsourceTrace
 from ..models.mold import BrokenMold
 from ..models.calendar import Calendar
+from ..models.material_management import (
+    MaterialType, MaterialForm, MaterialSpec, MaterialItem, MaterialLot,
+    MaterialTransaction, MaterialStockSnapshot
+)
 from ..schemas import customer as customer_schema
 from ..schemas import product as product_schema
 from ..schemas import employee as employee_schema
@@ -46,6 +50,13 @@ async def get_table_counts(db: Session = Depends(get_db)):
         "cycletimes": db.query(Cycletime).count(),
         "calendar": db.query(Calendar).count(),
         "processes": db.query(Process).count(),
+        # Material Management
+        "material_types": db.query(MaterialType).count(),
+        "material_specs": db.query(MaterialSpec).count(),
+        "material_items": db.query(MaterialItem).count(),
+        "material_lots": db.query(MaterialLot).count(),
+        "material_transactions": db.query(MaterialTransaction).count(),
+        "material_stock": db.query(MaterialStockSnapshot).count(),
     }
 
 
