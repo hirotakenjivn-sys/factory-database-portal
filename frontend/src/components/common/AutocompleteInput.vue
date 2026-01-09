@@ -146,8 +146,8 @@ watch(
   () => props.modelValue,
   (newVal) => {
     if (newVal && (!selectedItem.value || selectedItem.value[props.valueField] !== newVal)) {
-      // IDから名前を取得
-      api.get(props.endpoint).then((response) => {
+      // IDから名前を取得（idパラメータを渡して特定のアイテムを取得）
+      api.get(props.endpoint, { params: { id: newVal } }).then((response) => {
         const item = response.data.find((i) => i[props.valueField] === newVal)
         if (item) {
           inputValue.value = item[props.displayField]

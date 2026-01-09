@@ -510,6 +510,7 @@ async def autocomplete_customers(
 @router.get("/autocomplete/products")
 async def autocomplete_products(
     search: str = "",
+    id: int = None,
     db: Session = Depends(get_db)
 ):
     """製品コードのオートコンプリート用エンドポイント（顧客名も含む）"""
@@ -522,7 +523,9 @@ async def autocomplete_products(
     ).filter(
         Product.is_active == True
     )
-    if search:
+    if id:
+        query = query.filter(Product.product_id == id)
+    elif search:
         query = query.filter(Product.product_code.contains(search))
     products = query.limit(20).all()
     return [{"id": p.product_id, "product_code": p.product_code, "customer_name": p.customer_name} for p in products]
