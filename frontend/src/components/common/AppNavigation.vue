@@ -1,5 +1,5 @@
 <template>
-  <nav class="app-sidebar" :class="{ collapsed: isCollapsed }">
+  <nav class="app-sidebar" :class="{ collapsed: isCollapsed, 'mobile-open': mobileOpen }">
     <div class="sidebar-toggle" @click="toggleSidebar">
       <span class="toggle-icon">{{ isCollapsed ? '>' : '<' }}</span>
     </div>
@@ -12,6 +12,7 @@
         class="nav-item"
         :class="{ active: $route.path === item.path }"
         :title="item.label"
+        @click="closeMobileMenu"
       >
         <span class="nav-icon">{{ item.icon }}</span>
         <span class="nav-label" v-show="!isCollapsed">{{ item.label }}</span>
@@ -39,6 +40,7 @@ import { useRouter } from 'vue-router'
 const authStore = useAuthStore()
 const router = useRouter()
 const isCollapsed = ref(false)
+const mobileOpen = ref(false)
 
 // Display name in format: Name (employee_no)
 const displayName = computed(() => {
@@ -65,6 +67,14 @@ const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value
 }
 
+const toggleMobileMenu = () => {
+  mobileOpen.value = !mobileOpen.value
+}
+
+const closeMobileMenu = () => {
+  mobileOpen.value = false
+}
+
 const handleLogout = () => {
   authStore.logout()
   router.push('/login')
@@ -72,7 +82,10 @@ const handleLogout = () => {
 
 // 親コンポーネントから参照できるように公開
 defineExpose({
-  isCollapsed
+  isCollapsed,
+  mobileOpen,
+  toggleMobileMenu,
+  closeMobileMenu
 })
 </script>
 

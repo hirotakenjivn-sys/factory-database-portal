@@ -57,6 +57,11 @@
   background-color: #e67e22;
 }
 
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
 /* フォーム */
 .form-group {
   margin-bottom: var(--spacing-sm);
