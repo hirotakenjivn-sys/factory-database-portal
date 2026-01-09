@@ -23,7 +23,7 @@ import api from '../../utils/api'
 
 const masterMenus = [
   { path: '/master/customers', label: 'CUSTOMER', icon: '👥', key: 'customers' },
-  { path: '/master/products', label: 'PRODUCT', icon: '📦', key: 'products' },
+  { path: '/master/products', label: 'PRODUCT', icon: '🔩', key: 'products' },
   { path: '/master/employees', label: 'EMPLOYEE', icon: '👷', key: 'employees' },
   { path: '/master/suppliers', label: 'SUPPLIER', icon: '🚚', key: 'suppliers' },
   { path: '/master/process-names', label: 'PROCESS NAME TYPE', icon: '🔄', key: 'process_name_types' },
