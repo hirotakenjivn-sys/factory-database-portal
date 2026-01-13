@@ -73,8 +73,8 @@
                   <td
                     v-for="i in 20"
                     :key="i"
+                    class="clickable-cell"
                     :class="{
-                      'clickable-cell': selectedProductProcess[`process_${i}`],
                       'highlight-zero-cycletime': selectedProductProcess[`process_${i}`] && Number(selectedProductProcess[`rough_cycletime_${i}`]) === 0
                     }"
                     @click="editProcessCellFromSearch(selectedProductProcess, i)"
@@ -144,8 +144,8 @@
                 <td
                   v-for="i in 20"
                   :key="i"
+                  class="clickable-cell"
                   :class="{
-                    'clickable-cell': product[`process_${i}`],
                     'error-cell': isPressSetIncomplete(product, product[`process_${i}`]),
                     'highlight-zero-cycletime': product[`process_${i}`] && Number(product[`rough_cycletime_${i}`]) === 0
                   }"
@@ -417,8 +417,22 @@ const editProcess = (process) => {
 }
 
 const editProcessCell = async (product, processNo) => {
-  // Not clickable if no process name
+  // プロセス名がない場合は新規登録モードでフォームをフィル
   if (!product[`process_${processNo}`]) {
+    editMode.value = false
+    editingProcessId.value = null
+    processType.value = null
+    cycleTimeLabel.value = 'Cycle Time'
+    form.value = {
+      product_id: product.product_id,
+      process_no: processNo,
+      process_name: '',
+      rough_cycletime: null,
+      setup_time: null,
+      production_limit: 99999,
+    }
+    selectedProductProcess.value = product
+    window.scrollTo({ top: 0, behavior: 'smooth' })
     return
   }
 
@@ -471,8 +485,20 @@ const handleProductSelect = async () => {
 }
 
 const editProcessCellFromSearch = async (product, processNo) => {
-  // Not clickable if no process name
+  // プロセス名がない場合は新規登録モードでフォームをフィル
   if (!product[`process_${processNo}`]) {
+    editMode.value = false
+    editingProcessId.value = null
+    processType.value = null
+    cycleTimeLabel.value = 'Cycle Time'
+    form.value = {
+      product_id: product.product_id,
+      process_no: processNo,
+      process_name: '',
+      rough_cycletime: null,
+      setup_time: null,
+      production_limit: 99999,
+    }
     return
   }
 
