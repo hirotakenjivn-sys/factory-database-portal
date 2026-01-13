@@ -116,7 +116,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="process in processes" :key="process.process_id" :class="{ 'highlight-zero-cycletime': process.rough_cycletime === 0 }">
+              <tr v-for="process in processes" :key="process.process_id">
                 <template v-if="editingProcessId === process.process_id">
                   <!-- Edit Mode -->
                   <td>
@@ -143,7 +143,7 @@
                   <!-- View Mode -->
                   <td>{{ process.process_no }}</td>
                   <td>{{ process.process_name }}</td>
-                  <td>{{ process.rough_cycletime || '-' }}</td>
+                  <td :class="{ 'highlight-zero-cycletime': process.rough_cycletime === 0 }">{{ process.rough_cycletime || '-' }}</td>
                   <td>{{ process.production_limit ? process.production_limit.toLocaleString() : '-' }}</td>
                   <td>{{ process.setup_time || '-' }}</td>
                   <td>
