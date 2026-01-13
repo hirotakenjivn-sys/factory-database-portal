@@ -116,7 +116,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="process in processes" :key="process.process_id">
+              <tr v-for="process in processes" :key="process.process_id" :class="{ 'highlight-zero-cycletime': process.rough_cycletime === 0 }">
                 <template v-if="editingProcessId === process.process_id">
                   <!-- Edit Mode -->
                   <td>
@@ -379,5 +379,9 @@ h2 {
 
 .status-inactive {
   color: var(--text-secondary);
+}
+
+.highlight-zero-cycletime {
+  background-color: rgba(255, 235, 59, 0.3);
 }
 </style>
