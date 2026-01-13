@@ -75,7 +75,7 @@
                     :key="i"
                     :class="{
                       'clickable-cell': selectedProductProcess[`process_${i}`],
-                      'highlight-zero-cycletime': Number(selectedProductProcess[`rough_cycletime_${i}`]) === 0
+                      'highlight-zero-cycletime': selectedProductProcess[`process_${i}`] && Number(selectedProductProcess[`rough_cycletime_${i}`]) === 0
                     }"
                     @click="editProcessCellFromSearch(selectedProductProcess, i)"
                   >
@@ -143,7 +143,7 @@
                   :class="{
                     'clickable-cell': product[`process_${i}`],
                     'error-cell': isPressSetIncomplete(product, product[`process_${i}`]),
-                    'highlight-zero-cycletime': Number(product[`rough_cycletime_${i}`]) === 0
+                    'highlight-zero-cycletime': product[`process_${i}`] && Number(product[`rough_cycletime_${i}`]) === 0
                   }"
                   @click="editProcessCell(product, i)"
                 >
