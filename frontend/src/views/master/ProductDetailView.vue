@@ -382,6 +382,6 @@ h2 {
 }
 
 .highlight-zero-cycletime {
-  background-color: rgba(255, 235, 59, 0.3);
+  background-color: rgba(255, 235, 59, 0.3) !important;
 }
 </style>
