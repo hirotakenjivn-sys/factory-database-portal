@@ -97,7 +97,8 @@ async def get_process_table(
             Product.product_code,
             Customer.customer_name,
             Process.process_no,
-            ProcessNameType.process_name
+            ProcessNameType.process_name,
+            Process.rough_cycletime
         ).join(
             Customer, Product.customer_id == Customer.customer_id
         ).join(
@@ -124,10 +125,12 @@ async def get_process_table(
                 # 工程1〜20のフィールドを初期化
                 for i in range(1, 21):
                     product_map[product_id][f"process_{i}"] = ""
+                    product_map[product_id][f"rough_cycletime_{i}"] = None
 
-            # 工程名をセット
+            # 工程名とrough_cycletimeをセット
             if row.process_no is not None:
                 product_map[product_id][f"process_{row.process_no}"] = row.process_name or ""
+                product_map[product_id][f"rough_cycletime_{row.process_no}"] = row.rough_cycletime
 
         return list(product_map.values())
     except Exception as e:

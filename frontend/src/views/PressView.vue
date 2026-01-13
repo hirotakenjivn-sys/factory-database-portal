@@ -73,7 +73,10 @@
                   <td
                     v-for="i in 20"
                     :key="i"
-                    :class="{ 'clickable-cell': selectedProductProcess[`process_${i}`] }"
+                    :class="{
+                      'clickable-cell': selectedProductProcess[`process_${i}`],
+                      'highlight-zero-cycletime': Number(selectedProductProcess[`rough_cycletime_${i}`]) === 0
+                    }"
                     @click="editProcessCellFromSearch(selectedProductProcess, i)"
                   >
                     {{ selectedProductProcess[`process_${i}`] || '-' }}
@@ -137,9 +140,10 @@
                 <td
                   v-for="i in 20"
                   :key="i"
-                  :class="{ 
+                  :class="{
                     'clickable-cell': product[`process_${i}`],
-                    'error-cell': isPressSetIncomplete(product, product[`process_${i}`])
+                    'error-cell': isPressSetIncomplete(product, product[`process_${i}`]),
+                    'highlight-zero-cycletime': Number(product[`rough_cycletime_${i}`]) === 0
                   }"
                   @click="editProcessCell(product, i)"
                 >
@@ -776,5 +780,9 @@ h2 {
 
 .error-cell {
   background-color: #ffcccc !important; /* 薄い赤色 */
+}
+
+.highlight-zero-cycletime {
+  background-color: rgba(255, 235, 59, 0.3) !important; /* 半透明の黄色 */
 }
 </style>
