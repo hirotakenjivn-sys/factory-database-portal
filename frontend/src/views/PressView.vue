@@ -111,7 +111,7 @@
         <h2>Process Table</h2>
 
         <!-- Search Fields -->
-        <div style="display: flex; gap: 8px; margin-bottom: var(--spacing-md);">
+        <div style="display: flex; gap: 8px; margin-bottom: var(--spacing-md); align-items: flex-end;">
           <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
             <label class="form-label" style="margin-bottom: 0;">Customer Name</label>
             <input v-model="searchTable.customer_name" class="form-input" type="text" placeholder="Search Customer..." />
@@ -120,6 +120,10 @@
             <label class="form-label" style="margin-bottom: 0;">Product Code</label>
             <input v-model="searchTable.product_code" class="form-input" type="text" placeholder="Search Product Code..." />
           </div>
+          <label style="display: flex; align-items: center; gap: 4px; height: 34px;">
+            <input v-model="showOnlyHighlighted" type="checkbox" />
+            <span>Show only highlighted</span>
+          </label>
         </div>
 
         <div class="table-scroll-container">
@@ -254,19 +258,41 @@ const sortConfig = ref({
   direction: 'asc' // 'asc' or 'desc'
 })
 
+const showOnlyHighlighted = ref(false)
+
 const processList = ref([])
 const processTable = ref([])
 const processNameSuggestions = ref([])
 
-// 工程表フィルタリング
+// ハイライト判定（rough_cycletime=0の工程があるか）
+const hasHighlight = (product) => {
+  for (let i = 1; i <= 20; i++) {
+    if (product[`process_${i}`] && Number(product[`rough_cycletime_${i}`]) === 0) {
+      return true
+    }
+  }
+  return false
+}
+
+// 工程表フィルタリング・ソート
 const filteredProcessTable = computed(() => {
-  return processTable.value.filter(product => {
+  let result = processTable.value.filter(product => {
     const customerMatch = !searchTable.value.customer_name ||
       product.customer_name.toLowerCase().includes(searchTable.value.customer_name.toLowerCase())
     const productMatch = !searchTable.value.product_code ||
       product.product_code.toLowerCase().includes(searchTable.value.product_code.toLowerCase())
-    return customerMatch && productMatch
+    const highlightMatch = !showOnlyHighlighted.value || hasHighlight(product)
+    return customerMatch && productMatch && highlightMatch
   })
+
+  // ハイライトがある行を上にソート
+  result.sort((a, b) => {
+    const aHas = hasHighlight(a) ? 1 : 0
+    const bHas = hasHighlight(b) ? 1 : 0
+    return bHas - aHas
+  })
+
+  return result
 })
 
 // 工程一覧ソート（フィルタリングはバックエンドで実行）
