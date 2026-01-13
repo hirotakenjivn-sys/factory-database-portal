@@ -441,6 +441,12 @@ const editProcessCell = async (product, processNo) => {
 }
 
 const handleProductSelect = async () => {
+  // 編集モードの場合、リセット
+  if (editMode.value) {
+    editMode.value = false
+    editingProcessId.value = null
+  }
+
   if (!form.value.product_id) {
     selectedProductProcess.value = null
     return
