@@ -142,8 +142,8 @@
                 <template v-else>
                   <!-- View Mode -->
                   <td>{{ process.process_no }}</td>
-                  <td>{{ process.process_name }}</td>
-                  <td :class="{ 'highlight-zero-cycletime': Number(process.rough_cycletime) === 0 }">{{ process.rough_cycletime || '-' }}</td>
+                  <td :class="{ 'highlight-zero-cycletime': Number(process.rough_cycletime) === 0 }">{{ process.process_name }}</td>
+                  <td>{{ process.rough_cycletime || '-' }}</td>
                   <td>{{ process.production_limit ? process.production_limit.toLocaleString() : '-' }}</td>
                   <td>{{ process.setup_time || '-' }}</td>
                   <td>
