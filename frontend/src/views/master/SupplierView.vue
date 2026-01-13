@@ -32,10 +32,16 @@
         <div style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); align-items: center;">
           <input
             v-model="searchQuery"
-            @input="handleSearch"
             class="form-input"
             type="text"
             placeholder="Search Supplier..."
+            style="max-width: 175px;"
+          />
+          <input
+            v-model="searchBusiness"
+            class="form-input"
+            type="text"
+            placeholder="Search Business Type..."
             style="max-width: 175px;"
           />
           <button class="btn btn-secondary" @click="downloadCSV">Download CSV</button>
@@ -64,7 +70,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import AppLayout from '../../components/common/AppLayout.vue'
 import api from '../../utils/api'
 
@@ -73,15 +79,25 @@ const form = ref({
   supplier_business: '',
 })
 
-const suppliers = ref([])
+const allSuppliers = ref([])
 const searchQuery = ref('')
+const searchBusiness = ref('')
 
-const loadSuppliers = async (search = '') => {
+// フィルタリング
+const suppliers = computed(() => {
+  return allSuppliers.value.filter(supplier => {
+    const nameMatch = !searchQuery.value ||
+      supplier.supplier_name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const businessMatch = !searchBusiness.value ||
+      (supplier.supplier_business || '').toLowerCase().includes(searchBusiness.value.toLowerCase())
+    return nameMatch && businessMatch
+  })
+})
+
+const loadSuppliers = async () => {
   try {
-    const response = await api.get('/master/suppliers', {
-      params: { search },
-    })
-    suppliers.value = response.data
+    const response = await api.get('/master/suppliers')
+    allSuppliers.value = response.data
   } catch (error) {
     console.error('Failed to load suppliers:', error)
     alert('Failed to load suppliers')
@@ -103,9 +119,6 @@ const handleSubmit = async () => {
   }
 }
 
-const handleSearch = () => {
-  loadSuppliers(searchQuery.value)
-}
 
 const downloadCSV = async () => {
   try {
