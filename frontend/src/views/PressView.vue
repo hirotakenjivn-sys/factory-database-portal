@@ -47,6 +47,10 @@
               <label class="form-label" style="margin-bottom: 0;">Prod. Limit (PCS)</label>
               <input v-model.number="form.production_limit" class="form-input" type="number" />
             </div>
+            <div style="width: 70px; display: flex; flex-direction: column; gap: 2px;">
+              <label class="form-label" style="margin-bottom: 0;">Cavity</label>
+              <input v-model.number="form.cavity" class="form-input" type="number" min="1" />
+            </div>
             <div style="display: flex; gap: 8px;">
               <button type="submit" class="btn btn-primary">{{ editMode ? 'Update' : 'Register' }}</button>
               <button v-if="editMode" @click="cancelEdit" type="button" class="btn btn-secondary">Cancel</button>
@@ -191,6 +195,7 @@
               <th>Cycle Time</th>
               <th>Setup Time (min)</th>
               <th>Prod. Limit (PCS)</th>
+              <th>Cavity</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -206,6 +211,7 @@
               <td>{{ process.rough_cycletime || '-' }}</td>
               <td>{{ process.setup_time || '-' }}</td>
               <td>{{ process.production_limit || '-' }}</td>
+              <td>{{ process.cavity || 1 }}</td>
               <td>
                 <button @click="editProcess(process)" class="btn btn-sm btn-secondary">Edit</button>
               </td>
@@ -241,6 +247,7 @@ const form = ref({
   rough_cycletime: null,
   setup_time: null,
   production_limit: 99999,
+  cavity: 1,
 })
 
 const searchTable = ref({
@@ -385,6 +392,7 @@ const handleSubmit = async () => {
         rough_cycletime: null,
         setup_time: null,
         production_limit: 99999,
+        cavity: 1,
       }
     }
     await loadProcesses()
@@ -409,6 +417,7 @@ const editProcess = (process) => {
     rough_cycletime: process.rough_cycletime,
     setup_time: process.setup_time,
     production_limit: process.production_limit,
+    cavity: process.cavity || 1,
   }
   // Get type based on process name
   handleProcessNameChange()
@@ -430,6 +439,7 @@ const editProcessCell = async (product, processNo) => {
       rough_cycletime: null,
       setup_time: null,
       production_limit: 99999,
+      cavity: 1,
     }
     selectedProductProcess.value = product
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -498,6 +508,7 @@ const editProcessCellFromSearch = async (product, processNo) => {
       rough_cycletime: null,
       setup_time: null,
       production_limit: 99999,
+      cavity: 1,
     }
     return
   }
@@ -537,6 +548,7 @@ const cancelEdit = () => {
     rough_cycletime: null,
     setup_time: null,
     production_limit: 99999,
+    cavity: 1,
   }
 }
 

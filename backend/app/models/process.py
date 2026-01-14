@@ -24,6 +24,7 @@ class Process(Base):
     rough_cycletime = Column(Integer)
     setup_time = Column(Integer, comment="段取時間（分）")
     production_limit = Column(Integer, comment="生産可能限界")
+    cavity = Column(Integer, default=1, comment="キャビティ数")
     timestamp = Column(DateTime, server_default=func.now(), onupdate=func.now())
     user = Column(String(100))
 

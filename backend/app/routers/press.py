@@ -35,6 +35,7 @@ async def get_processes(
             Process.rough_cycletime,
             Process.setup_time,
             Process.production_limit,
+            Process.cavity,
             Process.timestamp,
             Process.user,
             Customer.customer_name,
@@ -69,6 +70,7 @@ async def get_processes(
                 "rough_cycletime": p.rough_cycletime,
                 "setup_time": p.setup_time,
                 "production_limit": p.production_limit,
+                "cavity": p.cavity,
                 "timestamp": p.timestamp,
                 "user": p.user,
                 "customer_name": p.customer_name,
@@ -176,6 +178,7 @@ async def create_process(
         "rough_cycletime": db_process.rough_cycletime,
         "setup_time": db_process.setup_time,
         "production_limit": db_process.production_limit,
+        "cavity": db_process.cavity,
         "timestamp": db_process.timestamp,
         "user": db_process.user
     }
@@ -233,6 +236,7 @@ async def update_process(
         "rough_cycletime": db_process.rough_cycletime,
         "setup_time": db_process.setup_time,
         "production_limit": db_process.production_limit,
+        "cavity": db_process.cavity,
         "timestamp": db_process.timestamp,
         "user": db_process.user
     }

@@ -10,6 +10,7 @@ class ProcessBase(BaseModel):
     rough_cycletime: Optional[int] = None
     setup_time: Optional[int] = None
     production_limit: Optional[int] = None
+    cavity: Optional[int] = 1
 
 
 class ProcessCreate(ProcessBase):
@@ -23,6 +24,7 @@ class ProcessUpdate(BaseModel):
     rough_cycletime: Optional[int] = None
     setup_time: Optional[int] = None
     production_limit: Optional[int] = None
+    cavity: Optional[int] = None
     user: Optional[str] = None
 
 
