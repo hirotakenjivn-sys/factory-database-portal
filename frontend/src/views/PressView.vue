@@ -446,8 +446,8 @@ const editProcessCell = async (product, processNo) => {
 
     if (targetProcess) {
       editProcess(targetProcess)
-      // Show product process table
-      await handleProductSelect()
+      // Show product process table (直接設定してリセットを回避)
+      selectedProductProcess.value = product
     }
   } catch (error) {
     console.error('Failed to load process:', error)
@@ -512,8 +512,7 @@ const editProcessCellFromSearch = async (product, processNo) => {
 
     if (targetProcess) {
       editProcess(targetProcess)
-      // Show product process table
-      await handleProductSelect()
+      // selectedProductProcessはすでに設定されているのでそのまま
     }
   } catch (error) {
     console.error('Failed to load process:', error)
