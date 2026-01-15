@@ -8,7 +8,7 @@
 
       <!-- Registration Form -->
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>Register Supplier</h2>
+        <h2>{{ editMode ? 'Edit Supplier' : 'Register Supplier' }}</h2>
         <form @submit.prevent="handleSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 175px; display: flex; flex-direction: column; gap: 2px;">
@@ -19,8 +19,10 @@
               <label class="form-label" style="margin-bottom: 0;">Business Type</label>
               <input v-model="form.supplier_business" class="form-input" type="text" />
             </div>
-            <div>
-              <button type="submit" class="btn btn-primary">Register</button>
+            <div style="display: flex; gap: 8px;">
+              <button type="submit" class="btn btn-primary">{{ editMode ? 'Update' : 'Register' }}</button>
+              <button v-if="editMode" @click="cancelEdit" type="button" class="btn btn-secondary">Cancel</button>
+              <button v-if="editMode" @click="handleDelete" type="button" class="btn btn-danger">Delete</button>
             </div>
           </div>
         </form>
@@ -52,6 +54,7 @@
               <th>Supplier ID</th>
               <th>Supplier Name</th>
               <th>Business Type</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -59,6 +62,10 @@
               <td>{{ supplier.supplier_id }}</td>
               <td>{{ supplier.supplier_name }}</td>
               <td>{{ supplier.supplier_business || '-' }}</td>
+              <td>
+                <button @click="editSupplier(supplier)" class="btn btn-sm btn-secondary" style="margin-right: 4px;">Edit</button>
+                <button @click="deleteSupplier(supplier)" class="btn btn-sm btn-danger">Delete</button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -78,6 +85,9 @@ const form = ref({
   supplier_name: '',
   supplier_business: '',
 })
+
+const editMode = ref(false)
+const editingSupplierId = ref(null)
 
 const allSuppliers = ref([])
 const searchQuery = ref('')
@@ -106,19 +116,72 @@ const loadSuppliers = async () => {
 
 const handleSubmit = async () => {
   try {
-    await api.post('/master/suppliers', form.value)
-    alert('Supplier registered successfully')
-    form.value = {
-      supplier_name: '',
-      supplier_business: '',
+    if (editMode.value) {
+      await api.put(`/master/suppliers/${editingSupplierId.value}`, form.value)
+      alert('Supplier updated successfully')
+      cancelEdit()
+    } else {
+      await api.post('/master/suppliers', form.value)
+      alert('Supplier registered successfully')
+      form.value = {
+        supplier_name: '',
+        supplier_business: '',
+      }
     }
     await loadSuppliers()
   } catch (error) {
-    console.error('Failed to create supplier:', error)
-    alert('Failed to register supplier')
+    console.error('Failed to save supplier:', error)
+    alert(editMode.value ? 'Failed to update supplier' : 'Failed to register supplier')
   }
 }
 
+const editSupplier = (supplier) => {
+  editMode.value = true
+  editingSupplierId.value = supplier.supplier_id
+  form.value = {
+    supplier_name: supplier.supplier_name,
+    supplier_business: supplier.supplier_business || '',
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const cancelEdit = () => {
+  editMode.value = false
+  editingSupplierId.value = null
+  form.value = {
+    supplier_name: '',
+    supplier_business: '',
+  }
+}
+
+const handleDelete = async () => {
+  if (!confirm('Are you sure you want to delete this supplier?')) {
+    return
+  }
+  try {
+    await api.delete(`/master/suppliers/${editingSupplierId.value}`)
+    alert('Supplier deleted successfully')
+    cancelEdit()
+    await loadSuppliers()
+  } catch (error) {
+    console.error('Failed to delete supplier:', error)
+    alert('Failed to delete supplier')
+  }
+}
+
+const deleteSupplier = async (supplier) => {
+  if (!confirm(`Are you sure you want to delete "${supplier.supplier_name}"?`)) {
+    return
+  }
+  try {
+    await api.delete(`/master/suppliers/${supplier.supplier_id}`)
+    alert('Supplier deleted successfully')
+    await loadSuppliers()
+  } catch (error) {
+    console.error('Failed to delete supplier:', error)
+    alert('Failed to delete supplier')
+  }
+}
 
 const downloadCSV = async () => {
   try {
@@ -173,5 +236,19 @@ h2 {
   text-align: center;
   padding: var(--spacing-2xl);
   color: var(--text-secondary);
+}
+
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.btn-danger {
+  background: var(--error);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c0392b;
 }
 </style>

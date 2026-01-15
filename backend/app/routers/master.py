@@ -491,6 +491,42 @@ async def create_supplier(
     return db_supplier
 
 
+@router.put("/suppliers/{supplier_id}", response_model=supplier_schema.SupplierResponse)
+async def update_supplier(
+    supplier_id: int,
+    supplier: supplier_schema.SupplierUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    db_supplier = db.query(Supplier).filter(Supplier.supplier_id == supplier_id).first()
+    if not db_supplier:
+        raise HTTPException(status_code=404, detail="Supplier not found")
+
+    update_data = supplier.model_dump(exclude_unset=True)
+    update_data['user'] = current_user['username']
+    for key, value in update_data.items():
+        setattr(db_supplier, key, value)
+
+    db.commit()
+    db.refresh(db_supplier)
+    return db_supplier
+
+
+@router.delete("/suppliers/{supplier_id}")
+async def delete_supplier(
+    supplier_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    db_supplier = db.query(Supplier).filter(Supplier.supplier_id == supplier_id).first()
+    if not db_supplier:
+        raise HTTPException(status_code=404, detail="Supplier not found")
+
+    db.delete(db_supplier)
+    db.commit()
+    return {"message": "Supplier deleted successfully"}
+
+
 # ==================== Autocomplete Endpoints ====================
 @router.get("/autocomplete/customers")
 async def autocomplete_customers(
