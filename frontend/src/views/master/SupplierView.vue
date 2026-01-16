@@ -63,8 +63,7 @@
               <td>{{ supplier.supplier_name }}</td>
               <td>{{ supplier.supplier_business || '-' }}</td>
               <td>
-                <button @click="editSupplier(supplier)" class="btn btn-sm btn-secondary" style="margin-right: 4px;">Edit</button>
-                <button @click="deleteSupplier(supplier)" class="btn btn-sm btn-danger">Delete</button>
+                <button @click="editSupplier(supplier)" class="btn btn-sm btn-secondary">Edit</button>
               </td>
             </tr>
           </tbody>
@@ -162,20 +161,6 @@ const handleDelete = async () => {
     await api.delete(`/master/suppliers/${editingSupplierId.value}`)
     alert('Supplier deleted successfully')
     cancelEdit()
-    await loadSuppliers()
-  } catch (error) {
-    console.error('Failed to delete supplier:', error)
-    alert('Failed to delete supplier')
-  }
-}
-
-const deleteSupplier = async (supplier) => {
-  if (!confirm(`Are you sure you want to delete "${supplier.supplier_name}"?`)) {
-    return
-  }
-  try {
-    await api.delete(`/master/suppliers/${supplier.supplier_id}`)
-    alert('Supplier deleted successfully')
     await loadSuppliers()
   } catch (error) {
     console.error('Failed to delete supplier:', error)
