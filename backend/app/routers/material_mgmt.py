@@ -102,7 +102,7 @@ async def get_material_forms(
     current_user: dict = Depends(get_current_user)
 ):
     """Get all material forms"""
-    return db.query(MaterialForm).all()
+    return db.query(MaterialForm).order_by(MaterialForm.material_form_id).all()
 
 
 @router.post("/material-forms", response_model=schema.MaterialFormResponse)
@@ -116,11 +116,54 @@ async def create_material_form(
     if existing:
         raise HTTPException(status_code=400, detail="Material form code already exists")
 
-    db_item = MaterialForm(**material_form.model_dump())
+    data = material_form.model_dump()
+    data['user'] = current_user['username']
+    db_item = MaterialForm(**data)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
     return db_item
+
+
+@router.put("/material-forms/{material_form_id}", response_model=schema.MaterialFormResponse)
+async def update_material_form(
+    material_form_id: int,
+    material_form: schema.MaterialFormUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """Update a material form"""
+    db_item = db.query(MaterialForm).filter(MaterialForm.material_form_id == material_form_id).first()
+    if not db_item:
+        raise HTTPException(status_code=404, detail="Material form not found")
+
+    for key, value in material_form.model_dump(exclude_unset=True).items():
+        setattr(db_item, key, value)
+    db_item.user = current_user['username']
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+
+@router.delete("/material-forms/{material_form_id}")
+async def delete_material_form(
+    material_form_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete a material form"""
+    db_item = db.query(MaterialForm).filter(MaterialForm.material_form_id == material_form_id).first()
+    if not db_item:
+        raise HTTPException(status_code=404, detail="Material form not found")
+
+    # Check for related specs
+    specs_count = db.query(MaterialSpec).filter(MaterialSpec.material_form_id == material_form_id).count()
+    if specs_count > 0:
+        raise HTTPException(status_code=400, detail="Cannot delete material form with associated specs")
+
+    db.delete(db_item)
+    db.commit()
+    return {"message": "Material form deleted successfully"}
 
 
 # ==================== Material Specs ====================
@@ -142,7 +185,7 @@ async def get_material_specs(
     result = []
     for s in specs:
         material_type = db.query(MaterialType).filter(MaterialType.material_type_id == s.material_type_id).first()
-        material_form = db.query(MaterialForm).filter(MaterialForm.material_form_code == s.material_form_code).first()
+        material_form = db.query(MaterialForm).filter(MaterialForm.material_form_id == s.material_form_id).first()
         result.append({
             **s.__dict__,
             "material_name": material_type.material_name if material_type else None,
@@ -231,7 +274,7 @@ async def get_material_items(
         material_form = None
         if spec:
             material_type = db.query(MaterialType).filter(MaterialType.material_type_id == spec.material_type_id).first()
-            material_form = db.query(MaterialForm).filter(MaterialForm.material_form_code == spec.material_form_code).first()
+            material_form = db.query(MaterialForm).filter(MaterialForm.material_form_id == spec.material_form_id).first()
 
         result.append({
             **item.__dict__,

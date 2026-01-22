@@ -22,8 +22,11 @@ class MaterialForm(Base):
     """Material form master (COIL, SHEET, etc.)"""
     __tablename__ = "material_forms"
 
-    material_form_code = Column(String(20), primary_key=True, index=True)
+    material_form_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    material_form_code = Column(String(20), nullable=False, unique=True, index=True)
     form_name = Column(String(50), nullable=False)
+    timestamp = Column(DateTime, server_default=func.now(), onupdate=func.now())
+    user = Column(String(100))
 
     # Relationships
     specs = relationship("MaterialSpec", back_populates="material_form")
@@ -35,7 +38,7 @@ class MaterialSpec(Base):
 
     material_spec_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     material_type_id = Column(Integer, ForeignKey("material_types.material_type_id"), nullable=False, index=True)
-    material_form_code = Column(String(20), ForeignKey("material_forms.material_form_code"), nullable=False, index=True)
+    material_form_id = Column(Integer, ForeignKey("material_forms.material_form_id"), nullable=False, index=True)
 
     # Dimensions
     thickness_mm = Column(Numeric(10, 3))

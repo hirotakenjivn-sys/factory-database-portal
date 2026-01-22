@@ -460,14 +460,18 @@ CREATE TABLE `material_types` (
 -- 24. material_forms (材料形状マスタ)
 -- ================================================
 CREATE TABLE `material_forms` (
-  `material_form_code` VARCHAR(20) PRIMARY KEY,
-  `form_name` VARCHAR(50) NOT NULL
+  `material_form_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `material_form_code` VARCHAR(20) NOT NULL UNIQUE,
+  `form_name` VARCHAR(50) NOT NULL,
+  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user` VARCHAR(100),
+  INDEX `idx_material_form_code` (`material_form_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- デフォルト形状
-INSERT INTO `material_forms` (`material_form_code`, `form_name`) VALUES
-('COIL', 'Coil'),
-('SHEET', 'Sheet');
+INSERT INTO `material_forms` (`material_form_id`, `material_form_code`, `form_name`, `user`) VALUES
+(1, 'COIL', 'Coil', 'system'),
+(2, 'SHEET', 'Sheet', 'system');
 
 -- ================================================
 -- 25. material_specs (材料仕様)
@@ -475,7 +479,7 @@ INSERT INTO `material_forms` (`material_form_code`, `form_name`) VALUES
 CREATE TABLE `material_specs` (
   `material_spec_id` INT AUTO_INCREMENT PRIMARY KEY,
   `material_type_id` INT NOT NULL,
-  `material_form_code` VARCHAR(20) NOT NULL,
+  `material_form_id` INT NOT NULL,
   `thickness_mm` DECIMAL(10,3),
   `width_mm` DECIMAL(10,2),
   `length_mm` DECIMAL(10,2),
@@ -488,9 +492,9 @@ CREATE TABLE `material_specs` (
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user` VARCHAR(100),
   FOREIGN KEY (`material_type_id`) REFERENCES `material_types`(`material_type_id`),
-  FOREIGN KEY (`material_form_code`) REFERENCES `material_forms`(`material_form_code`),
+  FOREIGN KEY (`material_form_id`) REFERENCES `material_forms`(`material_form_id`),
   INDEX `idx_material_type` (`material_type_id`),
-  INDEX `idx_material_form` (`material_form_code`)
+  INDEX `idx_material_form` (`material_form_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================

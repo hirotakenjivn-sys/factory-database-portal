@@ -24,9 +24,9 @@
           </div>
           <div style="width: 120px; display: flex; flex-direction: column; gap: 2px;">
             <label class="form-label" style="margin-bottom: 0;">Form</label>
-            <select v-model="form.material_form_code" class="form-input" required>
+            <select v-model="form.material_form_id" class="form-input" required>
               <option :value="null">Select Form</option>
-              <option v-for="f in materialForms" :key="f.material_form_code" :value="f.material_form_code">
+              <option v-for="f in materialForms" :key="f.material_form_id" :value="f.material_form_id">
                 {{ f.form_name }}
               </option>
             </select>
@@ -141,7 +141,7 @@ import api from '../../utils/api'
 
 const form = ref({
   material_type_id: null,
-  material_form_code: null,
+  material_form_id: null,
   thickness_mm: null,
   width_mm: null,
   length_mm: null,
@@ -196,7 +196,7 @@ const handleEdit = (item) => {
   editingId.value = item.material_spec_id
   form.value = {
     material_type_id: item.material_type_id,
-    material_form_code: item.material_form_code,
+    material_form_id: item.material_form_id,
     thickness_mm: item.thickness_mm,
     width_mm: item.width_mm,
     length_mm: item.length_mm,
@@ -231,7 +231,7 @@ const cancelEdit = () => {
 const resetForm = () => {
   form.value = {
     material_type_id: null,
-    material_form_code: null,
+    material_form_id: null,
     thickness_mm: null,
     width_mm: null,
     length_mm: null,

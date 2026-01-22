@@ -35,17 +35,27 @@ class MaterialFormBase(BaseModel):
 
 
 class MaterialFormCreate(MaterialFormBase):
-    pass
+    user: Optional[str] = None
+
+
+class MaterialFormUpdate(BaseModel):
+    material_form_code: Optional[str] = None
+    form_name: Optional[str] = None
+    user: Optional[str] = None
 
 
 class MaterialFormResponse(MaterialFormBase):
+    material_form_id: int
+    timestamp: Optional[datetime] = None
+    user: Optional[str] = None
+
     model_config = ConfigDict(from_attributes=True)
 
 
 # ==================== Material Spec ====================
 class MaterialSpecBase(BaseModel):
     material_type_id: int
-    material_form_code: str
+    material_form_id: int
     thickness_mm: Optional[Decimal] = None
     width_mm: Optional[Decimal] = None
     length_mm: Optional[Decimal] = None
@@ -63,7 +73,7 @@ class MaterialSpecCreate(MaterialSpecBase):
 
 class MaterialSpecUpdate(BaseModel):
     material_type_id: Optional[int] = None
-    material_form_code: Optional[str] = None
+    material_form_id: Optional[int] = None
     thickness_mm: Optional[Decimal] = None
     width_mm: Optional[Decimal] = None
     length_mm: Optional[Decimal] = None

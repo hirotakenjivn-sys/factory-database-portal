@@ -100,7 +100,7 @@
     <!-- Material Forms Tab -->
     <div v-if="activeTab === 'forms'">
       <div class="card" style="margin-bottom: var(--spacing-lg)">
-        <h2>Register Material Form</h2>
+        <h2>{{ editingFormId ? 'Edit Material Form' : 'Register Material Form' }}</h2>
         <form @submit.prevent="handleFormSubmit">
           <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end;">
             <div style="width: 120px; display: flex; flex-direction: column; gap: 2px;">
@@ -112,7 +112,12 @@
               <input v-model="formForm.form_name" class="form-input" type="text" required placeholder="e.g., Coil" />
             </div>
             <div style="display: flex; gap: 8px;">
-              <button type="submit" class="btn btn-primary">Register</button>
+              <button type="submit" class="btn btn-primary">
+                {{ editingFormId ? 'Update' : 'Register' }}
+              </button>
+              <button v-if="editingFormId" type="button" class="btn btn-secondary" @click="cancelFormEdit">
+                Cancel
+              </button>
             </div>
           </div>
         </form>
@@ -123,14 +128,29 @@
         <table class="table">
           <thead>
             <tr>
+              <th>ID</th>
               <th>Form Code</th>
               <th>Form Name</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in materialForms" :key="item.material_form_code">
+            <tr v-for="item in materialForms" :key="item.material_form_id">
+              <td>{{ item.material_form_id }}</td>
               <td>{{ item.material_form_code }}</td>
               <td>{{ item.form_name }}</td>
+              <td>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-secondary btn-sm" @click="handleFormEdit(item)">Edit</button>
+                  <button
+                    v-if="editingFormId === item.material_form_id"
+                    class="btn btn-danger btn-sm"
+                    @click="handleFormDelete(item.material_form_id)"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -157,6 +177,7 @@ const typeSearch = ref('')
 
 // Material Form
 const formForm = ref({ material_form_code: '', form_name: '' })
+const editingFormId = ref(null)
 const materialForms = ref([])
 
 const loadTypes = async () => {
@@ -228,15 +249,49 @@ const resetTypeForm = () => {
 
 const handleFormSubmit = async () => {
   try {
-    await api.post('/material/material-forms', formForm.value)
-    alert('Material form registered successfully')
-    formForm.value = { material_form_code: '', form_name: '' }
+    if (editingFormId.value) {
+      await api.put(`/material/material-forms/${editingFormId.value}`, formForm.value)
+      alert('Material form updated successfully')
+    } else {
+      await api.post('/material/material-forms', formForm.value)
+      alert('Material form registered successfully')
+    }
+    resetFormForm()
     await loadForms()
   } catch (error) {
     console.error('Failed to save material form:', error)
     const detail = error.response?.data?.detail || 'Failed to save material form'
     alert(detail)
   }
+}
+
+const handleFormEdit = (item) => {
+  editingFormId.value = item.material_form_id
+  formForm.value = { material_form_code: item.material_form_code, form_name: item.form_name }
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const handleFormDelete = async (id) => {
+  if (!confirm('Are you sure you want to delete this material form?')) return
+  try {
+    await api.delete(`/material/material-forms/${id}`)
+    alert('Material form deleted successfully')
+    resetFormForm()
+    await loadForms()
+  } catch (error) {
+    console.error('Failed to delete material form:', error)
+    const detail = error.response?.data?.detail || 'Failed to delete material form'
+    alert(detail)
+  }
+}
+
+const cancelFormEdit = () => {
+  resetFormForm()
+}
+
+const resetFormForm = () => {
+  formForm.value = { material_form_code: '', form_name: '' }
+  editingFormId.value = null
 }
 
 onMounted(() => {
