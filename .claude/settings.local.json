@@ -22,7 +22,8 @@
       "Bash(npx vite build)",
       "Bash(npm install:*)",
       "Bash(dir \"C:\\\\Users\\\\PCPV\\\\factory-database-portal\"\")",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(npx vite:*)"
     ]
   }
 }
