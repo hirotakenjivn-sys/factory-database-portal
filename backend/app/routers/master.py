@@ -39,24 +39,31 @@ router = APIRouter()
 @router.get("/table-counts")
 async def get_table_counts(db: Session = Depends(get_db)):
     """Get record counts for all master tables"""
+    def safe_count(model):
+        try:
+            return db.query(model).count()
+        except Exception:
+            db.rollback()
+            return None  # null = エラー、0 = データなし
+
     return {
-        "customers": db.query(Customer).count(),
-        "products": db.query(Product).count(),
-        "employees": db.query(Employee).count(),
-        "suppliers": db.query(Supplier).count(),
-        "process_name_types": db.query(ProcessNameType).count(),
-        "material_rates": db.query(MaterialRate).count(),
-        "machine_list": db.query(MachineList).count(),
-        "cycletimes": db.query(Cycletime).count(),
-        "calendar": db.query(Calendar).count(),
-        "processes": db.query(Process).count(),
+        "customers": safe_count(Customer),
+        "products": safe_count(Product),
+        "employees": safe_count(Employee),
+        "suppliers": safe_count(Supplier),
+        "process_name_types": safe_count(ProcessNameType),
+        "material_rates": safe_count(MaterialRate),
+        "machine_list": safe_count(MachineList),
+        "cycletimes": safe_count(Cycletime),
+        "calendar": safe_count(Calendar),
+        "processes": safe_count(Process),
         # Material Management
-        "material_types": db.query(MaterialType).count(),
-        "material_specs": db.query(MaterialSpec).count(),
-        "material_items": db.query(MaterialItem).count(),
-        "material_lots": db.query(MaterialLot).count(),
-        "material_transactions": db.query(MaterialTransaction).count(),
-        "material_stock": db.query(MaterialStockSnapshot).count(),
+        "material_types": safe_count(MaterialType),
+        "material_specs": safe_count(MaterialSpec),
+        "material_items": safe_count(MaterialItem),
+        "material_lots": safe_count(MaterialLot),
+        "material_transactions": safe_count(MaterialTransaction),
+        "material_stock": safe_count(MaterialStockSnapshot),
     }
 
 

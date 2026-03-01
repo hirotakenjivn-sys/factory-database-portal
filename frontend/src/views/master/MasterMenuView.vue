@@ -10,7 +10,7 @@
           class="card master-menu-card"
         >
           <span class="menu-icon">{{ menu.icon }}</span>
-          <h3>{{ menu.label }}<template v-if="menu.key"> ({{ counts[menu.key] ?? '-' }})</template></h3>
+          <h3>{{ menu.label }}<template v-if="menu.key"> (<span v-if="counts[menu.key] === null" class="count-error">ERR</span><template v-else>{{ counts[menu.key] ?? '-' }}</template>)</template></h3>
         </router-link>
       </div>
   </AppLayout>
@@ -83,5 +83,10 @@ onMounted(() => {
 .master-menu-card h3 {
   color: var(--primary);
   margin: 0;
+}
+
+.count-error {
+  color: var(--danger, #e74c3c);
+  font-weight: bold;
 }
 </style>
