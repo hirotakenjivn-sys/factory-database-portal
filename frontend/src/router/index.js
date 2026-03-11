@@ -8,6 +8,7 @@ import MoldView from '../views/MoldView.vue'
 import ScheduleView from '../views/ScheduleView.vue'
 import TraceView from '../views/TraceView.vue'
 import OutsourceView from '../views/OutsourceView.vue'
+import FactoryView from '../views/FactoryView.vue'
 import MasterMenuView from '../views/master/MasterMenuView.vue'
 import CustomerView from '../views/master/CustomerView.vue'
 import ProductView from '../views/master/ProductView.vue'
@@ -79,6 +80,12 @@ const router = createRouter({
       path: '/trace',
       name: 'Trace',
       component: TraceView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/factory',
+      name: 'Factory',
+      component: FactoryView,
       meta: { requiresAuth: true },
     },
     {

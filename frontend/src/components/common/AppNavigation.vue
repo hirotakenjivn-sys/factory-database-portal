@@ -55,7 +55,8 @@ const displayName = computed(() => {
 const navItems = [
   { name: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: '📊' },
   { name: 'trace', label: 'Trace', path: '/trace', icon: '🔍' },
-  { name: 'outsource', label: 'Outsource', path: '/outsource', icon: '🏭' },
+  { name: 'factory', label: 'Factory', path: '/factory', icon: '🏭' },
+  { name: 'outsource', label: 'Outsource', path: '/outsource', icon: '📤' },
   { name: 'schedule', label: 'Schedule', path: '/schedule', icon: '📅' },
   { name: 'sales', label: 'Sales', path: '/sales', icon: '💰' },
   { name: 'warehouse', label: 'Warehouse', path: '/warehouse', icon: '📦' },
