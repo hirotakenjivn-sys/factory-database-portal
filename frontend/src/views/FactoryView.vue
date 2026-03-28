@@ -147,7 +147,7 @@ const machineStatus = ref([
 
 // Factory SVG layout — presses
 const presses = [
-  { id: '28',   x: 222, y: 141, w: 30,  h: 15,  tx: 237,   ty: 148.5, fs: 10, label: '28' },
+  { id: '11',   x: 222, y: 141, w: 30,  h: 15,  tx: 237,   ty: 148.5, fs: 10, label: '11' },
   { id: '18',   x: 252, y: 141, w: 30,  h: 15,  tx: 267,   ty: 148.5, fs: 10, label: '18' },
   { id: '17',   x: 222, y: 170, w: 60,  h: 15,  tx: 252,   ty: 177.5, fs: 10, label: '17' },
   { id: '16',   x: 222, y: 200, w: 60,  h: 15,  tx: 252,   ty: 207.5, fs: 10, label: '16' },
@@ -155,7 +155,7 @@ const presses = [
   { id: '14',   x: 222, y: 260, w: 60,  h: 15,  tx: 252,   ty: 267.5, fs: 10, label: '14' },
   { id: '12-B', x: 222, y: 290, w: 60,  h: 15,  tx: 252,   ty: 297.5, fs: 10, label: '12-B' },
   { id: '12',   x: 222, y: 320, w: 60,  h: 15,  tx: 252,   ty: 327.5, fs: 10, label: '12' },
-  { id: '11',   x: 222, y: 348, w: 60,  h: 15,  tx: 252,   ty: 355.5, fs: 10, label: '11' },
+  { id: '28',   x: 222, y: 348, w: 60,  h: 15,  tx: 252,   ty: 355.5, fs: 10, label: '28' },
   { id: '10',   x: 312, y: 170, w: 34,  h: 15,  tx: 329,   ty: 177.5, fs: 10, label: '10' },
   { id: '9',    x: 312, y: 185, w: 34,  h: 15,  tx: 329,   ty: 192.5, fs: 10, label: '9' },
   { id: '8',    x: 312, y: 200, w: 34,  h: 15,  tx: 329,   ty: 207.5, fs: 10, label: '8' },
