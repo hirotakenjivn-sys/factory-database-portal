@@ -131,18 +131,24 @@
         </div>
 
         <div class="table-scroll-container">
-          <table class="table process-table">
+          <table class="table process-table" :style="{ width: tableWidth + 'px' }">
             <thead>
               <tr>
-                <th class="sticky-col">Customer Name</th>
-                <th class="sticky-col-2">Product Code</th>
+                <th class="sticky-col resizable-col" :style="{ width: colWidths.customer + 'px' }">
+                  Customer Name
+                  <span class="resize-handle" @mousedown.prevent="startResize($event, 'customer')"></span>
+                </th>
+                <th class="sticky-col-2 resizable-col" :style="{ width: colWidths.product + 'px', left: colWidths.customer + 'px' }">
+                  Product Code
+                  <span class="resize-handle" @mousedown.prevent="startResize($event, 'product')"></span>
+                </th>
                 <th v-for="i in 20" :key="i">Process {{ i }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="product in filteredProcessTable" :key="product.product_id">
-                <td class="sticky-col">{{ product.customer_name }}</td>
-                <td class="sticky-col-2" @click="selectProductForForm(product)" style="cursor: pointer; color: var(--primary);">
+                <td class="sticky-col" :style="{ width: colWidths.customer + 'px' }">{{ product.customer_name }}</td>
+                <td class="sticky-col-2" :style="{ width: colWidths.product + 'px', left: colWidths.customer + 'px' }" @click="selectProductForForm(product)" style="cursor: pointer; color: var(--primary);">
                   {{ product.product_code }}
                 </td>
                 <td
@@ -226,7 +232,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import AppLayout from '../components/common/AppLayout.vue'
 import AutocompleteInput from '../components/common/AutocompleteInput.vue'
 import CopyableText from '../components/common/CopyableText.vue'
@@ -266,6 +272,51 @@ const sortConfig = ref({
 })
 
 const showOnlyHighlighted = ref(false)
+
+// Column widths for resizable columns (box-sizing: border-box, padding込みの幅)
+// Customer Name: 列名幅相当 (~130px), Product Code: 列名幅 x 1.5 (~180px)
+const colWidths = ref({
+  customer: 130,
+  product: 180,
+})
+
+// テーブル全体の幅 = sticky2列 + Process20列(各100px)
+const tableWidth = computed(() => colWidths.value.customer + colWidths.value.product + 20 * 100)
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousemove', onResize)
+  document.removeEventListener('mouseup', stopResize)
+})
+
+// Column resize logic
+let resizingCol = null
+let resizeStartX = 0
+let resizeStartWidth = 0
+
+const startResize = (event, col) => {
+  resizingCol = col
+  resizeStartX = event.clientX
+  resizeStartWidth = colWidths.value[col]
+  document.addEventListener('mousemove', onResize)
+  document.addEventListener('mouseup', stopResize)
+  document.body.style.cursor = 'col-resize'
+  document.body.style.userSelect = 'none'
+}
+
+const onResize = (event) => {
+  if (!resizingCol) return
+  const diff = event.clientX - resizeStartX
+  const newWidth = Math.max(60, resizeStartWidth + diff)
+  colWidths.value[resizingCol] = newWidth
+}
+
+const stopResize = () => {
+  resizingCol = null
+  document.removeEventListener('mousemove', onResize)
+  document.removeEventListener('mouseup', stopResize)
+  document.body.style.cursor = ''
+  document.body.style.userSelect = ''
+}
 
 const processList = ref([])
 const processTable = ref([])
@@ -723,6 +774,11 @@ const isPressSetIncomplete = (product, processName) => {
 </script>
 
 <style scoped>
+/* Widen the display area for this page */
+:deep(.app-main) {
+  max-width: 100%;
+}
+
 .page-title {
   margin-bottom: var(--spacing-lg);
 }
@@ -771,34 +827,62 @@ h2 {
 }
 
 .process-table {
-  min-width: 1500px;
+  table-layout: fixed;
 }
 
 .process-table th,
 .process-table td {
-  min-width: 100px;
+  width: 100px;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.process-table .sticky-col,
+.process-table .sticky-col-2 {
+  max-width: none;
+}
+
+.sticky-col,
+.sticky-col-2 {
+  position: sticky;
+  background: white;
+  z-index: 2;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .sticky-col {
-  position: sticky;
   left: 0;
-  background: white;
-  z-index: 2;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
 .sticky-col-2 {
-  position: sticky;
-  left: 120px;
-  background: white;
-  z-index: 2;
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
 .process-table thead .sticky-col,
 .process-table thead .sticky-col-2 {
   background: #f8f9fa;
+}
+
+.resizable-col {
+  /* position: sticky already creates a containing block for absolute children */
+}
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  cursor: col-resize;
+  background: transparent;
+}
+
+.resize-handle:hover {
+  background: var(--primary);
+  opacity: 0.3;
 }
 
 .empty-state {

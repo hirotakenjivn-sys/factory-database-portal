@@ -23,7 +23,16 @@
       "Bash(npm install:*)",
       "Bash(dir \"C:\\\\Users\\\\PCPV\\\\factory-database-portal\"\")",
       "Bash(dir:*)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "WebFetch(domain:localhost)",
+      "Bash(npx --yes playwright --version)",
+      "Bash(npx --yes puppeteer --version)",
+      "Bash(node -e \"try{require\\(''puppeteer''\\);console.log\\(''puppeteer available''\\)}catch\\(e\\){console.log\\(''no puppeteer module''\\)}\")",
+      "Bash(node:*)",
+      "Bash(npx playwright:*)",
+      "Bash(find . -maxdepth 2 -name .env* -o -name *.env)",
+      "Bash(find frontend/src -name *login* -o -name *auth*)",
+      "Bash(find . -name docker-compose* -o -name *.sql)"
     ]
   }
 }
