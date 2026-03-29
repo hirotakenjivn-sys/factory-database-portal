@@ -1,7 +1,11 @@
 # CLAUDE.md - Factory Database Portal
 
 ## プロジェクト概要
-工場管理データベースポータル。受注(PO)管理、生産スケジューリング、工程管理、トレース、倉庫出荷、金型管理、材料管理を統合したWebアプリ。
+工場管理データベースポータル。受注(PO)管理、生産スケジューリング、工程管理、トレース、倉庫出荷、金型管理、材料管理を統合したWebアプリ。**本番ローンチ済み。**
+
+## 環境
+- **開発環境**: Windows 11 + VS Code (Claude Code拡張)
+- **本番環境**: Vittel IDC (Docker Compose デプロイ)
 
 ## 技術スタック
 - **Backend**: FastAPI + SQLAlchemy 2.0 + PyMySQL (Python 3.11)
