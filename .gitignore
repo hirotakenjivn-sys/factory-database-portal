@@ -67,3 +67,4 @@ logs/
 .coverage
 htmlcov/
 .pytest_cache/
+backup.sql
