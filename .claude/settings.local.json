@@ -32,7 +32,10 @@
       "Bash(npx playwright:*)",
       "Bash(find . -maxdepth 2 -name .env* -o -name *.env)",
       "Bash(find frontend/src -name *login* -o -name *auth*)",
-      "Bash(find . -name docker-compose* -o -name *.sql)"
+      "Bash(find . -name docker-compose* -o -name *.sql)",
+      "Bash(start:*)",
+      "Bash(find /c/Users/PCPV/factory-database-portal/factory-database-portal/frontend/src/views -type f -name *actory*)",
+      "Bash(find /c/Users/PCPV/factory-database-portal/factory-database-portal/frontend/src/components -type f -name *actory*)"
     ]
   }
 }

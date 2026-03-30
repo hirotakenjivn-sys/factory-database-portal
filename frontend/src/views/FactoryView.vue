@@ -3,6 +3,16 @@
       <div class="factory-header">
         <router-link to="/dashboard" class="back-btn">&larr;</router-link>
         <h1 class="page-title">Factory</h1>
+        <div class="header-actions">
+          <button
+            :class="['header-btn', { active: activeView === 'data' }]"
+            @click="activeView = 'data'"
+          >Data</button>
+          <button
+            :class="['header-btn', { active: activeView === 'graph' }]"
+            @click="activeView = 'graph'"
+          >Graph</button>
+        </div>
       </div>
 
       <!-- Machine Status Section -->
@@ -10,43 +20,44 @@
         <div class="layout-container">
           <div class="svg-column">
           <svg viewBox="0 0 362 432" class="factory-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Factory layout">
+
             <!-- Areas (static) -->
             <g>
-              <rect x="13" y="10" width="179" height="86" class="area"/>
+              <rect x="13" y="10" width="179" height="86" class="area" rx="2"/>
               <text x="102.5" y="53.0" class="area-text">MOLD</text>
 
-              <rect x="222" y="10" width="124" height="115" class="area"/>
+              <rect x="222" y="10" width="124" height="115" class="area" rx="2"/>
               <text x="284.0" y="67.5" class="area-text">Wire cutting room</text>
 
-              <rect x="13" y="110" width="90" height="15" class="area"/>
+              <rect x="13" y="110" width="90" height="15" class="area" rx="2"/>
               <text x="58.0" y="117.5" class="area-text">Milling</text>
 
-              <rect x="13" y="125" width="90" height="31" class="area"/>
+              <rect x="13" y="125" width="90" height="31" class="area" rx="2"/>
               <text x="58.0" y="140.5" class="area-text">CNC Toshiba</text>
 
-              <rect x="13" y="155" width="119" height="30" class="area"/>
+              <rect x="13" y="155" width="119" height="30" class="area" rx="2"/>
               <text x="72.5" y="170.0" class="area-text">Grinding</text>
 
-              <rect x="132" y="110" width="60" height="60" class="area"/>
+              <rect x="132" y="110" width="60" height="60" class="area" rx="2"/>
               <text x="162.0" y="140.0" class="area-text">CNC</text>
 
-              <rect x="132" y="200" width="60" height="45" class="area"/>
-              <text x="162.0" y="210.9" class="area-text">
-                <tspan x="162.0" y="210.9">molding</tspan>
-                <tspan x="162.0" y="223.6">work space</tspan>
+              <rect x="132" y="200" width="60" height="45" class="area" rx="2"/>
+              <text x="162.0" y="214" class="area-text">
+                <tspan x="162.0" y="214">molding</tspan>
+                <tspan x="162.0" y="224">work space</tspan>
               </text>
 
-              <rect x="132" y="275" width="60" height="45" class="area"/>
-              <text x="162.0" y="285.9" class="area-text">
-                <tspan x="162.0" y="285.9">Mold</tspan>
-                <tspan x="162.0" y="298.6">warehouse</tspan>
+              <rect x="132" y="275" width="60" height="45" class="area" rx="2"/>
+              <text x="162.0" y="289" class="area-text">
+                <tspan x="162.0" y="289">Mold</tspan>
+                <tspan x="162.0" y="299">warehouse</tspan>
               </text>
             </g>
 
             <!-- Tag (static label) -->
             <g>
-              <rect x="162" y="170" width="30" height="15" class="tag"/>
-              <text x="177.0" y="177.5" class="press-text">PRES</text>
+              <rect x="162" y="170" width="30" height="15" class="tag" rx="2"/>
+              <text x="177.0" y="177.5" class="press-text">Press</text>
             </g>
 
             <!-- Presses (Vue reactive) -->
@@ -54,6 +65,7 @@
               <g v-for="p in presses" :key="p.id" @click="selectPress(p.id)" style="cursor:pointer">
                 <rect
                   :x="p.x" :y="p.y" :width="p.w" :height="p.h"
+                  rx="4"
                   :class="['press-rect', 'status-' + pressStatus[p.id], { selected: selectedPressId === pressIdToNo(p.id) }]"
                 />
                 <text
@@ -91,6 +103,8 @@
                 :key="machine.no"
                 :ref="el => { if (el) rowRefs[machine.no] = el }"
                 :class="{ 'row-selected': selectedPressId === machine.no }"
+                style="cursor:pointer"
+                @click="selectRow(machine.no)"
               >
                 <td>{{ machine.no }}</td>
                 <td>{{ machine.pressure }}</td>
@@ -111,6 +125,8 @@
 
 <script setup>
 import { ref, reactive, nextTick } from 'vue'
+
+const activeView = ref('data')
 
 // Machine list — No & Pressure populated, others blank
 const machineStatus = ref([
@@ -147,35 +163,35 @@ const machineStatus = ref([
 
 // Factory SVG layout — presses
 const presses = [
-  { id: '11',   x: 222, y: 141, w: 30,  h: 15,  tx: 237,   ty: 148.5, fs: 10, label: '11' },
-  { id: '18',   x: 252, y: 141, w: 30,  h: 15,  tx: 267,   ty: 148.5, fs: 10, label: '18' },
-  { id: '17',   x: 222, y: 170, w: 60,  h: 15,  tx: 252,   ty: 177.5, fs: 10, label: '17' },
-  { id: '16',   x: 222, y: 200, w: 60,  h: 15,  tx: 252,   ty: 207.5, fs: 10, label: '16' },
-  { id: '15',   x: 222, y: 230, w: 60,  h: 15,  tx: 252,   ty: 237.5, fs: 10, label: '15' },
-  { id: '14',   x: 222, y: 260, w: 60,  h: 15,  tx: 252,   ty: 267.5, fs: 10, label: '14' },
-  { id: '12-B', x: 222, y: 290, w: 60,  h: 15,  tx: 252,   ty: 297.5, fs: 10, label: '12-B' },
-  { id: '12',   x: 222, y: 320, w: 60,  h: 15,  tx: 252,   ty: 327.5, fs: 10, label: '12' },
-  { id: '28',   x: 222, y: 348, w: 60,  h: 15,  tx: 252,   ty: 355.5, fs: 10, label: '28' },
-  { id: '10',   x: 312, y: 170, w: 34,  h: 15,  tx: 329,   ty: 177.5, fs: 10, label: '10' },
-  { id: '9',    x: 312, y: 185, w: 34,  h: 15,  tx: 329,   ty: 192.5, fs: 10, label: '9' },
-  { id: '8',    x: 312, y: 200, w: 34,  h: 15,  tx: 329,   ty: 207.5, fs: 10, label: '8' },
-  { id: '7',    x: 312, y: 215, w: 34,  h: 15,  tx: 329,   ty: 222.5, fs: 10, label: '7' },
-  { id: '6',    x: 312, y: 230, w: 34,  h: 15,  tx: 329,   ty: 237.5, fs: 10, label: '6' },
-  { id: '5',    x: 312, y: 260, w: 34,  h: 15,  tx: 329,   ty: 267.5, fs: 10, label: '5' },
-  { id: '4',    x: 312, y: 275, w: 34,  h: 15,  tx: 329,   ty: 282.5, fs: 10, label: '4' },
-  { id: '3',    x: 312, y: 290, w: 34,  h: 15,  tx: 329,   ty: 297.5, fs: 10, label: '3' },
-  { id: '2',    x: 312, y: 320, w: 34,  h: 15,  tx: 329,   ty: 327.5, fs: 10, label: '2' },
-  { id: '1',    x: 312, y: 335, w: 34,  h: 13,  tx: 329,   ty: 341.5, fs: 9,  label: '1' },
-  { id: '30',   x: 13,  y: 200, w: 30,  h: 60,  tx: 28,    ty: 230,   fs: 13, label: '30' },
-  { id: '31',   x: 13,  y: 260, w: 30,  h: 60,  tx: 28,    ty: 290,   fs: 13, label: '31' },
-  { id: '24',   x: 13,  y: 320, w: 30,  h: 43,  tx: 28,    ty: 341.5, fs: 13, label: '24' },
-  { id: '21',   x: 73,  y: 245, w: 30,  h: 60,  tx: 88,    ty: 275,   fs: 13, label: '21' },
-  { id: '25',   x: 73,  y: 305, w: 30,  h: 58,  tx: 88,    ty: 334,   fs: 13, label: '25' },
-  { id: '19',   x: 102, y: 215, w: 30,  h: 148, tx: 117,   ty: 289,   fs: 13, label: '19' },
-  { id: '23',   x: 132, y: 320, w: 60,  h: 28,  tx: 162,   ty: 334,   fs: 13, label: '23' },
-  { id: '22',   x: 102, y: 363, w: 90,  h: 30,  tx: 147,   ty: 378,   fs: 13, label: '22' },
-  { id: '27',   x: 222, y: 378, w: 124, h: 15,  tx: 284,   ty: 385.5, fs: 10, label: '27' },
-  { id: '26',   x: 222, y: 408, w: 124, h: 15,  tx: 284,   ty: 415.5, fs: 10, label: '26' },
+  { id: '11',   x: 222, y: 141, w: 30,  h: 15,  tx: 237,   ty: 148.5, fs: 8,  label: '11' },
+  { id: '18',   x: 252, y: 141, w: 30,  h: 15,  tx: 267,   ty: 148.5, fs: 8,  label: '18' },
+  { id: '17',   x: 222, y: 170, w: 60,  h: 15,  tx: 252,   ty: 177.5, fs: 8,  label: '17' },
+  { id: '16',   x: 222, y: 200, w: 60,  h: 15,  tx: 252,   ty: 207.5, fs: 8,  label: '16' },
+  { id: '15',   x: 222, y: 230, w: 60,  h: 15,  tx: 252,   ty: 237.5, fs: 8,  label: '15' },
+  { id: '14',   x: 222, y: 260, w: 60,  h: 15,  tx: 252,   ty: 267.5, fs: 8,  label: '14' },
+  { id: '12-B', x: 222, y: 290, w: 60,  h: 15,  tx: 252,   ty: 297.5, fs: 8,  label: '12-B' },
+  { id: '12',   x: 222, y: 320, w: 60,  h: 15,  tx: 252,   ty: 327.5, fs: 8,  label: '12' },
+  { id: '28',   x: 222, y: 348, w: 60,  h: 15,  tx: 252,   ty: 355.5, fs: 8,  label: '28' },
+  { id: '10',   x: 312, y: 170, w: 34,  h: 15,  tx: 329,   ty: 177.5, fs: 8,  label: '10' },
+  { id: '9',    x: 312, y: 185, w: 34,  h: 15,  tx: 329,   ty: 192.5, fs: 8,  label: '9' },
+  { id: '8',    x: 312, y: 200, w: 34,  h: 15,  tx: 329,   ty: 207.5, fs: 8,  label: '8' },
+  { id: '7',    x: 312, y: 215, w: 34,  h: 15,  tx: 329,   ty: 222.5, fs: 8,  label: '7' },
+  { id: '6',    x: 312, y: 230, w: 34,  h: 15,  tx: 329,   ty: 237.5, fs: 8,  label: '6' },
+  { id: '5',    x: 312, y: 260, w: 34,  h: 15,  tx: 329,   ty: 267.5, fs: 8,  label: '5' },
+  { id: '4',    x: 312, y: 275, w: 34,  h: 15,  tx: 329,   ty: 282.5, fs: 8,  label: '4' },
+  { id: '3',    x: 312, y: 290, w: 34,  h: 15,  tx: 329,   ty: 297.5, fs: 8,  label: '3' },
+  { id: '2',    x: 312, y: 320, w: 34,  h: 15,  tx: 329,   ty: 327.5, fs: 8,  label: '2' },
+  { id: '1',    x: 312, y: 335, w: 34,  h: 13,  tx: 329,   ty: 341.5, fs: 7,  label: '1' },
+  { id: '30',   x: 13,  y: 200, w: 30,  h: 60,  tx: 28,    ty: 230,   fs: 10, label: '30' },
+  { id: '31',   x: 13,  y: 260, w: 30,  h: 60,  tx: 28,    ty: 290,   fs: 10, label: '31' },
+  { id: '24',   x: 13,  y: 320, w: 30,  h: 43,  tx: 28,    ty: 341.5, fs: 10, label: '24' },
+  { id: '21',   x: 73,  y: 245, w: 30,  h: 60,  tx: 88,    ty: 275,   fs: 10, label: '21' },
+  { id: '25',   x: 73,  y: 305, w: 30,  h: 58,  tx: 88,    ty: 334,   fs: 10, label: '25' },
+  { id: '19',   x: 102, y: 215, w: 30,  h: 148, tx: 117,   ty: 289,   fs: 10, label: '19' },
+  { id: '23',   x: 132, y: 320, w: 60,  h: 28,  tx: 162,   ty: 334,   fs: 10, label: '23' },
+  { id: '22',   x: 102, y: 363, w: 90,  h: 30,  tx: 147,   ty: 378,   fs: 10, label: '22' },
+  { id: '27',   x: 222, y: 378, w: 124, h: 15,  tx: 284,   ty: 385.5, fs: 8,  label: '27' },
+  { id: '26',   x: 222, y: 408, w: 124, h: 15,  tx: 284,   ty: 415.5, fs: 8,  label: '26' },
 ]
 
 // Press status (default all idle)
@@ -201,14 +217,78 @@ function selectPress(id) {
     })
   }
 }
+
+function selectRow(no) {
+  selectedPressId.value = selectedPressId.value === no ? null : no
+}
 </script>
 
 <style scoped>
+/* ============================================================
+   Header action buttons
+   ============================================================ */
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.header-btn {
+  padding: 3px 12px;
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 14px;
+  background: transparent;
+  color: rgba(255,255,255,0.75);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.header-btn:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+.header-btn.active {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+  border-color: rgba(255,255,255,0.6);
+}
+
+/* ============================================================
+   Base layout (shared across themes)
+   ============================================================ */
 .factory-fullscreen {
+  /* Design tokens */
+  --bg: #f5f6fa;
+  --header-bg: #2c3e50;
+  --card-bg: #ffffff;
+  --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  --svg-bg: #ffffff;
+  --area-fill: rgb(183,183,183);
+  --area-stroke: rgb(120,120,120);
+  --area-text-fill: #222;
+  --press-stroke: rgb(120,120,120);
+  --press-stroke-w: 2;
+  --press-text-fill: #222;
+  --tag-fill: rgb(207,226,243);
+  --color-running: #6abf69;
+  --color-idle: rgb(207,226,243);
+  --color-warning: #f4d03f;
+  --color-error: #e74c3c;
+  --select-stroke: #0055ff;
+  --legend-color: #555;
+  --table-head-bg: #f8f9fa;
+  --table-border: #eee;
+  --table-hover: #f5f5f5;
+  --table-selected: #d6eaf8;
+  --table-text: inherit;
+  --font: 'Consolas', 'SF Mono', 'Fira Code', monospace;
+
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: var(--background, #f5f6fa);
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -217,16 +297,17 @@ function selectPress(id) {
 .factory-header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md, 12px);
+  gap: 12px;
   padding: 8px 16px;
-  background: #2c3e50;
+  background: var(--header-bg);
   color: white;
   flex-shrink: 0;
 }
 
 .factory-header .page-title {
   margin: 0;
-  font-size: var(--font-size-lg, 18px);
+  font-size: 18px;
+  font-family: var(--font);
 }
 
 .back-btn {
@@ -251,10 +332,10 @@ function selectPress(id) {
 
 .layout-container {
   flex: 1;
-  background: white;
+  background: var(--card-bg);
   padding: 12px 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: var(--card-shadow);
   display: flex;
   gap: 12px;
   overflow: hidden;
@@ -270,79 +351,84 @@ function selectPress(id) {
   min-height: 0;
 }
 
-/* Factory SVG */
+/* ============================================================
+   SVG elements — driven by CSS vars
+   ============================================================ */
 .factory-svg {
   width: 100%;
   flex: 1;
   min-height: 0;
-  background: #fff;
+  background: var(--svg-bg);
+  border-radius: 8px;
 }
 
 .area {
-  shape-rendering: crispEdges;
+  shape-rendering: auto;
   vector-effect: non-scaling-stroke;
-  fill: rgb(183,183,183);
-  stroke: rgb(120,120,120);
+  fill: var(--area-fill);
+  stroke: var(--area-stroke);
   stroke-width: 2;
 }
 
 .area-text {
-  font-family: Arial, sans-serif;
-  font-size: 11px;
-  fill: #222;
+  font-family: var(--font);
+  font-size: 8.5px;
+  fill: var(--area-text-fill);
   text-anchor: middle;
   dominant-baseline: middle;
 }
 
 .press-rect {
-  shape-rendering: crispEdges;
+  shape-rendering: auto;
   vector-effect: non-scaling-stroke;
-  stroke: rgb(120,120,120);
-  stroke-width: 2;
+  stroke: var(--press-stroke);
+  stroke-width: var(--press-stroke-w);
   cursor: pointer;
-  transition: fill 0.2s;
+  transition: fill 0.2s, stroke 0.2s;
 }
 
 .press-rect:hover {
-  stroke: #0055ff;
+  stroke: var(--select-stroke);
   stroke-width: 3;
 }
 
 .press-rect.selected {
-  stroke: #0055ff;
+  stroke: var(--select-stroke);
   stroke-width: 3;
 }
 
 .tag {
-  shape-rendering: crispEdges;
   vector-effect: non-scaling-stroke;
-  fill: rgb(207,226,243);
-  stroke: rgb(120,120,120);
-  stroke-width: 2;
+  fill: var(--tag-fill);
+  stroke: var(--area-stroke);
+  stroke-width: 1.5;
 }
 
 .press-text {
-  font-family: Arial, sans-serif;
-  font-size: 11px;
-  fill: #222;
+  font-family: var(--font);
+  font-size: 8.5px;
+  fill: var(--press-text-fill);
   text-anchor: middle;
   dominant-baseline: middle;
   pointer-events: none;
 }
 
 /* Status colors */
-.status-running { fill: #6abf69; }
-.status-idle    { fill: rgb(207,226,243); }
-.status-error   { fill: #e74c3c; }
-.status-warning { fill: #f4d03f; }
+.status-running { fill: var(--color-running); }
+.status-idle    { fill: var(--color-idle); }
+.status-error   { fill: var(--color-error); }
+.status-warning { fill: var(--color-warning); }
 
-/* SVG legend */
+/* ============================================================
+   Legend
+   ============================================================ */
 .svg-legend {
   display: flex;
   gap: 12px;
-  margin-top: 4px;
+  margin-top: 6px;
   font-size: 11px;
-  color: #555;
+  font-family: var(--font);
+  color: var(--legend-color);
   flex-shrink: 0;
 }
 
@@ -359,20 +445,14 @@ function selectPress(id) {
   display: inline-block;
 }
 
-.svg-legend-box.running { background: #6abf69; }
-.svg-legend-box.idle    { background: rgb(207,226,243); }
-.svg-legend-box.warning { background: #f4d03f; }
-.svg-legend-box.error   { background: #e74c3c; }
+.svg-legend-box.running { background: var(--color-running); }
+.svg-legend-box.idle    { background: var(--color-idle); }
+.svg-legend-box.warning { background: var(--color-warning); }
+.svg-legend-box.error   { background: var(--color-error); }
 
-.selected-press-info {
-  margin-top: 4px;
-  font-size: 12px;
-  color: #333;
-  background: #f0f4f8;
-  padding: 4px 10px;
-  border-radius: 4px;
-}
-
+/* ============================================================
+   Status table
+   ============================================================ */
 .status-table-wrapper {
   flex: 1;
   overflow: auto;
@@ -384,27 +464,29 @@ function selectPress(id) {
   border-collapse: collapse;
   white-space: nowrap;
   font-size: 13px;
+  font-family: var(--font);
+  color: var(--table-text);
 }
 
 .status-table th,
 .status-table td {
   padding: 5px 10px;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--table-border);
 }
 
 .status-table th {
-  background-color: #f8f9fa;
+  background-color: var(--table-head-bg);
   position: sticky;
   top: 0;
   z-index: 1;
 }
 
 .status-table tr:hover {
-  background-color: #f5f5f5;
+  background-color: var(--table-hover);
 }
 
 .status-table tr.row-selected {
-  background-color: #d6eaf8;
+  background-color: var(--table-selected);
 }
 </style>
