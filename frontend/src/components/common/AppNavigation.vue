@@ -5,18 +5,47 @@
     </div>
 
     <div class="sidebar-menu">
-      <router-link
-        v-for="item in navItems"
-        :key="item.name"
-        :to="item.path"
-        class="nav-item"
-        :class="{ active: $route.path === item.path }"
-        :title="item.label"
-        @click="closeMobileMenu"
-      >
-        <span class="nav-icon">{{ item.icon }}</span>
-        <span class="nav-label" v-show="!isCollapsed">{{ item.label }}</span>
-      </router-link>
+      <template v-for="item in navItems" :key="item.name">
+        <!-- Items with children: expandable -->
+        <template v-if="item.children">
+          <div
+            class="nav-item"
+            :class="{ active: isParentActive(item) }"
+            :title="item.label"
+            @click="toggleSubmenu(item.name)"
+          >
+            <span class="nav-icon">{{ item.icon }}</span>
+            <span class="nav-label" v-show="!isCollapsed">{{ item.label }}</span>
+            <span class="nav-arrow" v-show="!isCollapsed">{{ openSubmenus[item.name] ? '▾' : '▸' }}</span>
+          </div>
+          <div v-show="openSubmenus[item.name] && !isCollapsed" class="submenu">
+            <router-link
+              v-for="child in item.children"
+              :key="child.name"
+              :to="child.path"
+              class="nav-item sub-item"
+              :class="{ active: $route.path === child.path }"
+              :title="child.label"
+              @click="closeMobileMenu"
+            >
+              <span class="nav-label">{{ child.label }}</span>
+            </router-link>
+          </div>
+        </template>
+
+        <!-- Normal items -->
+        <router-link
+          v-else
+          :to="item.path"
+          class="nav-item"
+          :class="{ active: $route.path === item.path }"
+          :title="item.label"
+          @click="closeMobileMenu"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-label" v-show="!isCollapsed">{{ item.label }}</span>
+        </router-link>
+      </template>
     </div>
 
     <div class="sidebar-footer">
@@ -33,14 +62,16 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useAuthStore } from '../../stores/auth'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 const isCollapsed = ref(false)
 const mobileOpen = ref(false)
+const openSubmenus = reactive({})
 
 // Display name in format: Name (employee_no)
 const displayName = computed(() => {
@@ -58,11 +89,29 @@ const navItems = [
   { name: 'factory', label: 'Factory', path: '/factory', icon: '🏭' },
   { name: 'outsource', label: 'Outsource', path: '/outsource', icon: '📤' },
   { name: 'schedule', label: 'Schedule', path: '/schedule', icon: '📅' },
-  { name: 'sales', label: 'Sales', path: '/sales', icon: '💰' },
+  { name: 'sales', label: 'Sales', icon: '💰', children: [
+    { name: 'sales-po', label: 'PO', path: '/sales/po' },
+    { name: 'sales-purchase', label: 'Purchase', path: '/sales/purchase' },
+  ]},
   { name: 'warehouse', label: 'Warehouse', path: '/warehouse', icon: '📦' },
   { name: 'mold', label: 'Mold', path: '/mold', icon: '🔧' },
   { name: 'master', label: 'Master', path: '/master', icon: '⚡' },
 ]
+
+const isParentActive = (item) => {
+  return item.children?.some(child => route.path === child.path)
+}
+
+const toggleSubmenu = (name) => {
+  openSubmenus[name] = !openSubmenus[name]
+}
+
+// Auto-open submenu if current route matches a child
+navItems.forEach(item => {
+  if (item.children && item.children.some(child => route.path === child.path)) {
+    openSubmenus[item.name] = true
+  }
+})
 
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value
@@ -148,6 +197,7 @@ defineExpose({
   transition: background-color 0.2s;
   margin-bottom: 4px;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .nav-item:hover {
@@ -167,6 +217,21 @@ defineExpose({
 
 .nav-label {
   overflow: hidden;
+}
+
+.nav-arrow {
+  margin-left: auto;
+  font-size: 12px;
+  color: #bdc3c7;
+}
+
+.submenu {
+  padding-left: 12px;
+}
+
+.sub-item {
+  padding-left: 36px !important;
+  font-size: 13px;
 }
 
 .sidebar-footer {
