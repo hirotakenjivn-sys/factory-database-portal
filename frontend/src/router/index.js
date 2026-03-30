@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import SalesView from '../views/SalesView.vue'
+import PurchaseView from '../views/PurchaseView.vue'
 import PressView from '../views/PressView.vue'
 import WarehouseView from '../views/WarehouseView.vue'
 import MoldView from '../views/MoldView.vue'
@@ -48,8 +49,18 @@ const router = createRouter({
     },
     {
       path: '/sales',
-      name: 'Sales',
+      redirect: '/sales/po',
+    },
+    {
+      path: '/sales/po',
+      name: 'SalesPO',
       component: SalesView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/sales/purchase',
+      name: 'SalesPurchase',
+      component: PurchaseView,
       meta: { requiresAuth: true },
     },
     {
