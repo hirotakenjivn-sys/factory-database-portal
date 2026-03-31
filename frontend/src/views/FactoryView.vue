@@ -89,12 +89,21 @@
               <tr>
                 <th>No</th>
                 <th>Pressure</th>
-                <th>Customer</th>
-                <th>Product</th>
-                <th>Process</th>
-                <th>Qty/Total</th>
-                <th>Name</th>
-                <th>LOT, No</th>
+                <template v-if="activeView === 'data'">
+                  <th>Customer</th>
+                  <th>Product</th>
+                  <th>Process</th>
+                  <th>Qty/Total</th>
+                  <th>Name</th>
+                  <th>LOT, No</th>
+                </template>
+                <th v-if="activeView === 'graph'" class="th-timeline">
+                  <div class="timeline-axis">
+                    <span v-for="h in 13" :key="h" class="axis-tick" :style="{ left: ((h - 1) / 12 * 100) + '%' }">
+                      {{ String(h - 1 + 6).padStart(2, '0') }}
+                    </span>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -108,12 +117,28 @@
               >
                 <td>{{ machine.no }}</td>
                 <td>{{ machine.pressure }}</td>
-                <td>{{ machine.customer }}</td>
-                <td>{{ machine.product }}</td>
-                <td>{{ machine.process }}</td>
-                <td>{{ machine.qty }}</td>
-                <td>{{ machine.name }}</td>
-                <td>{{ machine.lot_no }}</td>
+                <template v-if="activeView === 'data'">
+                  <td>{{ machine.customer }}</td>
+                  <td>{{ machine.product }}</td>
+                  <td>{{ machine.process }}</td>
+                  <td>{{ machine.qty }}</td>
+                  <td>{{ machine.name }}</td>
+                  <td>{{ machine.lot_no }}</td>
+                </template>
+                <td v-if="activeView === 'graph'" class="td-timeline">
+                  <div class="timeline-bar">
+                    <template v-if="timelineData[machine.no]">
+                      <div
+                        v-for="(seg, i) in timelineData[machine.no]"
+                        :key="i"
+                        class="bar-seg"
+                        :style="{ flexBasis: seg.pct + '%', background: seg.color }"
+                        :title="seg.label"
+                      ></div>
+                    </template>
+                    <div v-else class="bar-seg" style="flex-basis:100%; background:#BDBDBD" title="データなし"></div>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -124,9 +149,90 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick } from 'vue'
+import { ref, reactive, nextTick, onMounted, watch } from 'vue'
+import api from '@/utils/api'
 
 const activeView = ref('data')
+
+// ============================================================
+// 24h Timeline bar (Press-raspi style)
+// ============================================================
+const CHOKO = 30000   // 30s  → チョコ停
+const DOKA  = 300000  // 5min → ドカ停
+const COLORS = { green: '#4CAF50', yellow: '#FFC107', red: '#F44336', gray: '#BDBDBD' }
+const LABELS = { green: '稼働中', yellow: 'チョコ停', red: 'ドカ停', gray: 'データなし' }
+
+const timelineData = reactive({})
+
+function classify(ms) {
+  if (ms < CHOKO) return 'green'
+  if (ms < DOKA) return 'yellow'
+  return 'red'
+}
+
+function buildSegments(events, ws, we) {
+  if (!events.length) return [{ s: ws, e: we, c: 'gray' }]
+  const segs = []
+  let cs = ws, cc = classify(events[0] - ws)
+  for (let i = 0; i < events.length - 1; i++) {
+    const nc = classify(events[i + 1] - events[i])
+    if (nc !== cc) {
+      segs.push({ s: cs, e: events[i], c: cc })
+      cs = events[i]; cc = nc
+    }
+  }
+  const last = events[events.length - 1]
+  const tc = classify(we - last)
+  if (tc === cc) {
+    segs.push({ s: cs, e: we, c: cc })
+  } else {
+    segs.push({ s: cs, e: last, c: cc })
+    segs.push({ s: last, e: we, c: tc })
+  }
+  return segs
+}
+
+function fmtTime(ms) {
+  const d = new Date(ms)
+  return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0')
+}
+
+function toBarData(segs, ws, we) {
+  const total = we - ws
+  if (total <= 0) return []
+  return segs
+    .map(seg => {
+      const pct = (seg.e - seg.s) / total * 100
+      return pct > 0 ? { pct, color: COLORS[seg.c], label: fmtTime(seg.s) + ' - ' + fmtTime(seg.e) + '  ' + LABELS[seg.c] } : null
+    })
+    .filter(Boolean)
+}
+
+async function fetchTimeline(machineNo) {
+  const today = new Date()
+  today.setHours(6, 0, 0, 0)
+  const dayStart = today.getTime()
+  const dayEnd = dayStart + 12 * 3600000
+  const now = Date.now()
+  const effEnd = Math.min(dayEnd, now)
+
+  try {
+    const { data } = await api.get('/api/iot/events', {
+      params: { start_ms: dayStart, end_ms: dayEnd, raspi_no: machineNo }
+    })
+    const events = data.events || []
+    const segs = buildSegments(events, dayStart, effEnd)
+    timelineData[machineNo] = toBarData(segs, dayStart, dayEnd)
+  } catch {
+    timelineData[machineNo] = toBarData([{ s: dayStart, e: dayEnd, c: 'gray' }], dayStart, dayEnd)
+  }
+}
+
+watch(activeView, (v) => {
+  if (v === 'graph') {
+    machineStatus.value.forEach(m => fetchTimeline(m.no))
+  }
+})
 
 // Machine list — No & Pressure populated, others blank
 const machineStatus = ref([
@@ -488,5 +594,59 @@ function selectRow(no) {
 
 .status-table tr.row-selected {
   background-color: var(--table-selected);
+}
+
+/* ============================================================
+   24h Timeline bar (Graph view)
+   ============================================================ */
+.th-timeline {
+  min-width: 600px;
+  padding-bottom: 0 !important;
+}
+
+.timeline-axis {
+  position: relative;
+  height: 18px;
+  font-size: 9px;
+  color: #888;
+}
+
+.axis-tick {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.axis-tick:first-child {
+  transform: translateX(0);
+}
+
+.axis-tick:last-child {
+  transform: translateX(-100%);
+}
+
+.td-timeline {
+  padding: 4px 10px !important;
+  min-width: 600px;
+}
+
+.timeline-bar {
+  display: flex;
+  width: 100%;
+  height: 22px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #eee;
+  border: 1px solid #ddd;
+}
+
+.bar-seg {
+  height: 100%;
+  min-width: 0;
+  transition: opacity 0.15s;
+}
+
+.bar-seg:hover {
+  opacity: 0.75;
 }
 </style>

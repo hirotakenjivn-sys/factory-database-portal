@@ -20,3 +20,22 @@ class IotButtonEvent(IotButtonEventBase):
 
     class Config:
         from_attributes = True
+
+
+# Press-raspi互換スキーマ
+class IotPressEventItem(BaseModel):
+    ts_ms: int
+
+
+class IotPressEventIn(BaseModel):
+    raspi_no: str = "unknown"
+    events: list[IotPressEventItem]
+
+
+class IotPressEventOut(BaseModel):
+    status: str = "ok"
+    total: int
+
+
+class IotPressEventsResponse(BaseModel):
+    events: list[int]
