@@ -10,6 +10,7 @@ import ScheduleView from '../views/ScheduleView.vue'
 import TraceView from '../views/TraceView.vue'
 import OutsourceView from '../views/OutsourceView.vue'
 import FactoryView from '../views/FactoryView.vue'
+import ProcessView from '../views/ProcessView.vue'
 import MasterMenuView from '../views/master/MasterMenuView.vue'
 import CustomerView from '../views/master/CustomerView.vue'
 import ProductView from '../views/master/ProductView.vue'
@@ -67,6 +68,12 @@ const router = createRouter({
       path: '/press',
       name: 'Press',
       component: PressView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/process',
+      name: 'Process',
+      component: ProcessView,
       meta: { requiresAuth: true },
     },
     {

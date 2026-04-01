@@ -87,6 +87,7 @@ const navItems = [
   { name: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: '📊' },
   { name: 'trace', label: 'Trace', path: '/trace', icon: '🔍' },
   { name: 'factory', label: 'Factory', path: '/factory', icon: '🏭' },
+  { name: 'process', label: 'Process', path: '/process', icon: '⚙' },
   { name: 'outsource', label: 'Outsource', path: '/outsource', icon: '📤' },
   { name: 'schedule', label: 'Schedule', path: '/schedule', icon: '📅' },
   { name: 'sales', label: 'Sales', icon: '💰', children: [
