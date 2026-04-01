@@ -35,7 +35,8 @@
       "Bash(find . -name docker-compose* -o -name *.sql)",
       "Bash(start:*)",
       "Bash(find /c/Users/PCPV/factory-database-portal/factory-database-portal/frontend/src/views -type f -name *actory*)",
-      "Bash(find /c/Users/PCPV/factory-database-portal/factory-database-portal/frontend/src/components -type f -name *actory*)"
+      "Bash(find /c/Users/PCPV/factory-database-portal/factory-database-portal/frontend/src/components -type f -name *actory*)",
+      "Bash(find C:UsersPCPVfactory-database-portalfactory-database-portalfrontendsrccomponents -name *Nav* -o -name *nav*)"
     ]
   }
 }
