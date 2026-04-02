@@ -5,6 +5,7 @@ import SalesView from '../views/SalesView.vue'
 import PurchaseView from '../views/PurchaseView.vue'
 import PressView from '../views/PressView.vue'
 import WarehouseView from '../views/WarehouseView.vue'
+import MaterialImportView from '../views/MaterialImportView.vue'
 import MoldView from '../views/MoldView.vue'
 import ScheduleView from '../views/ScheduleView.vue'
 import TraceView from '../views/TraceView.vue'
@@ -78,8 +79,18 @@ const router = createRouter({
     },
     {
       path: '/warehouse',
-      name: 'Warehouse',
+      redirect: '/warehouse/finished-products',
+    },
+    {
+      path: '/warehouse/finished-products',
+      name: 'WarehouseFinishedProducts',
       component: WarehouseView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/warehouse/material-import',
+      name: 'WarehouseMaterialImport',
+      component: MaterialImportView,
       meta: { requiresAuth: true },
     },
     {

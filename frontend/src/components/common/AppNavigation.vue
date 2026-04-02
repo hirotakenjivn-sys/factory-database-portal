@@ -94,7 +94,10 @@ const navItems = [
     { name: 'sales-po', label: 'PO', path: '/sales/po' },
     { name: 'sales-purchase', label: 'Purchase', path: '/sales/purchase' },
   ]},
-  { name: 'warehouse', label: 'Warehouse', path: '/warehouse', icon: '📦' },
+  { name: 'warehouse', label: 'Warehouse', icon: '📦', children: [
+    { name: 'warehouse-finished', label: 'Finished Products', path: '/warehouse/finished-products' },
+    { name: 'warehouse-material-import', label: 'Material Import', path: '/warehouse/material-import' },
+  ]},
   { name: 'mold', label: 'Mold', path: '/mold', icon: '🔧' },
   { name: 'master', label: 'Master', path: '/master', icon: '⚡' },
 ]
