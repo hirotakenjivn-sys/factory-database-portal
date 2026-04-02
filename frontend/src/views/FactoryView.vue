@@ -259,7 +259,7 @@ async function fetchTimeline(machineNo) {
 
   try {
     const { data } = await api.get('/api/iot/events', {
-      params: { start_ms: dayStart, end_ms: dayEnd, raspi_no: machineNo }
+      params: { start_ms: dayStart, end_ms: dayEnd, raspi_no: 'raspi_' + machineNo }
     })
     const events = data.events || []
     const segs = buildSegments(events, dayStart, effEnd)
