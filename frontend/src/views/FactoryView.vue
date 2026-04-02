@@ -12,13 +12,18 @@
             :class="['header-btn', { active: activeView === 'graph' }]"
             @click="activeView = 'graph'"
           >Graph</button>
+          <button
+            :class="['header-btn', { active: activeView === 'api' }]"
+            @click="activeView = 'api'"
+          >API</button>
         </div>
       </div>
 
       <!-- Machine Status Section -->
       <div class="machine-status-section">
         <div class="layout-container">
-          <div class="svg-column">
+          <!-- SVG column (hidden in API view) -->
+          <div v-if="activeView !== 'api'" class="svg-column">
           <svg viewBox="0 0 362 432" class="factory-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Factory layout">
 
             <!-- Areas (static) -->
@@ -83,7 +88,43 @@
             <span class="svg-legend-item"><span class="svg-legend-box error"></span> Error</span>
           </div>
           </div>
-          <div class="status-table-wrapper">
+
+          <!-- API Raw Data view -->
+          <div v-if="activeView === 'api'" class="api-data-wrapper">
+            <div class="api-toolbar">
+              <select v-model="apiRaspiFilter" @change="fetchRawEvents" class="api-select">
+                <option value="">All Raspi</option>
+                <option v-for="m in machineStatus" :key="m.no" :value="m.no">Raspi {{ m.no }}</option>
+              </select>
+              <button class="api-refresh-btn" @click="fetchRawEvents">Refresh</button>
+              <span class="api-count">{{ rawEvents.length }} events</span>
+            </div>
+            <div class="api-table-scroll">
+              <table class="status-table api-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Raspi No</th>
+                    <th>Timestamp (ms)</th>
+                    <th>Date / Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="ev in rawEvents" :key="ev.id">
+                    <td>{{ ev.id }}</td>
+                    <td>{{ ev.raspi_no }}</td>
+                    <td>{{ ev.ts_ms }}</td>
+                    <td>{{ formatTs(ev.ts_ms) }}</td>
+                  </tr>
+                  <tr v-if="!rawEvents.length">
+                    <td colspan="4" style="text-align:center; color:#999; padding:20px;">No data</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div v-if="activeView !== 'api'" class="status-table-wrapper">
           <table class="status-table">
             <thead>
               <tr>
@@ -228,9 +269,40 @@ async function fetchTimeline(machineNo) {
   }
 }
 
+// ============================================================
+// API Raw Data view
+// ============================================================
+const rawEvents = ref([])
+const apiRaspiFilter = ref('')
+
+async function fetchRawEvents() {
+  try {
+    const params = { limit: 500 }
+    if (apiRaspiFilter.value) params.raspi_no = apiRaspiFilter.value
+    const { data } = await api.get('/api/iot/events/raw', { params })
+    rawEvents.value = data
+  } catch {
+    rawEvents.value = []
+  }
+}
+
+function formatTs(tsMs) {
+  const d = new Date(tsMs)
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0') + ' ' +
+    String(d.getHours()).padStart(2, '0') + ':' +
+    String(d.getMinutes()).padStart(2, '0') + ':' +
+    String(d.getSeconds()).padStart(2, '0') + '.' +
+    String(d.getMilliseconds()).padStart(3, '0')
+}
+
 watch(activeView, (v) => {
   if (v === 'graph') {
     machineStatus.value.forEach(m => fetchTimeline(m.no))
+  }
+  if (v === 'api') {
+    fetchRawEvents()
   }
 })
 
@@ -648,5 +720,67 @@ function selectRow(no) {
 
 .bar-seg:hover {
   opacity: 0.75;
+}
+
+/* ============================================================
+   API Raw Data view
+   ============================================================ */
+.api-data-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.api-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  flex-shrink: 0;
+}
+
+.api-select {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 12px;
+}
+
+.api-refresh-btn {
+  padding: 4px 12px;
+  border: 1px solid #3498db;
+  border-radius: 4px;
+  background: #3498db;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+.api-refresh-btn:hover {
+  background: #2980b9;
+}
+
+.api-count {
+  font-size: 12px;
+  color: #888;
+  font-family: var(--font);
+}
+
+.api-table-scroll {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+.api-table {
+  font-size: 12px;
+}
+
+.api-table td {
+  font-variant-numeric: tabular-nums;
 }
 </style>

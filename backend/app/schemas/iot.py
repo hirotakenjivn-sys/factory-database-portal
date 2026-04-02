@@ -39,3 +39,12 @@ class IotPressEventOut(BaseModel):
 
 class IotPressEventsResponse(BaseModel):
     events: list[int]
+
+
+class IotPressEventRaw(BaseModel):
+    id: int
+    ts_ms: int
+    raspi_no: str
+
+    class Config:
+        from_attributes = True

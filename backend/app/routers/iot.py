@@ -11,6 +11,7 @@ from ..schemas.iot import (
     IotPressEventIn,
     IotPressEventOut,
     IotPressEventsResponse,
+    IotPressEventRaw,
 )
 
 router = APIRouter()
@@ -67,3 +68,20 @@ async def get_press_events(
     stmt = stmt.order_by(IotPressEvent.ts_ms.asc())
     rows = db.execute(stmt).scalars().all()
     return IotPressEventsResponse(events=list(rows))
+
+
+@router.get("/events/raw", response_model=list[IotPressEventRaw])
+async def get_press_events_raw(
+    limit: int = Query(200, description="取得件数", ge=1, le=5000),
+    raspi_no: Optional[str] = Query(None, description="ラズパイ番号でフィルタ"),
+    db: Session = Depends(get_db),
+):
+    """
+    プレスイベント生データを新しい順に返す
+    """
+    stmt = select(IotPressEvent).order_by(IotPressEvent.ts_ms.desc())
+    if raspi_no:
+        stmt = stmt.where(IotPressEvent.raspi_no == raspi_no)
+    stmt = stmt.limit(limit)
+    rows = db.execute(stmt).scalars().all()
+    return rows
