@@ -280,7 +280,7 @@ async function fetchRawEvents() {
     const params = { limit: 500 }
     if (apiRaspiFilter.value) params.raspi_no = apiRaspiFilter.value
     console.log('[API] fetching /api/iot/events/raw', params)
-    const { data } = await api.get('/api/iot/events/raw', { params })
+    const { data } = await api.get('/iot/events/raw', { params })
     console.log('[API] response:', data)
     rawEvents.value = data
   } catch (err) {
