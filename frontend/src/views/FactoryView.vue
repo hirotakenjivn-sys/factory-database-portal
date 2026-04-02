@@ -140,8 +140,8 @@
                 </template>
                 <th v-if="activeView === 'graph'" class="th-timeline">
                   <div class="timeline-axis">
-                    <span v-for="h in 13" :key="h" class="axis-tick" :style="{ left: ((h - 1) / 12 * 100) + '%' }">
-                      {{ String(h - 1 + 6).padStart(2, '0') }}
+                    <span v-for="h in 25" :key="h" class="axis-tick" :style="{ left: ((h - 1) / 24 * 100) + '%' }">
+                      {{ String(h - 1).padStart(2, '0') }}
                     </span>
                   </div>
                 </th>
@@ -251,9 +251,9 @@ function toBarData(segs, ws, we) {
 
 async function fetchTimeline(machineNo) {
   const today = new Date()
-  today.setHours(6, 0, 0, 0)
+  today.setHours(0, 0, 0, 0)
   const dayStart = today.getTime()
-  const dayEnd = dayStart + 12 * 3600000
+  const dayEnd = dayStart + 24 * 3600000
   const now = Date.now()
   const effEnd = Math.min(dayEnd, now)
 
