@@ -258,7 +258,7 @@ async function fetchTimeline(machineNo) {
   const effEnd = Math.min(dayEnd, now)
 
   try {
-    const { data } = await api.get('/api/iot/events', {
+    const { data } = await api.get('/iot/events', {
       params: { start_ms: dayStart, end_ms: dayEnd, raspi_no: 'raspi_' + machineNo }
     })
     const events = data.events || []
