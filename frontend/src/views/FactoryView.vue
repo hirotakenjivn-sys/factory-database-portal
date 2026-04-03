@@ -82,10 +82,10 @@
             </g>
           </svg>
           <div class="svg-legend">
-            <span class="svg-legend-item"><span class="svg-legend-box running"></span> Running</span>
+            <span class="svg-legend-item"><span class="svg-legend-box running"></span> Run</span>
+            <span class="svg-legend-item"><span class="svg-legend-box warning"></span> Warn</span>
+            <span class="svg-legend-item"><span class="svg-legend-box error"></span> Stop</span>
             <span class="svg-legend-item"><span class="svg-legend-box idle"></span> Idle</span>
-            <span class="svg-legend-item"><span class="svg-legend-box warning"></span> Warning</span>
-            <span class="svg-legend-item"><span class="svg-legend-box error"></span> Error</span>
           </div>
           </div>
 
