@@ -316,15 +316,14 @@ function toBarData(segs, ws, we) {
     .filter(Boolean)
 }
 
-// SVG press color based on current moment's timeline segment
-function getCurrentColor(machineNo) {
+// SVG press color based on scrubber position's timeline segment
+function getColorAtTime(machineNo, timeMs) {
   const segs = timelineSegments[machineNo]
   if (!segs || !segs.length) return null
-  const now = Date.now()
   for (const seg of segs) {
-    if (now >= seg.s && now <= seg.e) {
-      if (seg.c === 'gray') return null  // gray = default idle
-      return seg.c  // 'green', 'yellow', 'red'
+    if (timeMs >= seg.s && timeMs <= seg.e) {
+      if (seg.c === 'gray') return null
+      return seg.c
     }
   }
   return null
@@ -333,7 +332,7 @@ function getCurrentColor(machineNo) {
 function getSvgStatus(pressId) {
   if (activeView.value !== 'graph') return pressStatus[pressId]
   const no = pressIdToNo(pressId)
-  const color = getCurrentColor(no)
+  const color = getColorAtTime(no, scrubberTimeMs.value)
   if (!color) return 'idle'
   if (color === 'green') return 'running'
   if (color === 'yellow') return 'warning'
