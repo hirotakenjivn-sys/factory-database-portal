@@ -71,7 +71,7 @@
                 <rect
                   :x="p.x" :y="p.y" :width="p.w" :height="p.h"
                   rx="4"
-                  :class="['press-rect', 'status-' + pressStatus[p.id], { selected: selectedPressId === pressIdToNo(p.id) }]"
+                  :class="['press-rect', 'status-' + getSvgStatus(p.id), { selected: selectedPressId === pressIdToNo(p.id) }]"
                 />
                 <text
                   :x="p.tx" :y="p.ty"
@@ -125,6 +125,12 @@
           </div>
 
           <div v-if="activeView !== 'api'" class="status-table-wrapper">
+          <!-- Date navigation for Graph view -->
+          <div v-if="activeView === 'graph'" class="graph-date-nav">
+            <button class="date-nav-btn" @click="prevDay">&lt;</button>
+            <span class="date-nav-label">{{ graphDateLabel }}</span>
+            <button class="date-nav-btn" :disabled="isGraphToday" @click="nextDay">&gt;</button>
+          </div>
           <table class="status-table">
             <thead>
               <tr>
@@ -190,10 +196,47 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, onMounted, watch } from 'vue'
+import { ref, reactive, computed, nextTick, onMounted, watch } from 'vue'
 import api from '@/utils/api'
 
 const activeView = ref('data')
+
+// ============================================================
+// Graph date navigation
+// ============================================================
+const graphDate = ref(new Date())
+
+function resetGraphDateToToday() {
+  graphDate.value = new Date()
+}
+
+const graphDateLabel = computed(() => {
+  const d = graphDate.value
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  return `${yyyy}-${mm}-${dd} (${days[d.getDay()]})`
+})
+
+const isGraphToday = computed(() => {
+  const now = new Date()
+  const g = graphDate.value
+  return g.getFullYear() === now.getFullYear() && g.getMonth() === now.getMonth() && g.getDate() === now.getDate()
+})
+
+function prevDay() {
+  const d = new Date(graphDate.value)
+  d.setDate(d.getDate() - 1)
+  graphDate.value = d
+}
+
+function nextDay() {
+  if (isGraphToday.value) return
+  const d = new Date(graphDate.value)
+  d.setDate(d.getDate() + 1)
+  graphDate.value = d
+}
 
 // ============================================================
 // 24h Timeline bar (Press-raspi style)
@@ -204,6 +247,7 @@ const COLORS = { green: '#4CAF50', yellow: '#FFC107', red: '#F44336', gray: '#BD
 const LABELS = { green: '稼働中', yellow: 'チョコ停', red: 'ドカ停', gray: 'データなし' }
 
 const timelineData = reactive({})
+const timelineSegments = reactive({})  // raw segments per machine (for SVG color)
 
 function classify(ms) {
   if (ms < CHOKO) return 'green'
@@ -249,10 +293,35 @@ function toBarData(segs, ws, we) {
     .filter(Boolean)
 }
 
+// SVG press color based on current moment's timeline segment
+function getCurrentColor(machineNo) {
+  const segs = timelineSegments[machineNo]
+  if (!segs || !segs.length) return null
+  const now = Date.now()
+  for (const seg of segs) {
+    if (now >= seg.s && now <= seg.e) {
+      if (seg.c === 'gray') return null  // gray = default idle
+      return seg.c  // 'green', 'yellow', 'red'
+    }
+  }
+  return null
+}
+
+function getSvgStatus(pressId) {
+  if (activeView.value !== 'graph') return pressStatus[pressId]
+  const no = pressIdToNo(pressId)
+  const color = getCurrentColor(no)
+  if (!color) return 'idle'
+  if (color === 'green') return 'running'
+  if (color === 'yellow') return 'warning'
+  if (color === 'red') return 'error'
+  return 'idle'
+}
+
 async function fetchTimeline(machineNo) {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const dayStart = today.getTime()
+  const target = new Date(graphDate.value)
+  target.setHours(0, 0, 0, 0)
+  const dayStart = target.getTime()
   const dayEnd = dayStart + 24 * 3600000
   const now = Date.now()
   const effEnd = Math.min(dayEnd, now)
@@ -263,10 +332,16 @@ async function fetchTimeline(machineNo) {
     })
     const events = data.events || []
     const segs = buildSegments(events, dayStart, effEnd)
+    timelineSegments[machineNo] = segs
     timelineData[machineNo] = toBarData(segs, dayStart, dayEnd)
   } catch {
+    timelineSegments[machineNo] = [{ s: dayStart, e: dayEnd, c: 'gray' }]
     timelineData[machineNo] = toBarData([{ s: dayStart, e: dayEnd, c: 'gray' }], dayStart, dayEnd)
   }
+}
+
+function fetchAllTimelines() {
+  machineStatus.value.forEach(m => fetchTimeline(m.no))
 }
 
 // ============================================================
@@ -302,10 +377,17 @@ function formatTs(tsMs) {
 
 watch(activeView, (v) => {
   if (v === 'graph') {
-    machineStatus.value.forEach(m => fetchTimeline(m.no))
+    resetGraphDateToToday()
+    fetchAllTimelines()
   }
   if (v === 'api') {
     fetchRawEvents()
+  }
+})
+
+watch(graphDate, () => {
+  if (activeView.value === 'graph') {
+    fetchAllTimelines()
   }
 })
 
@@ -669,6 +751,51 @@ function selectRow(no) {
 
 .status-table tr.row-selected {
   background-color: var(--table-selected);
+}
+
+/* ============================================================
+   Graph date navigation
+   ============================================================ */
+.graph-date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 4px 0 8px;
+  flex-shrink: 0;
+}
+
+.date-nav-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+  transition: background 0.2s;
+}
+
+.date-nav-btn:hover:not(:disabled) {
+  background: #e8e8e8;
+}
+
+.date-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.date-nav-label {
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 160px;
+  text-align: center;
 }
 
 /* ============================================================
