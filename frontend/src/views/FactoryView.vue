@@ -3,6 +3,12 @@
       <div class="factory-header">
         <router-link to="/dashboard" class="back-btn">&larr;</router-link>
         <h1 class="page-title">Factory</h1>
+        <!-- Date navigation (Graph view) -->
+        <div v-if="activeView === 'graph'" class="header-date-nav">
+          <button class="date-nav-btn" @click="prevDay">&lt;</button>
+          <span class="date-nav-label">{{ graphDateLabel }}</span>
+          <button class="date-nav-btn" :disabled="isGraphToday" @click="nextDay">&gt;</button>
+        </div>
         <div class="header-actions">
           <button
             :class="['header-btn', { active: activeView === 'data' }]"
@@ -124,13 +130,7 @@
             </div>
           </div>
 
-          <div v-if="activeView !== 'api'" class="status-table-wrapper">
-          <!-- Date navigation for Graph view -->
-          <div v-if="activeView === 'graph'" class="graph-date-nav">
-            <button class="date-nav-btn" @click="prevDay">&lt;</button>
-            <span class="date-nav-label">{{ graphDateLabel }}</span>
-            <button class="date-nav-btn" :disabled="isGraphToday" @click="nextDay">&gt;</button>
-          </div>
+          <div v-if="activeView !== 'api'" class="status-table-wrapper" ref="tableWrapperRef">
           <table class="status-table">
             <thead>
               <tr>
@@ -153,17 +153,6 @@
                     <span v-for="h in 25" :key="h" class="axis-tick" :style="{ left: ((h - 1) / 24 * 100) + '%' }">
                       {{ String(h - 1).padStart(2, '0') }}
                     </span>
-                    <!-- Scrubber handle -->
-                    <div
-                      class="scrubber-handle"
-                      :style="{ left: scrubberFractionPct + '%' }"
-                      @mousedown.prevent="startDrag"
-                      @touchstart.prevent="startDrag"
-                      @dblclick="resetScrubberToLive"
-                    >
-                      <div class="scrubber-triangle">&#9661;</div>
-                      <div v-if="isDragging || scrubberFraction !== null" class="scrubber-time-label">{{ scrubberTimeLabel }}</div>
-                    </div>
                   </div>
                 </th>
               </tr>
@@ -203,12 +192,25 @@
                       ></div>
                     </template>
                     <div v-else class="bar-seg" style="flex-basis:100%; background:#BDBDBD" title="データなし"></div>
-                    <div class="scrubber-cell-line" :style="{ left: scrubberFractionPct + '%' }"></div>
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
+          <!-- Scrubber overlay: handle + full-height line -->
+          <div v-if="activeView === 'graph'" class="scrubber-overlay" :style="{ left: scrubberOverlayLeft + 'px', width: scrubberOverlayWidth + 'px' }">
+            <div
+              class="scrubber-handle"
+              :style="{ left: scrubberFractionPct + '%' }"
+              @mousedown.prevent="startDrag"
+              @touchstart.prevent="startDrag"
+              @dblclick="resetScrubberToLive"
+            >
+              <div v-if="isDragging || scrubberFraction !== null" class="scrubber-time-label">{{ scrubberTimeLabel }}</div>
+              <div class="scrubber-triangle">&#9661;</div>
+            </div>
+            <div class="scrubber-line" :style="{ left: scrubberFractionPct + '%' }"></div>
+          </div>
           </div>
         </div>
       </div>
@@ -374,7 +376,19 @@ const scrubberFraction = ref(null) // null = live mode, 0..1 = manual
 const isDragging = ref(false)
 const nowTick = ref(0)
 const thTimelineRef = ref(null)
+const tableWrapperRef = ref(null)
+const scrubberOverlayLeft = ref(0)
+const scrubberOverlayWidth = ref(0)
 let tickInterval = null
+
+function updateOverlayRect() {
+  if (!thTimelineRef.value || !tableWrapperRef.value) return
+  const thRect = thTimelineRef.value.getBoundingClientRect()
+  const wrapperRect = tableWrapperRef.value.getBoundingClientRect()
+  const pad = 10 // td-timeline padding
+  scrubberOverlayLeft.value = thRect.left - wrapperRect.left + tableWrapperRef.value.scrollLeft + pad
+  scrubberOverlayWidth.value = thRect.width - pad * 2
+}
 
 onMounted(() => {
   tickInterval = setInterval(() => { nowTick.value++ }, 1000)
@@ -439,6 +453,7 @@ function getSPM(machineNo) {
 // Drag interaction
 function startDrag(e) {
   isDragging.value = true
+  updateOverlayRect()
   if (scrubberFraction.value === null) {
     scrubberFraction.value = getCurrentTimeFraction()
   }
@@ -449,13 +464,14 @@ function startDrag(e) {
 }
 
 function onDrag(e) {
-  if (!thTimelineRef.value) return
+  if (!thTimelineRef.value || !tableWrapperRef.value) return
   const clientX = e.touches ? e.touches[0].clientX : e.clientX
-  const rect = thTimelineRef.value.getBoundingClientRect()
-  const pad = 10 // td-timeline padding
-  const left = rect.left + pad
-  const width = rect.width - pad * 2
+  const thRect = thTimelineRef.value.getBoundingClientRect()
+  const pad = 10
+  const left = thRect.left + pad
+  const width = thRect.width - pad * 2
   scrubberFraction.value = Math.max(0, Math.min(1, (clientX - left) / width))
+  updateOverlayRect()
 }
 
 function stopDrag() {
@@ -505,6 +521,8 @@ watch(activeView, (v) => {
   if (v === 'graph') {
     resetGraphDateToToday()
     fetchAllTimelines()
+    scrubberFraction.value = null
+    nextTick(() => updateOverlayRect())
   }
   if (v === 'api') {
     fetchRawEvents()
@@ -618,9 +636,12 @@ function selectRow(no) {
    Header action buttons
    ============================================================ */
 .header-actions {
-  margin-left: auto;
   display: flex;
   gap: 6px;
+}
+
+.factory-header:not(:has(.header-date-nav)) .header-actions {
+  margin-left: auto;
 }
 
 .header-btn {
@@ -847,6 +868,7 @@ function selectRow(no) {
   flex: 1;
   overflow: auto;
   min-width: 0;
+  position: relative;
 }
 
 .status-table {
@@ -881,24 +903,23 @@ function selectRow(no) {
 }
 
 /* ============================================================
-   Graph date navigation
+   Header date navigation
    ============================================================ */
-.graph-date-nav {
+.header-date-nav {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 4px 0 8px;
-  flex-shrink: 0;
+  gap: 8px;
+  margin-left: auto;
 }
 
 .date-nav-btn {
-  width: 28px;
-  height: 28px;
-  border: 1px solid #ccc;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255,255,255,0.35);
   border-radius: 4px;
-  background: #fff;
-  font-size: 14px;
+  background: transparent;
+  color: rgba(255,255,255,0.85);
+  font-size: 13px;
   font-weight: bold;
   cursor: pointer;
   display: flex;
@@ -909,19 +930,19 @@ function selectRow(no) {
 }
 
 .date-nav-btn:hover:not(:disabled) {
-  background: #e8e8e8;
+  background: rgba(255,255,255,0.12);
 }
 
 .date-nav-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.25;
   cursor: not-allowed;
 }
 
 .date-nav-label {
   font-family: var(--font);
-  font-size: 14px;
-  font-weight: 600;
-  min-width: 160px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.9);
+  min-width: 140px;
   text-align: center;
 }
 
@@ -967,7 +988,6 @@ function selectRow(no) {
   overflow: hidden;
   background: #eee;
   border: 1px solid #ddd;
-  position: relative;
 }
 
 .bar-seg {
@@ -992,14 +1012,23 @@ function selectRow(no) {
 }
 
 /* ============================================================
-   Scrubber
+   Scrubber overlay (full-height line + handle above table)
    ============================================================ */
+.scrubber-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
 .scrubber-handle {
   position: absolute;
-  top: -2px;
+  top: 0;
   transform: translateX(-50%);
+  pointer-events: auto;
   cursor: ew-resize;
-  z-index: 5;
+  z-index: 11;
   user-select: none;
   display: flex;
   flex-direction: column;
@@ -1007,7 +1036,7 @@ function selectRow(no) {
 }
 
 .scrubber-triangle {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1;
   color: #e53935;
 }
@@ -1016,21 +1045,20 @@ function selectRow(no) {
   background: #333;
   color: #fff;
   font-size: 9px;
-  padding: 1px 4px;
+  padding: 1px 5px;
   border-radius: 3px;
   white-space: nowrap;
-  margin-top: 1px;
   pointer-events: none;
 }
 
-.scrubber-cell-line {
+.scrubber-line {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 1px;
   background: #e53935;
   pointer-events: none;
-  z-index: 2;
+  transform: translateX(-0.5px);
 }
 
 /* ============================================================
