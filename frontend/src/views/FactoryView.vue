@@ -144,11 +144,26 @@
                   <th>Name</th>
                   <th>LOT, No</th>
                 </template>
-                <th v-if="activeView === 'graph'" class="th-timeline">
+                <template v-if="activeView === 'graph'">
+                  <th class="th-stat">Stamped</th>
+                  <th class="th-stat">SPM</th>
+                </template>
+                <th v-if="activeView === 'graph'" class="th-timeline" ref="thTimelineRef">
                   <div class="timeline-axis">
                     <span v-for="h in 25" :key="h" class="axis-tick" :style="{ left: ((h - 1) / 24 * 100) + '%' }">
                       {{ String(h - 1).padStart(2, '0') }}
                     </span>
+                    <!-- Scrubber handle -->
+                    <div
+                      class="scrubber-handle"
+                      :style="{ left: scrubberFractionPct + '%' }"
+                      @mousedown.prevent="startDrag"
+                      @touchstart.prevent="startDrag"
+                      @dblclick="resetScrubberToLive"
+                    >
+                      <div class="scrubber-triangle">&#9661;</div>
+                      <div v-if="isDragging || scrubberFraction !== null" class="scrubber-time-label">{{ scrubberTimeLabel }}</div>
+                    </div>
                   </div>
                 </th>
               </tr>
@@ -172,6 +187,10 @@
                   <td>{{ machine.name }}</td>
                   <td>{{ machine.lot_no }}</td>
                 </template>
+                <template v-if="activeView === 'graph'">
+                  <td class="td-stat">{{ getStamped(machine.no) }}</td>
+                  <td class="td-stat">{{ getSPM(machine.no) }}</td>
+                </template>
                 <td v-if="activeView === 'graph'" class="td-timeline">
                   <div class="timeline-bar">
                     <template v-if="timelineData[machine.no]">
@@ -184,6 +203,7 @@
                       ></div>
                     </template>
                     <div v-else class="bar-seg" style="flex-basis:100%; background:#BDBDBD" title="データなし"></div>
+                    <div class="scrubber-cell-line" :style="{ left: scrubberFractionPct + '%' }"></div>
                   </div>
                 </td>
               </tr>
@@ -196,7 +216,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, nextTick, onMounted, watch } from 'vue'
+import { ref, reactive, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import api from '@/utils/api'
 
 const activeView = ref('data')
@@ -248,6 +268,7 @@ const LABELS = { green: '稼働中', yellow: 'チョコ停', red: 'ドカ停', g
 
 const timelineData = reactive({})
 const timelineSegments = reactive({})  // raw segments per machine (for SVG color)
+const rawEventsPerMachine = reactive({})  // { machineNo: [ts_ms, ...] sorted }
 
 function classify(ms) {
   if (ms < CHOKO) return 'green'
@@ -331,10 +352,12 @@ async function fetchTimeline(machineNo) {
       params: { start_ms: dayStart, end_ms: dayEnd, raspi_no: 'raspi_' + machineNo }
     })
     const events = data.events || []
+    rawEventsPerMachine[machineNo] = events
     const segs = buildSegments(events, dayStart, effEnd)
     timelineSegments[machineNo] = segs
     timelineData[machineNo] = toBarData(segs, dayStart, dayEnd)
   } catch {
+    rawEventsPerMachine[machineNo] = []
     timelineSegments[machineNo] = [{ s: dayStart, e: dayEnd, c: 'gray' }]
     timelineData[machineNo] = toBarData([{ s: dayStart, e: dayEnd, c: 'gray' }], dayStart, dayEnd)
   }
@@ -342,6 +365,109 @@ async function fetchTimeline(machineNo) {
 
 function fetchAllTimelines() {
   machineStatus.value.forEach(m => fetchTimeline(m.no))
+}
+
+// ============================================================
+// Scrubber state & Stamped / SPM
+// ============================================================
+const scrubberFraction = ref(null) // null = live mode, 0..1 = manual
+const isDragging = ref(false)
+const nowTick = ref(0)
+const thTimelineRef = ref(null)
+let tickInterval = null
+
+onMounted(() => {
+  tickInterval = setInterval(() => { nowTick.value++ }, 1000)
+})
+onUnmounted(() => { clearInterval(tickInterval) })
+
+function getCurrentTimeFraction() {
+  const d = new Date(graphDate.value)
+  d.setHours(0, 0, 0, 0)
+  const dayStart = d.getTime()
+  return Math.min(1, Math.max(0, (Date.now() - dayStart) / 86400000))
+}
+
+const scrubberFractionPct = computed(() => {
+  nowTick.value // touch for reactivity in live mode
+  const frac = scrubberFraction.value ?? getCurrentTimeFraction()
+  return frac * 100
+})
+
+const scrubberTimeMs = computed(() => {
+  nowTick.value
+  const d = new Date(graphDate.value)
+  d.setHours(0, 0, 0, 0)
+  const dayStart = d.getTime()
+  if (scrubberFraction.value === null) {
+    return Math.min(Date.now(), dayStart + 86400000)
+  }
+  return dayStart + scrubberFraction.value * 86400000
+})
+
+const scrubberTimeLabel = computed(() => {
+  const d = new Date(scrubberTimeMs.value)
+  return [d.getHours(), d.getMinutes(), d.getSeconds()]
+    .map(v => String(v).padStart(2, '0'))
+    .join(':')
+})
+
+// Binary search: count of events with ts <= timeMs
+function countEventsUpTo(events, timeMs) {
+  let lo = 0, hi = events.length
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1
+    if (events[mid] <= timeMs) lo = mid + 1
+    else hi = mid
+  }
+  return lo
+}
+
+function getStamped(machineNo) {
+  const events = rawEventsPerMachine[machineNo]
+  if (!events || !events.length) return 0
+  return countEventsUpTo(events, scrubberTimeMs.value)
+}
+
+function getSPM(machineNo) {
+  const events = rawEventsPerMachine[machineNo]
+  if (!events || !events.length) return 0
+  const t = scrubberTimeMs.value
+  return countEventsUpTo(events, t) - countEventsUpTo(events, t - 60001)
+}
+
+// Drag interaction
+function startDrag(e) {
+  isDragging.value = true
+  if (scrubberFraction.value === null) {
+    scrubberFraction.value = getCurrentTimeFraction()
+  }
+  document.addEventListener('mousemove', onDrag)
+  document.addEventListener('mouseup', stopDrag)
+  document.addEventListener('touchmove', onDrag)
+  document.addEventListener('touchend', stopDrag)
+}
+
+function onDrag(e) {
+  if (!thTimelineRef.value) return
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX
+  const rect = thTimelineRef.value.getBoundingClientRect()
+  const pad = 10 // td-timeline padding
+  const left = rect.left + pad
+  const width = rect.width - pad * 2
+  scrubberFraction.value = Math.max(0, Math.min(1, (clientX - left) / width))
+}
+
+function stopDrag() {
+  isDragging.value = false
+  document.removeEventListener('mousemove', onDrag)
+  document.removeEventListener('mouseup', stopDrag)
+  document.removeEventListener('touchmove', onDrag)
+  document.removeEventListener('touchend', stopDrag)
+}
+
+function resetScrubberToLive() {
+  scrubberFraction.value = null
 }
 
 // ============================================================
@@ -386,6 +512,7 @@ watch(activeView, (v) => {
 })
 
 watch(graphDate, () => {
+  scrubberFraction.value = null
   if (activeView.value === 'graph') {
     fetchAllTimelines()
   }
@@ -840,6 +967,7 @@ function selectRow(no) {
   overflow: hidden;
   background: #eee;
   border: 1px solid #ddd;
+  position: relative;
 }
 
 .bar-seg {
@@ -850,6 +978,59 @@ function selectRow(no) {
 
 .bar-seg:hover {
   opacity: 0.75;
+}
+
+/* ============================================================
+   Stamped / SPM stat columns
+   ============================================================ */
+.th-stat,
+.td-stat {
+  text-align: right;
+  white-space: nowrap;
+  min-width: 60px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   Scrubber
+   ============================================================ */
+.scrubber-handle {
+  position: absolute;
+  top: -2px;
+  transform: translateX(-50%);
+  cursor: ew-resize;
+  z-index: 5;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scrubber-triangle {
+  font-size: 14px;
+  line-height: 1;
+  color: #e53935;
+}
+
+.scrubber-time-label {
+  background: #333;
+  color: #fff;
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  margin-top: 1px;
+  pointer-events: none;
+}
+
+.scrubber-cell-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #e53935;
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* ============================================================
