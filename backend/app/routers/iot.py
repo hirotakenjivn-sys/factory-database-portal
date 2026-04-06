@@ -5,12 +5,14 @@ from sqlalchemy import select
 from ..database import get_db
 from ..models.iot_button_event import IotButtonEvent
 from ..models.iot_press_event import IotPressEvent
+from collections import defaultdict
 from ..schemas.iot import (
     IotButtonEventCreate,
     IotButtonEvent as IotButtonEventSchema,
     IotPressEventIn,
     IotPressEventOut,
     IotPressEventsResponse,
+    IotPressEventsBatchResponse,
     IotPressEventRaw,
 )
 
@@ -68,6 +70,28 @@ async def get_press_events(
     stmt = stmt.order_by(IotPressEvent.ts_ms.asc())
     rows = db.execute(stmt).scalars().all()
     return IotPressEventsResponse(events=list(rows))
+
+
+@router.get("/events/batch", response_model=IotPressEventsBatchResponse)
+async def get_press_events_batch(
+    start_ms: int = Query(..., description="開始タイムスタンプ (ms)"),
+    end_ms: int = Query(..., description="終了タイムスタンプ (ms)"),
+    db: Session = Depends(get_db),
+):
+    """
+    全マシンのプレスイベントを一括取得する (タイムライングラフ用)
+    """
+    stmt = (
+        select(IotPressEvent.raspi_no, IotPressEvent.ts_ms)
+        .where(IotPressEvent.ts_ms >= start_ms)
+        .where(IotPressEvent.ts_ms <= end_ms)
+        .order_by(IotPressEvent.ts_ms.asc())
+    )
+    rows = db.execute(stmt).all()
+    machines = defaultdict(list)
+    for raspi_no, ts_ms in rows:
+        machines[raspi_no].append(ts_ms)
+    return IotPressEventsBatchResponse(machines=dict(machines))
 
 
 @router.get("/events/raw", response_model=list[IotPressEventRaw])

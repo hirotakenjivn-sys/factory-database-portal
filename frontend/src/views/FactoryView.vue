@@ -342,7 +342,14 @@ function getSvgStatus(pressId) {
   return 'idle'
 }
 
-async function fetchTimeline(machineNo) {
+function processTimelineForMachine(machineNo, events, dayStart, dayEnd, effEnd) {
+  rawEventsPerMachine[machineNo] = events
+  const segs = buildSegments(events, dayStart, effEnd)
+  timelineSegments[machineNo] = segs
+  timelineData[machineNo] = toBarData(segs, dayStart, dayEnd)
+}
+
+async function fetchAllTimelines() {
   const target = new Date(graphDate.value)
   target.setHours(0, 0, 0, 0)
   const dayStart = target.getTime()
@@ -351,23 +358,20 @@ async function fetchTimeline(machineNo) {
   const effEnd = Math.min(dayEnd, now)
 
   try {
-    const { data } = await api.get('/iot/events', {
-      params: { start_ms: dayStart, end_ms: dayEnd, raspi_no: 'raspi_' + machineNo }
+    const { data } = await api.get('/iot/events/batch', {
+      params: { start_ms: dayStart, end_ms: dayEnd }
     })
-    const events = data.events || []
-    rawEventsPerMachine[machineNo] = events
-    const segs = buildSegments(events, dayStart, effEnd)
-    timelineSegments[machineNo] = segs
-    timelineData[machineNo] = toBarData(segs, dayStart, dayEnd)
+    const machines = data.machines || {}
+    machineStatus.value.forEach(m => {
+      const raspiKey = 'raspi_' + m.no
+      const events = machines[raspiKey] || []
+      processTimelineForMachine(m.no, events, dayStart, dayEnd, effEnd)
+    })
   } catch {
-    rawEventsPerMachine[machineNo] = []
-    timelineSegments[machineNo] = [{ s: dayStart, e: dayEnd, c: 'gray' }]
-    timelineData[machineNo] = toBarData([{ s: dayStart, e: dayEnd, c: 'gray' }], dayStart, dayEnd)
+    machineStatus.value.forEach(m => {
+      processTimelineForMachine(m.no, [], dayStart, dayEnd, effEnd)
+    })
   }
-}
-
-function fetchAllTimelines() {
-  machineStatus.value.forEach(m => fetchTimeline(m.no))
 }
 
 // ============================================================

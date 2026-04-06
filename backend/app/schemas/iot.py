@@ -41,6 +41,10 @@ class IotPressEventsResponse(BaseModel):
     events: list[int]
 
 
+class IotPressEventsBatchResponse(BaseModel):
+    machines: dict[str, list[int]]
+
+
 class IotPressEventRaw(BaseModel):
     id: int
     ts_ms: int
