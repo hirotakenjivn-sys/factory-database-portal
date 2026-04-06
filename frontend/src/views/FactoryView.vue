@@ -328,6 +328,15 @@ function getColorAtTime(machineNo, timeMs) {
       return seg.c
     }
   }
+  // timeMs is beyond the last segment (live mode advancing past fetch time)
+  // Classify based on gap from the last event
+  const events = rawEventsPerMachine[machineNo]
+  if (events && events.length) {
+    const lastEvent = events[events.length - 1]
+    if (timeMs > lastEvent) {
+      return classify(timeMs - lastEvent)
+    }
+  }
   return null
 }
 
