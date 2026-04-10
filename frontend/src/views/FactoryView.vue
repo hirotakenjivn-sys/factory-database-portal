@@ -273,6 +273,7 @@ const LABELS = { green: '稼働中', yellow: 'チョコ停', red: 'ドカ停', g
 const timelineData = reactive({})
 const timelineSegments = reactive({})  // raw segments per machine (for SVG color)
 const rawEventsPerMachine = reactive({})  // { machineNo: [ts_ms, ...] sorted }
+const lastFetchTime = ref(0)
 
 function classify(ms) {
   if (ms < CHOKO) return 'green'
@@ -340,15 +341,29 @@ function getColorAtTime(machineNo, timeMs) {
   return null
 }
 
-function getSvgStatus(pressId) {
-  if (activeView.value !== 'graph') return pressStatus[pressId]
-  const no = pressIdToNo(pressId)
-  const color = getColorAtTime(no, scrubberTimeMs.value)
+function colorToStatus(color) {
   if (!color) return 'idle'
   if (color === 'green') return 'running'
   if (color === 'yellow') return 'warning'
   if (color === 'red') return 'error'
   return 'idle'
+}
+
+function getSvgStatus(pressId) {
+  if (activeView.value !== 'graph') return pressStatus[pressId]
+  const no = pressIdToNo(pressId)
+
+  // Live mode: judge based on lastFetchTime (absorbs raspi batch send lag)
+  if (scrubberFraction.value === null) {
+    const events = rawEventsPerMachine[no]
+    if (!events || !events.length || !lastFetchTime.value) return 'idle'
+    const idx = countEventsUpTo(events, lastFetchTime.value) - 1
+    if (idx < 0) return 'idle'
+    return colorToStatus(classify(lastFetchTime.value - events[idx]))
+  }
+
+  // Manual scrubber: use existing segment-based lookup
+  return colorToStatus(getColorAtTime(no, scrubberTimeMs.value))
 }
 
 function processTimelineForMachine(machineNo, events, dayStart, dayEnd, effEnd) {
@@ -376,10 +391,31 @@ async function fetchAllTimelines() {
       const events = machines[raspiKey] || []
       processTimelineForMachine(m.no, events, dayStart, dayEnd, effEnd)
     })
+    lastFetchTime.value = Date.now()
   } catch {
     machineStatus.value.forEach(m => {
       processTimelineForMachine(m.no, [], dayStart, dayEnd, effEnd)
     })
+  }
+}
+
+// ============================================================
+// Polling (ライブ更新: 30秒ごとにバッチAPI再取得)
+// ============================================================
+const POLL_INTERVAL_MS = 30000
+let pollInterval = null
+
+function startPolling() {
+  stopPolling()
+  if (activeView.value === 'graph' && isGraphToday.value) {
+    pollInterval = setInterval(() => fetchAllTimelines(), POLL_INTERVAL_MS)
+  }
+}
+
+function stopPolling() {
+  if (pollInterval) {
+    clearInterval(pollInterval)
+    pollInterval = null
   }
 }
 
@@ -409,7 +445,10 @@ function updateOverlayRect() {
 onMounted(() => {
   tickInterval = setInterval(() => { nowTick.value++ }, 1000)
 })
-onUnmounted(() => { clearInterval(tickInterval) })
+onUnmounted(() => {
+  clearInterval(tickInterval)
+  stopPolling()
+})
 
 function getCurrentTimeFraction() {
   const d = new Date(graphDate.value)
@@ -456,13 +495,16 @@ function countEventsUpTo(events, timeMs) {
 function getStamped(machineNo) {
   const events = rawEventsPerMachine[machineNo]
   if (!events || !events.length) return 0
-  return countEventsUpTo(events, scrubberTimeMs.value)
+  const t = scrubberFraction.value === null ? lastFetchTime.value : scrubberTimeMs.value
+  if (!t) return 0
+  return countEventsUpTo(events, t)
 }
 
 function getSPM(machineNo) {
   const events = rawEventsPerMachine[machineNo]
   if (!events || !events.length) return 0
-  const t = scrubberTimeMs.value
+  const t = scrubberFraction.value === null ? lastFetchTime.value : scrubberTimeMs.value
+  if (!t) return 0
   return countEventsUpTo(events, t) - countEventsUpTo(events, t - 60001)
 }
 
@@ -539,6 +581,9 @@ watch(activeView, (v) => {
     fetchAllTimelines()
     scrubberFraction.value = null
     nextTick(() => updateOverlayRect())
+    startPolling()
+  } else {
+    stopPolling()
   }
   if (v === 'api') {
     fetchRawEvents()
@@ -549,6 +594,7 @@ watch(graphDate, () => {
   scrubberFraction.value = null
   if (activeView.value === 'graph') {
     fetchAllTimelines()
+    startPolling()  // restart based on isGraphToday (no-op if past date)
   }
 })
 
